@@ -9,6 +9,7 @@ import { loadMemory, saveMemory } from "@/lib/workspace/memory";
 import { todayStamp } from "@/lib/workspace/updates";
 import { loadMdvWasm } from "@/lib/geometry/mdv-wasm";
 import { useAgentSend } from "@/lib/workspace/use-agent-send";
+import { SupportOverlay } from "@/components/forge/support-overlay";
 
 function isLiveFloor() {
   if (typeof window === "undefined") return false;
@@ -60,6 +61,7 @@ export function HxApp() {
     <>
       <HxSessionFrame />
       <HxIde onSend={(t) => void send(t)} error={error} onBack={() => setReady(false)} />
+      <SupportOverlay />
     </>
   );
 }

@@ -8,9 +8,10 @@ import { isHelloJob, localApply } from "@/lib/workspace/local-job";
 import { yieldToDevice } from "@/lib/hx/session";
 import { recordHxJob } from "@/lib/superset/record";
 import { writeEpisode } from "@/lib/memory/warehouse";
-import { workingPack } from "@/lib/geometry/lattice";
+import { workingPack } from "@/lib/geometry/ontology";
 import { packFiles, statsOf } from "@/lib/geopack/volume";
 import { saveVolume } from "@/lib/geopack/persist";
+import { critique, learnFromTurn, valueLessons } from "@/lib/align/cai";
 
 export function useAgentSend(voice: "hector" | "hx" = "hx") {
   const software = useForgeStore((s) => s.software);
@@ -137,7 +138,8 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         voice === "hector" ? "Host: Hector Build. Coding floor: Spectral HX. Parallel bots." : "Parallel Spectral HX lanes.",
         repo ? `Granted repo: ${repo}` : "Granted local workspace.",
         software.length ? `Approved software: ${software.join(", ")}` : "",
-        pack.paths.length ? `Lattice working set: ${pack.paths.join(", ")}` : "",
+        pack.paths.length ? `Observed set: ${pack.paths.join(", ")}` : "",
+        pack.geo ? pack.geo : "",
         pack.text ? `Lattice chunks:\n${pack.text}` : "",
       ]
         .filter(Boolean)
@@ -147,7 +149,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         voice,
         files: snap,
         history,
-        lessons: store.memory.lessons,
+        lessons: [...store.memory.lessons, ...valueLessons()],
         visitorKey: store.visitorKey || undefined,
         baseUrl: store.baseUrl,
         model: store.model,
@@ -200,6 +202,14 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
       if (tests.length && tests.every((t) => t.pass)) useForgeStore.getState().markChip(true);
       useForgeStore.getState().setPhase("review");
       const nextFail = tests.filter((t) => t.pass === false).length;
+      const cai = critique({
+        reply,
+        fail: nextFail,
+        traces,
+        diffs: useForgeStore.getState().diffs,
+      });
+      learnFromTurn({ user: prompt, reply, fail: nextFail, critique: cai });
+      if (!cai.ok) useForgeStore.getState().remember(cai.violations[0] ?? "Stay inside the constitution.");
       useForgeStore.getState().setStatus(nextFail ? `${nextFail} check(s) still failing.` : "Parallel bots complete.");
       void recordHxJob({
         data: {

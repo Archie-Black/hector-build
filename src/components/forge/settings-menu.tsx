@@ -3,18 +3,26 @@ import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OsWindow } from "@/components/forge/os-window";
 import { useForgeStore } from "@/lib/forge-store";
-import { ANDROID_STUDIO, UE_DOWNLOAD, VS_DOWNLOAD } from "@/lib/workspace/platform";
 import { CHAT_PROVIDERS, type ChatProviderId } from "@/lib/workspace/providers";
 import { isApiKey } from "@/lib/workspace/keys";
+import { VaultPanel } from "@/components/forge/vault-panel";
+import { GuestPanel } from "@/components/forge/guest-panel";
+import { CREDIT, DISCLAIMER, FREE_API_URL, FREE_LINE, ONE_MAN, SUPPORT_EMAIL } from "@/lib/legal/copy";
+import { loadSession } from "@/lib/auth/local-account";
+import { requestSupport } from "@/lib/support/session";
+import { sfx } from "@/lib/sfx/hector";
 
-const TABS = ["Look", "Chatbot", "Agent", "Updates", "About"] as const;
+const TABS = ["Look", "Chatbot", "Agent", "Updates", "Vault", "Guest", "About"] as const;
 
 export function SettingsButton() {
   return (
     <button
       type="button"
       className="flex size-11 items-center justify-center rounded-md text-muted"
-      onClick={() => useForgeStore.getState().setSettingsOpen(true)}
+      onClick={() => {
+        sfx.click();
+        useForgeStore.getState().setSettingsOpen(true);
+      }}
       aria-label="Settings"
     >
       <Settings className="size-4" />
@@ -24,14 +32,12 @@ export function SettingsButton() {
 
 export function SettingsPanel() {
   const theme = useForgeStore((s) => s.theme);
-  const platform = useForgeStore((s) => s.platform);
   const spendCap = useForgeStore((s) => s.spendCap);
   const allowlist = useForgeStore((s) => s.allowlist);
   const updates = useForgeStore((s) => s.updates);
   const providerId = useForgeStore((s) => s.providerId);
   const baseUrl = useForgeStore((s) => s.baseUrl);
   const model = useForgeStore((s) => s.model);
-  const desktop = platform === "desktop";
   const [tab, setTab] = useState<(typeof TABS)[number]>("Look");
   const [path, setPath] = useState("");
   const [key, setKey] = useState("");
@@ -215,28 +221,35 @@ export function SettingsPanel() {
             )}
           </>
         ) : null}
+        {tab === "Vault" ? <VaultPanel /> : null}
+        {tab === "Guest" ? <GuestPanel /> : null}
         {tab === "About" ? (
           <>
             <p className="text-sm">Hector Build · Spectral HX</p>
-            <p className="mt-2 text-sm text-muted text-pretty">
-              Platform locked: {platform}. Black and cobalt, frosted glass. Coding floor talks to any
-              OpenAI-compatible chatbot, including local loopback (Ollama, LM Studio).
-            </p>
-            {desktop ? (
-              <div className="mt-3 space-y-2">
-                <a href={UE_DOWNLOAD} target="_blank" rel="noreferrer" className="flex h-11 items-center justify-center rounded-md glass-thin text-sm">
-                  Unreal Engine 5.8
-                </a>
-                <a href={VS_DOWNLOAD} target="_blank" rel="noreferrer" className="flex h-11 items-center justify-center rounded-md glass-thin text-sm">
-                  Visual Studio
-                </a>
-              </div>
-            ) : (
-              <a href={ANDROID_STUDIO} target="_blank" rel="noreferrer" className="mt-3 flex h-11 items-center justify-center rounded-md glass-thin text-sm">
-                Android Studio
+            <p className="mt-2 text-sm text-pass text-pretty">{FREE_LINE}</p>
+            <a href={FREE_API_URL} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-accent">
+              Get a free Groq API key
+            </a>
+            <p className="mt-4 text-sm text-muted text-pretty">{ONE_MAN}</p>
+            <p className="mt-4 text-xs text-subtle text-pretty">{DISCLAIMER}</p>
+            <p className="mt-4 text-sm">
+              Tech support:{" "}
+              <a href={"mailto:" + SUPPORT_EMAIL} className="text-accent">
+                {SUPPORT_EMAIL}
               </a>
-            )}
-            <p className="mt-6 text-xs tracking-[0.14em] text-subtle uppercase">By DeltaKingZero</p>
+            </p>
+            <Button
+              type="button"
+              className="mt-3"
+              onClick={() => {
+                const email = loadSession()?.email || "user@local";
+                void requestSupport(email);
+                useForgeStore.getState().setStatus("Support requested. Approve the connect when it arrives.");
+              }}
+            >
+              Request support
+            </Button>
+            <p className="mt-6 text-xs tracking-[0.14em] text-subtle uppercase">{CREDIT}</p>
           </>
         ) : null}
       </div>

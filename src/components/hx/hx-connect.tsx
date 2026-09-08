@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/forge/back-button";
@@ -6,6 +6,9 @@ import { SpectreStage } from "@/components/forge/spectre-stage";
 import { useForgeStore } from "@/lib/forge-store";
 import { isApiKey } from "@/lib/workspace/keys";
 import { CHAT_PROVIDERS, type ChatProviderId } from "@/lib/workspace/providers";
+import { loadSession, sessionIsVerified, signIn } from "@/lib/auth/local-account";
+import { scanEnvironment, scanLines, type EnvScan } from "@/lib/hw/env-scan";
+import { lockPlatform } from "@/lib/workspace/platform";
 
 type Props = {
   onReady: () => void;
@@ -20,8 +23,19 @@ export function HxConnect({ onReady }: Props) {
   const [model, setModel] = useState(useForgeStore.getState().model || preset.model);
   const [key, setKey] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState(loadSession()?.email ?? "");
+  const [password, setPassword] = useState("");
+  const [authed, setAuthed] = useState(sessionIsVerified());
+  const [scan, setScan] = useState<EnvScan | null>(null);
   const ownerReady = useForgeStore((s) => s.ownerReady);
   const haveKey = isApiKey(useForgeStore((s) => s.visitorKey));
+
+  useEffect(() => {
+    void scanEnvironment().then((env) => {
+      setScan(env);
+      lockPlatform(env.platform);
+    });
+  }, []);
 
   function pick(next: ChatProviderId) {
     const p = CHAT_PROVIDERS.find((x) => x.id === next)!;
@@ -54,8 +68,45 @@ export function HxConnect({ onReady }: Props) {
         <SpectreStage busy={false} ghosts={3} />
         <h1 className="mt-5 text-center text-3xl font-medium tracking-tight">Spectral HX</h1>
         <p className="mt-2 text-center text-sm text-muted text-pretty">
-          Coding floor. Works with any OpenAI-compatible chatbot. Connect once, then just talk.
+          Coding floor. Maps this machine, then talks to any chatbot.
         </p>
+        {scan ? (
+          <p className="mt-3 text-center font-mono text-[10px] text-subtle">{scanLines(scan).slice(0, 3).join(" · ")}</p>
+        ) : (
+          <p className="mt-3 text-center text-xs text-subtle">Scanning hardware…</p>
+        )}
+        {!authed ? (
+          <form
+            className="mt-5 flex flex-col gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void signIn(email, password)
+                .then(() => setAuthed(true))
+                .catch((err: Error) => setError(err.message));
+            }}
+          >
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Any email"
+              className="h-11 rounded-md bg-inset px-3 text-sm"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="h-11 rounded-md bg-inset px-3 text-sm"
+            />
+            <Button type="submit" className="h-12 w-full">
+              Log in
+            </Button>
+            <p className="text-center text-xs text-subtle">Create an account on Hector first. Email must be verified.</p>
+          </form>
+        ) : null}
+        {authed ? (
+        <>
         <p className="mt-5 text-xs tracking-[0.14em] text-subtle uppercase">Chatbot</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {CHAT_PROVIDERS.map((p) => (
@@ -103,6 +154,8 @@ export function HxConnect({ onReady }: Props) {
         <Button type="button" className="mt-5 h-12 w-full" onClick={connect}>
           Start building
         </Button>
+        </>
+        ) : null}
       </div>
       </div>
     </div>

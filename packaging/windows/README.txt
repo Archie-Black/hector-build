@@ -1,15 +1,22 @@
 Hector Build + Spectral HX — Windows
 ====================================
 
-Double-click these .exe files (not the .bat files):
+Spectral HX is a desktop IDE (VS Code chrome: Monaco editor, Git, debug,
+terminal, extensions) plus Hector host chat.
 
-  HectorBuild-Setup.exe      first-time install (uses WSL, installs Node 22 into the app)
+Native (no WSL, Electron):
+  npm install
+  npm run desktop:hx
+
+Or double-click after Setup:
+
+  HectorBuild-Setup.exe      first-time install
   HectorBuild.exe            host window
   SpectralHX.exe             coding floor
-  HectorBuild-Uninstall.exe  remove
 
-Needs Windows 10/11 on NTFS, WSL (Ubuntu), Chrome or Edge.
+Node 22 is bundled in runtime/node.
 
-Node 22 is bundled inside the app at runtime/node. You do not install Node yourself.
+WSL is optional (Linux tools). The IDE itself is native Chromium + Node.
 
-If WSL is missing, Setup tells you to run:  wsl --install
+npm run desktop:win   → Windows zip
+npm run desktop:linux → AppImage + deb

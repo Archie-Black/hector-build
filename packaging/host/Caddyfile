@@ -1,0 +1,105 @@
+# Hector Build · doomchat.ca
+# One VPS. Caddy terminates TLS.
+#
+# DNS A records → this box:
+#   @  www  hx  y  files  updates  chat  matrix
+#
+# Local services:
+#   127.0.0.1:8080  Hector Build + Spectral HX
+#   127.0.0.1:4000  y.doomchat.ca social
+#   127.0.0.1:8090  file share
+#   127.0.0.1:6167  Matrix (conduwuit)
+
+{
+	email admin@doomchat.ca
+}
+
+(proxy) {
+	header_up Host {host}
+	header_up X-Forwarded-For {remote_host}
+	header_up X-Forwarded-Proto {scheme}
+	header_up X-Real-IP {remote_host}
+	header_up Upgrade {http.request.header.Upgrade}
+	header_up Connection {http.request.header.Connection}
+	flush_interval -1
+	transport http {
+		read_timeout 0
+		write_timeout 0
+		versions 1.1 2
+	}
+}
+
+doomchat.ca {
+	redir https://www.doomchat.ca{uri} permanent
+}
+
+www.doomchat.ca {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:8080 {
+		import proxy
+	}
+}
+
+hx.doomchat.ca {
+	encode gzip zstd
+	@root path /
+	redir @root /hx
+	reverse_proxy 127.0.0.1:8080 {
+		import proxy
+	}
+}
+
+y.doomchat.ca {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:4000 {
+		import proxy
+	}
+}
+
+files.doomchat.ca {
+	encode gzip zstd
+	@share {
+		not path /healthz
+	}
+	reverse_proxy @share 127.0.0.1:8090 {
+		import proxy
+		fail_duration 10s
+		max_fails 2
+		lb_try_duration 2s
+	}
+	handle_errors {
+		root * /var/lib/hector/share
+		file_server browse
+	}
+}
+
+updates.doomchat.ca {
+	encode gzip
+	rewrite * /updates.json
+	reverse_proxy 127.0.0.1:8080 {
+		import proxy
+	}
+	header Access-Control-Allow-Origin *
+	header Cache-Control "public, max-age=60"
+}
+
+chat.doomchat.ca {
+	encode gzip zstd
+	handle /_matrix/* {
+		reverse_proxy 127.0.0.1:6167 {
+			import proxy
+		}
+	}
+	handle {
+		root * /var/lib/hector/element
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+matrix.doomchat.ca {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:6167 {
+		import proxy
+	}
+}

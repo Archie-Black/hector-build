@@ -1,0 +1,1 @@
+class Optional{static from(t){return t&&Some.of(t)||None}map(t){return this}flatMap(t){return this}fold({none:t}){return t&&t()}}class Some extends Optional{constructor(t){super(),this.value=t}map(t){return Some.of(t(this.value))}flatMap(t){return t(this.value)}fold({some:t}){return t&&t(this.value)}static of(t){return new Some(t)}}const None=new Optional;

@@ -1,0 +1,18 @@
+{
+  "app": "hector-build",
+  "channel": "stable",
+  "url": "https://www.doomchat.ca/updates.json",
+  "files": "https://files.doomchat.ca",
+  "social": "https://y.doomchat.ca",
+  "releases": [
+    {
+      "id": "2026-09-08",
+      "summary": "Login, geometric PQC vault, Asimov keel, hardware scan.",
+      "lessons": [
+        "Be good. Be better. Never give up.",
+        "Asimov first.",
+        "Host updates from doomchat.ca."
+      ]
+    }
+  ]
+}

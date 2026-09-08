@@ -1,0 +1,16 @@
+[global]
+server_name = "doomchat.ca"
+database_path = "/workspace/data/matrix/db"
+database_backend = "rocksdb"
+address = ["127.0.0.1"]
+port = 6167
+allow_registration = true
+registration_token = "hector-doomchat"
+allow_federation = false
+allow_guest_registration = true
+allow_check_for_updates = false
+trusted_servers = []
+
+[global.well_known]
+client = "http://127.0.0.1:6167"
+server = "doomchat.ca:443"

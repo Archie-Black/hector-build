@@ -10,22 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as BiRouteImport } from './routes/bi'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as DownloadsRouteImport } from './routes/downloads'
 import { Route as HxRouteImport } from './routes/hx'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as SandboxRouteImport } from './routes/sandbox'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as ApiRtcRouteImport } from './routes/api/rtc'
 import { Route as ApiShareRouteImport } from './routes/api/share'
 import { Route as HxSessionRouteImport } from './routes/hx.session'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BiRoute = BiRouteImport.update({
   id: '/bi',
   path: '/bi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DownloadsRoute = DownloadsRouteImport.update({
@@ -38,9 +53,19 @@ const HxRoute = HxRouteImport.update({
   path: '/hx',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SandboxRoute = SandboxRouteImport.update({
   id: '/sandbox',
   path: '/sandbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRtcRoute = ApiRtcRouteImport.update({
@@ -58,79 +83,119 @@ const HxSessionRoute = HxSessionRouteImport.update({
   path: '/session',
   getParentRoute: () => HxRoute,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bi': typeof BiRoute
+  '/chat': typeof ChatRoute
   '/downloads': typeof DownloadsRoute
   '/hx': typeof HxRouteWithChildren
+  '/login': typeof LoginRoute
   '/sandbox': typeof SandboxRoute
+  '/verify': typeof VerifyRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/share': typeof ApiShareRoute
   '/hx/session': typeof HxSessionRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bi': typeof BiRoute
+  '/chat': typeof ChatRoute
   '/downloads': typeof DownloadsRoute
   '/hx': typeof HxRouteWithChildren
+  '/login': typeof LoginRoute
   '/sandbox': typeof SandboxRoute
+  '/verify': typeof VerifyRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/share': typeof ApiShareRoute
   '/hx/session': typeof HxSessionRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/bi': typeof BiRoute
+  '/chat': typeof ChatRoute
   '/downloads': typeof DownloadsRoute
   '/hx': typeof HxRouteWithChildren
+  '/login': typeof LoginRoute
   '/sandbox': typeof SandboxRoute
+  '/verify': typeof VerifyRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/share': typeof ApiShareRoute
   '/hx/session': typeof HxSessionRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/bi'
+    | '/chat'
     | '/downloads'
     | '/hx'
+    | '/login'
     | '/sandbox'
+    | '/verify'
     | '/api/rtc'
     | '/api/share'
     | '/hx/session'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/bi'
+    | '/chat'
     | '/downloads'
     | '/hx'
+    | '/login'
     | '/sandbox'
+    | '/verify'
     | '/api/rtc'
     | '/api/share'
     | '/hx/session'
+    | '/api/auth/$'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/bi'
+    | '/chat'
     | '/downloads'
     | '/hx'
+    | '/login'
     | '/sandbox'
+    | '/verify'
     | '/api/rtc'
     | '/api/share'
     | '/hx/session'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   BiRoute: typeof BiRoute
+  ChatRoute: typeof ChatRoute
   DownloadsRoute: typeof DownloadsRoute
   HxRoute: typeof HxRouteWithChildren
+  LoginRoute: typeof LoginRoute
   SandboxRoute: typeof SandboxRoute
+  VerifyRoute: typeof VerifyRoute
   ApiRtcRoute: typeof ApiRtcRoute
   ApiShareRoute: typeof ApiShareRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -142,11 +207,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bi': {
       id: '/bi'
       path: '/bi'
       fullPath: '/bi'
       preLoaderRoute: typeof BiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/downloads': {
@@ -163,11 +242,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HxRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sandbox': {
       id: '/sandbox'
       path: '/sandbox'
       fullPath: '/sandbox'
       preLoaderRoute: typeof SandboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/rtc': {
@@ -191,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HxSessionRouteImport
       parentRoute: typeof HxRoute
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -206,12 +306,17 @@ const HxRouteWithChildren = HxRoute._addFileChildren(HxRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   BiRoute: BiRoute,
+  ChatRoute: ChatRoute,
   DownloadsRoute: DownloadsRoute,
   HxRoute: HxRouteWithChildren,
+  LoginRoute: LoginRoute,
   SandboxRoute: SandboxRoute,
+  VerifyRoute: VerifyRoute,
   ApiRtcRoute: ApiRtcRoute,
   ApiShareRoute: ApiShareRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

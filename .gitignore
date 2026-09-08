@@ -17,3 +17,6 @@ public/downloads/
 .env.*
 *.log
 .DS_Store
+data/guest/
+data/matrix/
+data/mail/

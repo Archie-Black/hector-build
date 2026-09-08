@@ -23,11 +23,15 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "rust:build": "cargo build --release --manifest-path crates/hx-vector/Cargo.toml && cargo build --release --target wasm32-unknown-unknown --manifest-path crates/hx-vector/Cargo.toml && mkdir -p packaging/linux/bin public && cp crates/hx-vector/target/release/hx-search packaging/linux/bin/hx-search && cp crates/hx-vector/target/wasm32-unknown-unknown/release/hx_vector.wasm public/hx-vector.wasm",
-    "desktop": "npx --yes electron desktop/main.mjs"
+    "desktop": "electron desktop/main.mjs",
+    "desktop:hx": "electron desktop/main.mjs --hx",
+    "desktop:linux": "electron-builder --linux AppImage deb",
+    "desktop:win": "electron-builder --win zip"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
     "@hookform/resolvers": "^5.7.0",
+    "@noble/post-quantum": "^0.7.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -57,15 +61,20 @@
     "@tanstack/react-start": "^1.168.0",
     "@tanstack/react-table": "^8.21.0",
     "@tanstack/router-plugin": "^1.168.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
     "better-auth": "~1.6.30",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.0.0",
+    "isomorphic-git": "^1.41.9",
     "jose": "6.2.9",
     "kysely": "^0.28.5",
     "lucide-react": "^0.510.0",
+    "monaco-editor": "^0.56.0",
     "pg": "^8.16.3",
+    "qrcode": "^1.5.4",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",
@@ -86,11 +95,14 @@
     "@eslint/js": "^9.20.0",
     "@types/node": "^22.16.5",
     "@types/pg": "^8.11.10",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@types/ssh2": "^1.15.6",
     "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^37.10.3",
+    "electron-builder": "^26.15.3",
     "eslint": "^9.20.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",
@@ -104,5 +116,36 @@
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.2.0"
+  },
+  "main": "desktop/main.mjs",
+  "build": {
+    "appId": "ca.doomchat.hector-build",
+    "productName": "Hector Build",
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "files": [
+      "desktop/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "public/hector",
+        "to": "hector"
+      }
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Development"
+    },
+    "win": {
+      "target": [
+        "zip"
+      ],
+      "signAndEditExecutable": false
+    }
   }
 }

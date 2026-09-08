@@ -1,32 +1,63 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell } from "electron";
+import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(HERE, "..");
 const PORT = process.env.HECTOR_PORT || "8080";
 const ORIGIN = `http://127.0.0.1:${PORT}`;
+
+nativeTheme.themeSource = "dark";
 
 /** @type {BrowserWindow | null} */
 let hector = null;
 /** @type {BrowserWindow | null} */
 let hx = null;
 
+function chrome(kind) {
+  const hxWin = kind === "hx";
+  return new BrowserWindow({
+    width: hxWin ? 1440 : 1280,
+    height: hxWin ? 920 : 860,
+    minWidth: 900,
+    minHeight: 600,
+    title: hxWin ? "Spectral HX" : "Hector Build",
+    backgroundColor: "#000000",
+    show: false,
+    autoHideMenuBar: false,
+    titleBarStyle: "hidden",
+    titleBarOverlay: {
+      color: "#000000",
+      symbolColor: "#6ea8ff",
+      height: 36,
+    },
+    webPreferences: {
+      preload: join(HERE, "preload.mjs"),
+      contextIsolation: true,
+      sandbox: false,
+      nodeIntegration: false,
+    },
+    icon: join(ROOT, "public/hector", hxWin ? "agent-v2.png" : "hector-v2.png"),
+  });
+}
+
 function openHector() {
   if (hector && !hector.isDestroyed()) {
     hector.focus();
     return hector;
   }
-  hector = new BrowserWindow({
-    width: 1280,
-    height: 860,
-    minWidth: 720,
-    minHeight: 520,
-    title: "Hector Build",
-    backgroundColor: "#000000",
-    autoHideMenuBar: true,
-    webPreferences: { sandbox: true },
-  });
-  hector.loadURL(`${ORIGIN}/?house=1`);
+  hector = chrome("hector");
+  hector.once("ready-to-show", () => hector?.show());
+  void hector.loadURL(`${ORIGIN}/?house=1`);
   hector.webContents.setWindowOpenHandler(({ url }) => {
     if (url.includes("/hx")) {
       queueMicrotask(() => openHx());
+      return { action: "deny" };
+    }
+    if (url.startsWith("http")) {
+      void shell.openExternal(url);
       return { action: "deny" };
     }
     return { action: "allow" };
@@ -42,24 +73,62 @@ function openHx() {
     hx.focus();
     return hx;
   }
-  hx = new BrowserWindow({
-    width: 1100,
-    height: 800,
-    minWidth: 640,
-    minHeight: 480,
-    title: "Spectral HX",
-    backgroundColor: "#000000",
-    autoHideMenuBar: true,
-    webPreferences: { sandbox: true },
-  });
-  hx.loadURL(`${ORIGIN}/hx?live=1`);
+  hx = chrome("hx");
+  hx.once("ready-to-show", () => hx?.show());
+  void hx.loadURL(`${ORIGIN}/hx?live=1`);
   hx.on("closed", () => {
     hx = null;
   });
   return hx;
 }
 
-app.whenReady().then(() => {
+function ping() {
+  return fetch(`${ORIGIN}/`).then((r) => r.ok).catch(() => false);
+}
+
+async function ensureServer() {
+  if (await ping()) return true;
+  const npm = existsSync(join(ROOT, "runtime/node/bin/npm"))
+    ? join(ROOT, "runtime/node/bin/npm")
+    : "npm";
+  const child = spawn(npm, ["run", "dev"], {
+    cwd: ROOT,
+    env: { ...process.env, PORT, PATH: `${join(ROOT, "runtime/node/bin")}:${process.env.PATH || ""}` },
+    stdio: "ignore",
+    detached: true,
+  });
+  child.unref();
+  const start = Date.now();
+  while (Date.now() - start < 25000) {
+    if (await ping()) return true;
+    await new Promise((r) => setTimeout(r, 400));
+  }
+  return false;
+}
+
+app.whenReady().then(async () => {
+  ipcMain.handle("desktop:open-hx", () => openHx());
+  ipcMain.handle("desktop:open-amp", () => {
+    const w = hector && !hector.isDestroyed() ? hector : openHector();
+    void w.loadURL(`${ORIGIN}/?house=1`);
+    return true;
+  });
+  Menu.setApplicationMenu(
+    Menu.buildFromTemplate([
+      { role: "fileMenu" },
+      { role: "editMenu" },
+      { role: "viewMenu" },
+      {
+        label: "Hector",
+        submenu: [
+          { label: "Hector Build", click: () => openHector() },
+          { label: "Spectral HX", click: () => openHx() },
+        ],
+      },
+      { role: "windowMenu" },
+    ]),
+  );
+  await ensureServer();
   const which = process.argv.includes("--hx") ? "hx" : "hector";
   if (which === "hx") openHx();
   else openHector();

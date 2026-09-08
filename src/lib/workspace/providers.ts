@@ -32,7 +32,7 @@ export const CHAT_PROVIDERS: ChatProvider[] = [
     baseUrl: "https://api.groq.com/openai/v1",
     model: "llama-3.3-70b-versatile",
     keysUrl: "https://console.groq.com/keys",
-    hint: "Create a key at console.groq.com/keys. OpenAI-compatible endpoint.",
+    hint: "Best free API key for this app. Create one at console.groq.com/keys. OpenAI-compatible.",
   },
   {
     id: "openrouter",

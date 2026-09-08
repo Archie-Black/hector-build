@@ -1,0 +1,18 @@
+{
+  "default_server_config": {
+    "m.homeserver": {
+      "base_url": "http://127.0.0.1:6167",
+      "server_name": "doomchat.ca"
+    }
+  },
+  "brand": "Doomchat",
+  "disable_custom_urls": false,
+  "disable_guests": false,
+  "disable_3pid_login": true,
+  "default_theme": "dark",
+  "default_country_code": "CA",
+  "show_labs_settings": true,
+  "setting_defaults": {
+    "language": "en"
+  }
+}

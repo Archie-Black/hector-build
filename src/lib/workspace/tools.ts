@@ -1,6 +1,7 @@
 import { applyUnifiedDiff, PatchError } from "./patch";
 import { grepFiles, globFiles, listFilePaths } from "./search";
 import { executeLattice } from "@/lib/geometry/lattice";
+import { observe, ontologyLine } from "@/lib/geometry/ontology";
 import { runWorkspaceTests } from "./run-tests";
 import { normalizePath, pathAllowed } from "./acl";
 import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
@@ -50,16 +51,20 @@ export function executeTool(
       const hits = grepFiles(files, query, Boolean(args.regex));
       return ok(files, name, hits, `${hits.length} hit(s)`);
     }
-    case "lattice_search": {
+    case "lattice_search":
+    case "observe": {
       const query = String(args.query ?? "");
-      const found = executeLattice(files, query, 8);
-      const payload = found.hits.map((h) => ({
-        path: h.path,
-        offset: h.offset,
-        score: Number(h.score.toFixed(4)),
-        text: h.text.slice(0, 280),
-      }));
-      return ok(files, name, payload, `${payload.length} lattice hit(s)`);
+      const found = observe(files, query, 8);
+      const payload = {
+        geo: ontologyLine(found.phase),
+        hits: found.phase.amplitudes.map((h) => ({
+          path: h.path,
+          offset: h.offset,
+          amp: h.amp,
+          text: h.text.slice(0, 280),
+        })),
+      };
+      return ok(files, name, payload, `${payload.hits.length} observed · ${payload.geo}`);
     }
     case "read_file": {
       const path = normalizePath(String(args.path ?? ""));

@@ -150,6 +150,9 @@ export default defineConfig(({ command, isPreview }) => ({
     host: "0.0.0.0",
     port: 8080,
     strictPort: true,
+    watch: {
+      ignored: ["**/.venv*/**", "**/runtime/node/**", "**/node_modules/**", "**/.git/**"],
+    },
   },
   preview: {
     host: "127.0.0.1",
@@ -157,6 +160,10 @@ export default defineConfig(({ command, isPreview }) => ({
     strictPort: true,
   },
   resolve: { tsconfigPaths: true },
+  worker: { format: "es" },
+  optimizeDeps: {
+    include: ["monaco-editor", "@xterm/xterm", "@xterm/addon-fit", "isomorphic-git"],
+  },
   plugins: [
     pgliteBootstrapPlugin(),
     // Before tanstackStart so /auth/popup never falls through to the SPA.

@@ -45,6 +45,9 @@ function DownloadsPage() {
         <a href="/downloads/SpectralHX.exe" className="mt-2 flex h-11 items-center justify-center rounded-md glass-thin text-sm">
           SpectralHX.exe
         </a>
+        <a href="/downloads/winamp_latest_full.exe" className="mt-2 flex h-11 items-center justify-center rounded-md glass-thin text-sm">
+          Winamp (Windows)
+        </a>
       </section>
       <section className="rounded-lg p-5 glass-window">
         <h2 className="text-lg">Linux</h2>

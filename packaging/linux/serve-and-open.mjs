@@ -119,6 +119,12 @@ function chromeCandidates() {
 }
 
 function openWindow() {
+  const electronCli = join(ROOT, "node_modules/electron/cli.js");
+  if (existsSync(electronCli)) {
+    const node = bundledNode() || "node";
+    launch(node, [electronCli, join(ROOT, "desktop/main.mjs"), ...(target === "hx" ? ["--hx"] : [])]);
+    return;
+  }
   const profile = WSL
     ? join(winLocalAppData(), "HectorBuild", "chrome-profile", target)
     : WIN

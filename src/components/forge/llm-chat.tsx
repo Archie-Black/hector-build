@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { ArrowUp, ChevronLeft, LoaderCircle } from "lucide-react";
 import { SettingsButton, SettingsHost } from "@/components/forge/settings-menu";
+import { UserButton } from "@/lib/auth/gates";
 import { SpectreStage } from "@/components/forge/spectre-stage";
 import { useForgeStore } from "@/lib/forge-store";
 
@@ -59,6 +60,7 @@ export function LlmChat({ onSend, error, onBack }: Props) {
         )}
         <SpectreStage busy={busy} ghosts={busy ? 4 : 3} size="compact" />
         <p className="ml-1 flex-1 text-sm text-muted">Hector</p>
+        <UserButton />
         <SettingsButton />
       </header>
 

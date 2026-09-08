@@ -7,6 +7,8 @@ import { hectorHostPrompt, spectralHxPrompt } from "@/lib/spectral-hx";
 import { formatRecall } from "@/lib/memory/lattice";
 import { recallMemory } from "@/lib/memory/warehouse";
 import { rustSearchNative } from "@/lib/geometry/mdv-native";
+import { critique, revisionPrompt } from "@/lib/align/cai";
+import { harmScan } from "@/lib/align/asimov";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -47,7 +49,7 @@ const TOOLS = [
     function: {
       name: "lattice_search",
       description:
-        "Geometric code search. English → lattice point → nearest chunks. Faster than listing the tree. Use before grep.",
+        "Observe geometry. English → knot + lattice amplitudes → collapsed working set. Use before grep.",
       parameters: {
         type: "object",
         properties: { query: { type: "string" } },
@@ -273,6 +275,16 @@ export const runForgeTurn = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AgentResponse> => {
     const visitor = isApiKey(data.visitorKey ?? "") ? data.visitorKey!.trim() : "";
     const apiKey = visitor || process.env.XAI_API_KEY || "";
+    const harm = harmScan(data.prompt);
+    if (harm.harm) {
+      return {
+        ok: true,
+        reply: harm.note,
+        files: data.files,
+        traces: [{ name: "asimov", ok: true, detail: harm.law }],
+        tests: runWorkspaceTests(data.files),
+      };
+    }
     if (!apiKey) {
       return {
         ok: false,
@@ -426,9 +438,29 @@ export const runForgeTurn = createServerFn({ method: "POST" })
         continue;
       }
 
-      reply = content || "The job is finished.";
-      if (mode === "plan" && !plan) plan = reply;
-      break;
+      if (!toolCalls.length) {
+        const checks = runWorkspaceTests(files);
+        const fail = checks.filter((t) => !t.pass);
+        const cai = critique({
+          reply: content,
+          fail: fail.length,
+          traces,
+          diffs: diffsFrom(before, files),
+        });
+        if ((!cai.ok || fail.length) && round < maxRounds - 1 && (mode === "swarm" || mode === "patch")) {
+          messages.push(msg);
+          messages.push({
+            role: "user",
+            content: fail.length
+              ? `Checks still fail: ${fail.map((t) => t.name).join(", ")}. Do not give up. Be better. Fix them and continue.`
+              : revisionPrompt(cai),
+          });
+          continue;
+        }
+        reply = content || "The job is finished.";
+        if (mode === "plan" && !plan) plan = reply;
+        break;
+      }
     }
 
     if (!reply) {

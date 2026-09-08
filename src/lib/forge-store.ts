@@ -21,9 +21,14 @@ import {
 import { applyTheme, loadTheme, type ThemeName } from "@/lib/workspace/theme";
 import { loadBench, saveBench } from "@/lib/workspace/bench";
 import { pathAllowed } from "@/lib/workspace/acl";
+import { gitStatus, newCommitId } from "@/lib/ide/git-core";
+import { dapContinue, dapNext, pickAdapter, workspaceLaunch, type DapSession } from "@/lib/ide/dap";
+import { silentIndex, type IndexSnapshot } from "@/lib/ide/indexer";
+import { fathomAssure, type FathomReport } from "@/lib/ide/fathom-agent";
 import { advanceTasks, planJob, type AgentRole, type AgentTask, type TaskStatus } from "@/lib/workspace/team";
 import {
   buildDailyUpdate,
+  fetchHostUpdates,
   defaultUpdateSettings,
   loadUpdateSettings,
   saveUpdateSettings,
@@ -41,7 +46,7 @@ import type {
   ToolTrace,
 } from "@/lib/workspace/types";
 
-export type AppSurface = "title" | "work" | "maze" | "journal" | "paint" | "studio";
+export type AppSurface = "title" | "work" | "maze" | "journal" | "paint" | "studio" | "winamp";
 export type WorkPhase = "idle" | "plan" | "awaiting" | "apply" | "review";
 
 export type VerboseLine = { id: string; text: string; at: number };
@@ -96,7 +101,7 @@ type ForgeState = {
   dirty: Record<string, boolean>;
   cursorLine: number;
   cursorCol: number;
-  bottomPane: "term" | "problems" | "diff";
+  bottomPane: "term" | "problems" | "output" | "debug" | "diff";
   paletteOpen: boolean;
   searchOpen: boolean;
   settingsOpen: boolean;
@@ -104,6 +109,17 @@ type ForgeState = {
   chip: boolean;
   fileSeal: boolean;
   pinSeal: boolean;
+  breakpoints: Record<string, number[]>;
+  gitHead: Record<string, string> | null;
+  gitLog: { id: string; message: string; at: number; files: number }[];
+  workbenchSide: "explorer" | "search" | "scm" | "debug" | "ext" | "hector" | "agents";
+  hostChatOpen: boolean;
+  debugRunning: boolean;
+  extraExt: string[];
+  dap: DapSession | null;
+  indexSnap: IndexSnapshot | null;
+  gitNative: boolean;
+  fathom: FathomReport | null;
   setDraft: (draft: string) => void;
   grant: () => void;
   setBusy: (busy: boolean) => void;
@@ -153,7 +169,7 @@ type ForgeState = {
   deleteFile: (path: string) => void;
   saveActive: () => void;
   setCursor: (line: number, col: number) => void;
-  setBottomPane: (pane: "term" | "problems" | "diff") => void;
+  setBottomPane: (pane: "term" | "problems" | "output" | "debug" | "diff") => void;
   setPaletteOpen: (open: boolean) => void;
   setSearchOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
@@ -162,6 +178,16 @@ type ForgeState = {
   setSpendCap: (cap: number) => void;
   addAllow: (path: string) => void;
   pushTerm: (line: string) => void;
+  toggleBreakpoint: (path: string, line: number) => void;
+  gitCommit: (message: string) => void;
+  setWorkbenchSide: (side: ForgeState["workbenchSide"]) => void;
+  setHostChatOpen: (open: boolean) => void;
+  setDebugRunning: (running: boolean) => void;
+  installExtension: (id: string) => void;
+  startDap: () => void;
+  dapStep: (kind: "continue" | "next") => void;
+  runSilentIndex: () => void;
+  bootHost: () => void;
   takeCheckpoint: () => void;
   undoApply: () => void;
   sealHashes: (hashes: Record<string, string>) => void;
@@ -245,9 +271,20 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   searchOpen: false,
   settingsOpen: false,
   lastJob: "",
-  chip: false,
+  chip: true,
   fileSeal: false,
   pinSeal: false,
+  breakpoints: {},
+  gitHead: seedFiles(),
+  gitLog: [],
+  workbenchSide: "explorer",
+  hostChatOpen: true,
+  debugRunning: false,
+  extraExt: [],
+  dap: null,
+  indexSnap: null,
+  gitNative: false,
+  fathom: null,
   setDraft: (draft) => set({ draft }),
   grant: () =>
     set({
@@ -466,6 +503,20 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       lastBuildDay: todayStamp(),
     });
     set({ updates, status: "Daily improvement build is ready for approval." });
+    void fetchHostUpdates().then((feed) => {
+      const remote = feed?.releases[0];
+      if (!remote) return;
+      const cur = get().updates.pending;
+      if (!cur) return;
+      persistUpdates({
+        ...get().updates,
+        pending: {
+          ...cur,
+          summary: remote.summary,
+          lessons: mergeLessons(cur.lessons, remote.lessons),
+        },
+      });
+    });
   },
   approveUpdate: () => {
     const pending = get().updates.pending;
@@ -549,6 +600,64 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   },
   setCursor: (cursorLine, cursorCol) => set({ cursorLine, cursorCol }),
   setBottomPane: (bottomPane) => set({ bottomPane }),
+  toggleBreakpoint: (path, line) => {
+    const cur = get().breakpoints[path] ?? [];
+    const next = cur.includes(line) ? cur.filter((n) => n !== line) : [...cur, line].sort((a, b) => a - b);
+    set({ breakpoints: { ...get().breakpoints, [path]: next } });
+  },
+  gitCommit: (message) => {
+    const files = { ...get().files };
+    const changed = gitStatus(get().gitHead, files).length;
+    if (!changed) {
+      get().pushTerm("Git: nothing to commit");
+      return;
+    }
+    const commit = { id: newCommitId(), message: message.trim() || "workspace", at: Date.now(), files: changed };
+    set({ gitHead: files, gitLog: [commit, ...get().gitLog].slice(0, 40) });
+    get().pushTerm(`LIVE git commit ${commit.id} — ${commit.files} file(s)`);
+  },
+  setWorkbenchSide: (workbenchSide) => set({ workbenchSide }),
+  setHostChatOpen: (hostChatOpen) => set({ hostChatOpen }),
+  setDebugRunning: (debugRunning) => {
+    if (debugRunning) get().startDap();
+    else set({ debugRunning: false, dap: get().dap ? { ...get().dap!, stopped: false, reason: "stopped" } : null, bottomPane: "debug" });
+  },
+  startDap: () => {
+    const files = get().files;
+    const session = workspaceLaunch(files, get().breakpoints, get().tests);
+    session.adapter = pickAdapter(get().activePath);
+    get().runChecks();
+    set({ debugRunning: true, dap: session, bottomPane: "debug" });
+    get().pushTerm(`LIVE DAP ${session.adapter} · ${session.reason}`);
+  },
+  dapStep: (kind) => {
+    const cur = get().dap;
+    if (!cur) return;
+    const next = kind === "continue" ? dapContinue(cur) : dapNext(cur);
+    set({ dap: next, debugRunning: next.stopped || kind === "continue" });
+    get().pushTerm(`DAP ${kind}`);
+  },
+  runSilentIndex: () => {
+    const snap = silentIndex(get().files);
+    set({ indexSnap: { ready: snap.ready, files: snap.files, chunks: snap.chunks, edges: snap.edges, ms: snap.ms } });
+  },
+  bootHost: () => {
+    const snap = silentIndex(get().files);
+    set({
+      indexSnap: { ready: snap.ready, files: snap.files, chunks: snap.chunks, edges: snap.edges, ms: snap.ms },
+    });
+    void fathomAssure(get().files).then((report) => {
+      set({ fathom: report });
+      get().pushTerm(
+        `LIVE Fathom ${report.score.pct}% · WASM ${report.wasm.ready ? report.wasm.engine : "STUB"} · ${report.wasm.bytes}B`,
+      );
+    });
+  },
+  installExtension: (id) => {
+    if (get().extraExt.includes(id)) return;
+    set({ extraExt: [...get().extraExt, id] });
+    get().pushTerm(`LIVE extension ${id}`);
+  },
   setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
   setSearchOpen: (searchOpen) => set({ searchOpen }),
   setSettingsOpen: (settingsOpen) => set({ settingsOpen }),
