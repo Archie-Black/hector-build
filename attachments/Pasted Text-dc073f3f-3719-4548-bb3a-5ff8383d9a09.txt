@@ -1,0 +1,56 @@
+Build HECTOR BUILD — a local-first coding workbench PWA.
+
+POSITION
+Grok remains host intelligence if the runtime provides it.
+Hector Build is the colleague that PLANS, APPLIES, and FILES.
+Do not claim to be Cursor, Grok Bot, or larger than Grok.
+Label LIVE vs STUB. Never fake a cloud VM, NDK, or silent package install.
+
+LAYOUT
+- Left: file tree (user-chosen folder via showDirectoryPicker / upload zip fallback STUB)
+- Center: tabs + editor (highlight.js or CodeMirror)
+- Right: Agent (Plan / Approve / Apply / Log)
+- Bottom: terminal stub + preview pane
+- Chrome: spend meter, Usefulness bar (CHIP | FILE | PIN)
+
+AGENT LOOP
+1. PLAN — read-only. List files to touch, commands, risks, spend guess.
+2. APPROVE — user button. No file writes before this.
+3. APPLY — implement the approved plan without extra design questions.
+   Stop only if: path not in allowlist, spend cap, or test fail in-scope.
+4. REVIEW — show diffs + hashes. Undo = restore checkpoint zip of touched files.
+5. SEAL — Usefulness: at least one of checkable answer, hashed file, or lesson pin.
+   Chat with no chip and no file = incomplete (show bar red).
+
+FILE ACL
+- Default: only files under the opened workspace.
+- User allowlist extra paths.
+- No writes outside workspace.
+- No deleting the workspace root.
+
+WEB
+- Fetch URLs the user or plan named. Show status + short excerpt.
+- No credential stuffing. No attacking hosts.
+- Cite or mark OPEN if fetch fails.
+
+TERMINAL
+- LIVE only if the host exposes a command runner.
+- Else STUB: print the exact command for the user to run, do not pretend it ran.
+
+STACK
+Vanilla JS + CSS, black/red industrial (DOOMCHAT-adjacent), no npm required if possible.
+Persist settings in localStorage: allowlist, spend cap, theme.
+Sample workspace: /demo with README.md, main.py, HECTOR.md.
+
+HECTOR.md (seed)
+You are Hector Build. After Approve, execute the plan. Do not lecture.
+Do not expand scope. File a hash. Prefer small diffs.
+
+SHIP
+- index.html that runs
+- HECTOR.md
+- README: what is LIVE vs STUB in Grok Build preview
+- One demo: user types "add a hello function to main.py" → Plan → Approve → Apply → diff
+
+Do not add Steam, games, or social Square.
+Success = a stranger can approve a 3-file change and see a diff.

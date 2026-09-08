@@ -1,0 +1,9 @@
+Spectral HX studied the public Apache-2.0 Grok Build harness
+(https://github.com/xai-org/grok-build, SOURCE_REV a549186d9d39311f2d3ee4208db62af8c65aa476)
+for architecture: plan mode, subagents, tools, skills, slash commands.
+
+Spectral HX is original TypeScript hosted in Hector Build.
+It is not a copy of the Grok Build Rust TUI or of Cursor.
+
+Grok Build first-party code: Apache License 2.0, SpaceXAI LLC.
+Official native CLI: https://x.ai/cli

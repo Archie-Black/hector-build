@@ -1,0 +1,22 @@
+[package]
+name = "hx-vector"
+version = "0.1.0"
+edition = "2021"
+description = "Meta-dynamic vector search for Spectral HX"
+
+[lib]
+name = "hx_vector"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "hx-search"
+path = "src/main.rs"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

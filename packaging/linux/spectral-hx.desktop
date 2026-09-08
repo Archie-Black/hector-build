@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Spectral HX
+Comment=Coding floor for Hector Build. Works with any chatbot.
+Exec=spectral-hx
+Icon=spectral-hx
+Terminal=false
+Categories=Development;IDE;
+StartupWMClass=SpectralHX

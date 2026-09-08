@@ -1,0 +1,19 @@
+# Internal warehouse only. No login UI. Bind loopback.
+# Image: apache/superset:GHA-dev-34215550932
+services:
+  warehouse:
+    image: apache/superset:GHA-dev-34215550932
+    container_name: hx-warehouse
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8088:8088"
+    environment:
+      SUPERSET_SECRET_KEY: hector-hx-apache-superset-local-key-32b
+      SUPERSET_CONFIG_PATH: /app/pythonpath/superset_config.py
+      FLASK_APP: superset
+    volumes:
+      - ./superset_config.py:/app/pythonpath/superset_config.py:ro
+      - ../../data:/app/data
+    command: >
+      /bin/sh -c "superset db upgrade && superset init &&
+      gunicorn --bind 0.0.0.0:8088 --workers 1 --timeout 120 'superset.app:create_app()'"

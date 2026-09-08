@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Hector Build
+Comment=Host intelligence. Spectral HX is the coding floor.
+Exec=hector-build
+Icon=hector-build
+Terminal=false
+Categories=Development;IDE;
+StartupWMClass=HectorBuild
