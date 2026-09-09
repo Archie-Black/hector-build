@@ -56,7 +56,13 @@ export function HxWorkbench({ onSend, error, onBack }: Props) {
             </div>
             <Group orientation="vertical" className="flex min-h-0 flex-1 flex-col">
               <Panel defaultSize="70" minSize="30" className="flex min-h-0 flex-col">
-                <MonacoPane />
+                <MonacoPane
+                  onEdit={(instruction, selection, path, start, end) => {
+                    onSend(
+                      `INLINE EDIT ${path} L${start}-${end}\n\`\`\`\n${selection.slice(0, 4000)}\n\`\`\`\n${instruction}`,
+                    );
+                  }}
+                />
               </Panel>
               <Separator className="h-px bg-line" />
               <Panel defaultSize="30" minSize="14" className="flex min-h-0 flex-col">

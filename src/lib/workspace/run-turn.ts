@@ -101,15 +101,72 @@ const TOOLS = [
     type: "function",
     function: {
       name: "search_replace",
-      description: "Replace one exact string in a file.",
+      description: "Replace one exact string in a file. Set replace_all for every occurrence. If it fails, retry a shorter unique old_string.",
       parameters: {
         type: "object",
         properties: {
           path: { type: "string" },
           old_string: { type: "string" },
           new_string: { type: "string" },
+          replace_all: { type: "boolean" },
         },
         required: ["path", "old_string", "new_string"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "get_diagnostics",
+      description: "Return workspace lints: unmatched braces, missing relative imports, JSON parse errors.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "read_symbol",
+      description: "Jump to a function/class/const definition and read nearby lines.",
+      parameters: {
+        type: "object",
+        properties: { name: { type: "string" }, path: { type: "string" } },
+        required: ["name"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "find_references",
+      description: "Find every use of a symbol across the workspace.",
+      parameters: {
+        type: "object",
+        properties: { name: { type: "string" } },
+        required: ["name"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "rename_symbol",
+      description: "Rename an identifier across granted files.",
+      parameters: {
+        type: "object",
+        properties: { from: { type: "string" }, to: { type: "string" } },
+        required: ["from", "to"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "format_file",
+      description: "Trim trailing space and normalize a file.",
+      parameters: {
+        type: "object",
+        properties: { path: { type: "string" } },
+        required: ["path"],
       },
     },
   },

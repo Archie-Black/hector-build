@@ -13,9 +13,14 @@ export function CommandPalette() {
 
   const actions = [
     { id: "save", label: "Save file", run: () => useForgeStore.getState().saveActive() },
+    { id: "format", label: "Format document", run: () => useForgeStore.getState().formatActive() },
     { id: "test", label: "Run checks", run: () => useForgeStore.getState().runChecks() },
     { id: "undo", label: "Undo apply", run: () => useForgeStore.getState().undoApply() },
     { id: "search", label: "Search workspace", run: () => useForgeStore.getState().setSearchOpen(true) },
+    { id: "problems", label: "Problems", run: () => useForgeStore.getState().setBottomPane("problems") },
+    { id: "term", label: "Terminal", run: () => useForgeStore.getState().setBottomPane("term") },
+    { id: "diff", label: "Diff", run: () => useForgeStore.getState().setBottomPane("diff") },
+    { id: "chat", label: "Toggle host chat", run: () => useForgeStore.getState().setHostChatOpen(!useForgeStore.getState().hostChatOpen) },
     { id: "settings", label: "Settings", run: () => useForgeStore.getState().setSettingsOpen(true) },
   ];
   const paths = Object.keys(files);

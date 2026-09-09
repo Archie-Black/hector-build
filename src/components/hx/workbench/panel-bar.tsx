@@ -14,6 +14,7 @@ const TABS = [
 export function PanelBar() {
   const pane = useForgeStore((s) => s.bottomPane);
   const tests = useForgeStore((s) => s.tests);
+  const lints = useForgeStore((s) => s.lints);
   const term = useForgeStore((s) => s.termLines);
   const xterm = useRef<HTMLDivElement>(null);
 
@@ -60,6 +61,7 @@ export function PanelBar() {
   }, [pane]);
 
   const fail = tests.filter((t) => !t.pass);
+  const problems = lints.length + fail.length;
 
   return (
     <section className="flex min-h-0 flex-1 flex-col">
@@ -72,7 +74,7 @@ export function PanelBar() {
             onClick={() => useForgeStore.getState().setBottomPane(t.id)}
           >
             {t.label}
-            {t.id === "problems" && fail.length ? ` ${fail.length}` : ""}
+            {t.id === "problems" && problems ? ` ${problems}` : ""}
           </button>
         ))}
       </div>
@@ -80,7 +82,20 @@ export function PanelBar() {
         {pane === "term" ? <div ref={xterm} className="hx-xterm h-full w-full" /> : null}
         {pane === "problems" ? (
           <div className="overflow-auto p-2 font-mono text-xs">
-            {fail.length === 0 ? <p className="text-pass">No problems</p> : null}
+            {problems === 0 ? <p className="text-pass">No problems</p> : null}
+            {lints.map((l, i) => (
+              <button
+                key={l.path + l.line + i}
+                type="button"
+                className={"block w-full text-left " + (l.severity === "error" ? "text-fail" : "text-muted")}
+                onClick={() => {
+                  useForgeStore.getState().openPath(l.path);
+                  useForgeStore.getState().setCursor(l.line, l.col);
+                }}
+              >
+                {l.path}:{l.line} {l.message}
+              </button>
+            ))}
             {fail.map((t) => (
               <p key={t.name} className="text-fail">
                 {t.name}: {t.detail}

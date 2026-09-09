@@ -37,6 +37,7 @@ import {
   type UpdatePolicy,
   type UpdateSettings,
 } from "@/lib/workspace/updates";
+import { diagnostics, formatFile, type Lint } from "@/lib/ide/symbols";
 import type {
   AgentTodo,
   ChatMessage,
@@ -120,6 +121,7 @@ type ForgeState = {
   indexSnap: IndexSnapshot | null;
   gitNative: boolean;
   fathom: FathomReport | null;
+  lints: Lint[];
   setDraft: (draft: string) => void;
   grant: () => void;
   setBusy: (busy: boolean) => void;
@@ -196,6 +198,7 @@ type ForgeState = {
   setLastJob: (job: string) => void;
   runChecks: () => void;
   resetWorkspace: () => void;
+  formatActive: () => void;
 };
 
 const welcome: ChatMessage = {
@@ -285,6 +288,7 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   indexSnap: null,
   gitNative: false,
   fathom: null,
+  lints: [],
   setDraft: (draft) => set({ draft }),
   grant: () =>
     set({
@@ -377,13 +381,16 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       if (pathAllowed(path, get().allowlist) || files[path] !== undefined) files[path] = content;
     }
     const tests = runWorkspaceTests(files);
-    const first = Object.keys(incoming)[0];
-    const tabs = first && !get().openTabs.includes(first) ? [...get().openTabs, first].slice(-8) : get().openTabs;
+    const first = Object.keys(incoming).find((p) => !/HASHES|KNOTS/.test(p));
+    const tabs =
+      first && !get().openTabs.includes(first) ? [...get().openTabs, first].slice(-8) : get().openTabs;
+    const snap = silentIndex(files);
     set({
       files,
       tests,
+      lints: diagnostics(files),
+      indexSnap: { ready: snap.ready, files: snap.files, chunks: snap.chunks, edges: snap.edges, ms: snap.ms },
       progress: computeProgress(get().busy, get().traces, tests),
-      activePath: first || get().activePath,
       openTabs: tabs,
     });
   },
@@ -645,6 +652,7 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
     const snap = silentIndex(get().files);
     set({
       indexSnap: { ready: snap.ready, files: snap.files, chunks: snap.chunks, edges: snap.edges, ms: snap.ms },
+      lints: diagnostics(get().files),
     });
     void fathomAssure(get().files).then((report) => {
       set({ fathom: report });
@@ -745,12 +753,21 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
     const tests = runWorkspaceTests(get().files);
     set({
       tests,
+      lints: diagnostics(get().files),
       chip: tests.length > 0 && tests.every((t) => t.pass),
       termLines: [
         ...get().termLines,
         `LIVE checks ${tests.filter((t) => t.pass).length}/${tests.length}`,
       ].slice(-80),
     });
+  },
+  formatActive: () => {
+    const path = get().activePath;
+    const text = get().files[path];
+    if (text === undefined) return;
+    get().writeActive(formatFile(path, text));
+    get().saveActive();
+    set({ lints: diagnostics(get().files) });
   },
   resetWorkspace: () => {
     const files = seedFiles();

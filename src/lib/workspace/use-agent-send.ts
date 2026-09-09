@@ -12,6 +12,9 @@ import { workingPack } from "@/lib/geometry/ontology";
 import { packFiles, statsOf } from "@/lib/geopack/volume";
 import { saveVolume } from "@/lib/geopack/persist";
 import { critique, learnFromTurn, valueLessons } from "@/lib/align/cai";
+import { mentionedPaths, workspaceRules, attachFiles } from "@/lib/workspace/context";
+import { diagnostics } from "@/lib/ide/symbols";
+import { gitNativeStatus } from "@/lib/ide/native-git";
 
 export function useAgentSend(voice: "hector" | "hx" = "hx") {
   const software = useForgeStore((s) => s.software);
@@ -134,13 +137,29 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         .slice(-12)
         .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
       const pack = workingPack(store.files, prompt);
+      const mentions = mentionedPaths(prompt, store.files);
+      if (store.activePath && !mentions.includes(store.activePath)) mentions.unshift(store.activePath);
+      const lints = diagnostics(store.files).slice(0, 12);
+      const rules = workspaceRules(store.files);
+      let gitLine = "";
+      try {
+        const git = await gitNativeStatus();
+        gitLine = git.live ? `Git: ${git.text.slice(0, 400)}` : "";
+      } catch {
+        gitLine = "";
+      }
       const extra = [
         voice === "hector" ? "Host: Hector Build. Coding floor: Spectral HX. Parallel bots." : "Parallel Spectral HX lanes.",
         repo ? `Granted repo: ${repo}` : "Granted local workspace.",
         software.length ? `Approved software: ${software.join(", ")}` : "",
+        `Open: ${store.activePath}:${store.cursorLine}`,
         pack.paths.length ? `Observed set: ${pack.paths.join(", ")}` : "",
         pack.geo ? pack.geo : "",
         pack.text ? `Lattice chunks:\n${pack.text}` : "",
+        gitLine,
+        lints.length ? `Lints:\n${lints.map((l) => `${l.path}:${l.line} ${l.message}`).join("\n")}` : "",
+        rules ? `Workspace rules:\n${rules}` : "",
+        mentions.length ? attachFiles(store.files, mentions) : "",
       ]
         .filter(Boolean)
         .join("\n");

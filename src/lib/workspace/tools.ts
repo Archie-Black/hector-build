@@ -4,6 +4,7 @@ import { executeLattice } from "@/lib/geometry/lattice";
 import { observe, ontologyLine } from "@/lib/geometry/ontology";
 import { runWorkspaceTests } from "./run-tests";
 import { normalizePath, pathAllowed } from "./acl";
+import { diagnostics, formatFile, findDefinition, findReferences, renameSymbol } from "@/lib/ide/symbols";
 import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
@@ -106,13 +107,46 @@ export function executeTool(
       const nextText = String(args.new_string ?? args.new ?? "");
       const original = files[path];
       if (original === undefined) return refuse(files, name, `Missing file: ${path}`);
-      if (!oldText || !original.includes(oldText)) {
+      const all = Boolean(args.replace_all);
+      const updated = replaceInFile(original, oldText, nextText, all);
+      if (!updated) {
         const near = executeLattice({ [path]: original }, oldText, 2).hits[0];
         const hint = near ? ` Nearest chunk @${near.offset}: ${near.text.slice(0, 80)}` : "";
         return refuse(files, name, "old_string not found." + hint);
       }
-      const updated = original.replace(oldText, nextText);
       return ok({ ...files, [path]: updated }, name, { path }, `replaced in ${path}`);
+    }
+    case "get_diagnostics": {
+      const lints = diagnostics(files);
+      return ok(files, name, lints, `${lints.length} lint(s)`);
+    }
+    case "read_symbol": {
+      const ident = String(args.name ?? args.symbol ?? "");
+      const hit = findDefinition(files, ident, String(args.path ?? ""));
+      if (!hit) return refuse(files, name, `No definition for ${ident}`);
+      const lines = (files[hit.path] ?? "").split("\n");
+      const slice = lines.slice(Math.max(0, hit.line - 2), hit.line + 12).join("\n");
+      return ok(files, name, { ...hit, body: slice }, `${hit.path}:${hit.line}`);
+    }
+    case "find_references": {
+      const ident = String(args.name ?? args.symbol ?? "");
+      const hits = findReferences(files, ident);
+      return ok(files, name, hits.slice(0, 40), `${hits.length} ref(s)`);
+    }
+    case "rename_symbol": {
+      if (!WRITE_MODES.includes(mode)) return refuse(files, name, "Rename refused in this mode");
+      const from = String(args.from ?? args.name ?? "");
+      const to = String(args.to ?? args.next ?? "");
+      const next = renameSymbol(files, from, to);
+      const changed = Object.keys(next).filter((p) => next[p] !== files[p]).length;
+      return ok(next, name, { from, to, files: changed }, `renamed ${from} → ${to} in ${changed} file(s)`);
+    }
+    case "format_file": {
+      if (!WRITE_MODES.includes(mode)) return refuse(files, name, "Format refused in this mode");
+      const path = normalizePath(String(args.path ?? ""));
+      if (files[path] === undefined) return refuse(files, name, `Missing file: ${path}`);
+      const content = formatFile(path, files[path]);
+      return ok({ ...files, [path]: content }, name, { path }, `formatted ${path}`);
     }
     case "run_tests": {
       const tests = runWorkspaceTests(files);
@@ -163,4 +197,23 @@ export function diffsFrom(before: Record<string, string>, after: Record<string, 
   return [...paths]
     .filter((p) => before[p] !== after[p])
     .map((path) => ({ path, before: before[path] ?? "", after: after[path] ?? "" }));
+}
+
+function replaceInFile(src: string, oldText: string, nextText: string, all: boolean): string | null {
+  if (!oldText) return null;
+  if (src.includes(oldText)) return all ? src.split(oldText).join(nextText) : src.replace(oldText, nextText);
+  const lines = src.split("\n");
+  const oldLines = oldText.replace(/\r\n/g, "\n").split("\n");
+  const nextLines = nextText.replace(/\r\n/g, "\n").split("\n");
+  let hit = false;
+  const copy = [...lines];
+  for (let i = 0; i <= copy.length - oldLines.length; i++) {
+    if (oldLines.every((l, j) => copy[i + j].trim() === l.trim())) {
+      copy.splice(i, oldLines.length, ...nextLines);
+      hit = true;
+      if (!all) return copy.join("\n");
+      i += nextLines.length - 1;
+    }
+  }
+  return hit ? copy.join("\n") : null;
 }

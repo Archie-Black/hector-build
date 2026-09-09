@@ -1,5 +1,6 @@
 import { cosine, embed, pointOf } from "@/lib/geometry/embed";
 import { rustEngineReady, rustSearch } from "@/lib/geometry/mdv-wasm";
+import { completeTokens } from "@/lib/ide/symbols";
 
 export type IndexChunk = {
   path: string;
@@ -109,19 +110,22 @@ export function retrieve(query: string, cap = 8): { path: string; offset: number
 
 export function tabSuggest(path: string, prefix: string, files: Record<string, string>): string {
   const src = files[path] ?? "";
-  const needle = prefix.trim();
-  if (needle.length < 2) return "";
+  const token = prefix.match(/[A-Za-z_$][\w$]*$/)?.[0] ?? prefix.trim();
+  if (token.length < 2) return "";
+  const names = completeTokens(path, token, files);
+  if (names[0]) return names[0].slice(token.length);
   const lines = src.split("\n");
-  const hit = lines.find((l) => l.includes(needle) && l.trim() !== needle);
+  const hit = lines.find((l) => l.includes(token) && l.trim() !== token);
   if (hit) {
-    const i = hit.indexOf(needle);
-    return hit.slice(i + needle.length, i + needle.length + 80);
+    const i = hit.indexOf(token);
+    return hit.slice(i + token.length, i + token.length + 80);
   }
-  const geo = retrieve(needle, 3)[0];
+  const geo = retrieve(token, 3)[0];
   if (!geo) return "";
-  const line = geo.text.split("\n").find((l) => l.includes(needle.split(" ").pop() ?? needle));
+  const line = geo.text.split("\n").find((l) => l.includes(token));
   if (!line) return geo.text.split("\n")[0]?.slice(0, 80) ?? "";
-  return line.slice(0, 80);
+  const at = line.indexOf(token);
+  return at >= 0 ? line.slice(at + token.length, at + token.length + 80) : line.slice(0, 80);
 }
 
 export const SILENT_TEAM: SilentAgent[] = ["walker", "embedder", "grapher", "retriever"];

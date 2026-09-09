@@ -39,6 +39,14 @@ export type AgentTodo = {
   status: "pending" | "in_progress" | "done";
 };
 
+export type Lint = {
+  path: string;
+  line: number;
+  col: number;
+  message: string;
+  severity: "error" | "warning";
+};
+
 export type FileDiff = {
   path: string;
   before: string;

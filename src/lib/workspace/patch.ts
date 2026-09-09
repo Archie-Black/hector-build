@@ -20,7 +20,7 @@ export function applyUnifiedDiff(original: string, diffText: string): string {
     let end = endHint;
     const window = out.slice(start, end);
     if (hunk.oldExpect.length && !same(window, hunk.oldExpect)) {
-      const found = findWindow(out, hunk.oldExpect, startHint);
+      const found = findWindow(out, hunk.oldExpect, startHint) ?? findWindowTrim(out, hunk.oldExpect, startHint);
       if (!found) throw new PatchError("Hunk context mismatch near line " + hunk.oldStart);
       start = found[0];
       end = found[1];
@@ -96,6 +96,11 @@ function same(a: string[], b: string[]) {
   return a.every((v, i) => v === b[i]);
 }
 
+function sameTrim(a: string[], b: string[]) {
+  if (a.length !== b.length) return false;
+  return a.every((v, i) => v.trim() === b[i].trim());
+}
+
 function findWindow(hay: string[], needle: string[], hint: number): [number, number] | null {
   const n = needle.length;
   if (!n) return [hint, hint];
@@ -106,6 +111,16 @@ function findWindow(hay: string[], needle: string[], hint: number): [number, num
   }
   for (let i = 0; i <= hay.length - n; i++) {
     if (same(hay.slice(i, i + n), needle)) return [i, i + n];
+  }
+  return null;
+}
+
+function findWindowTrim(hay: string[], needle: string[], hint: number): [number, number] | null {
+  const n = needle.length;
+  if (!n) return [hint, hint];
+  void hint;
+  for (let i = 0; i <= hay.length - n; i++) {
+    if (sameTrim(hay.slice(i, i + n), needle)) return [i, i + n];
   }
   return null;
 }
