@@ -151,7 +151,7 @@ export default defineConfig(({ command, isPreview }) => ({
     port: 8080,
     strictPort: true,
     watch: {
-      ignored: ["**/.venv*/**", "**/runtime/node/**", "**/node_modules/**", "**/.git/**"],
+      ignored: ["**/.venv*/**", "**/runtime/node/**", "**/runtime/fnm-root/**", "**/node_modules/**", "**/.git/**"],
     },
   },
   preview: {

@@ -12,6 +12,7 @@ echo "Installing Hector Build and Spectral HX into $APPDIR"
 mkdir -p "$APPDIR" "$BIN" "$APP" "$PREFIX/icons/hicolor/256x256/apps"
 
 bash "$ROOT/packaging/linux/install-node22.sh" "$ROOT"
+bash "$ROOT/packaging/linux/install-fnm.sh" "$ROOT"
 NODE_HOME="$ROOT/runtime/node"
 export PATH="$NODE_HOME/bin:$PATH"
 

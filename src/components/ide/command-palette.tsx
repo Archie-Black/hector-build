@@ -21,7 +21,10 @@ export function CommandPalette() {
     { id: "term", label: "Terminal", run: () => useForgeStore.getState().setBottomPane("term") },
     { id: "diff", label: "Diff", run: () => useForgeStore.getState().setBottomPane("diff") },
     { id: "chat", label: "Toggle host chat", run: () => useForgeStore.getState().setHostChatOpen(!useForgeStore.getState().hostChatOpen) },
-    { id: "settings", label: "Settings", run: () => useForgeStore.getState().setSettingsOpen(true) },
+    { id: "node22", label: "Use Node 22", run: () => useForgeStore.getState().useNode("22") },
+    { id: "node20", label: "Use Node 20", run: () => useForgeStore.getState().useNode("20") },
+    { id: "node24", label: "Use Node 24", run: () => useForgeStore.getState().useNode("24") },
+    { id: "nodels", label: "List Node versions", run: () => useForgeStore.getState().refreshNode() },
   ];
   const paths = Object.keys(files);
   const items = useMemo(() => {

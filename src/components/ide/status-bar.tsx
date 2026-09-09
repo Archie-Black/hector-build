@@ -12,6 +12,7 @@ export function StatusBar() {
   const dap = useForgeStore((s) => s.dap);
   const index = useForgeStore((s) => s.indexSnap);
   const fathom = useForgeStore((s) => s.fathom);
+  const node = useForgeStore((s) => s.nodeRuntime);
   const fail = tests.filter((t) => !t.pass).length;
   const mod = modName();
   return (
@@ -45,6 +46,13 @@ export function StatusBar() {
           {fathom.services.some((s) => s.id === "geo.ontology" && s.kind === "LIVE") ? " · geo" : ""}
         </span>
       ) : null}
+      {node?.current ? (
+        <span title={(node.versions || []).join(" · ") || node.tool}>
+          Node {node.current} · {node.tool}
+        </span>
+      ) : (
+        <span>Node fnm</span>
+      )}
       <span className="ml-auto truncate">
         Tab ghost · {mod}+P · {mod}+S
       </span>

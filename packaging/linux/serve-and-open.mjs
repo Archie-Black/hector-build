@@ -48,6 +48,8 @@ function launch(cmd, args, opts = {}) {
 }
 
 function bundledNode() {
+  const fnm = join(ROOT, "runtime/fnm-root/aliases/default/bin/node");
+  if (existsSync(fnm)) return fnm;
   const bin = join(ROOT, "runtime/node/bin/node");
   return existsSync(bin) ? bin : "";
 }

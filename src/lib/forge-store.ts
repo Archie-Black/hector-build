@@ -25,6 +25,8 @@ import { gitStatus, newCommitId } from "@/lib/ide/git-core";
 import { dapContinue, dapNext, pickAdapter, workspaceLaunch, type DapSession } from "@/lib/ide/dap";
 import { silentIndex, type IndexSnapshot } from "@/lib/ide/indexer";
 import { fathomAssure, type FathomReport } from "@/lib/ide/fathom-agent";
+import { pinnedNode } from "@/lib/ide/node-pin";
+import { nodeRuntimeStatus, nodeRuntimeUse, type NodeRuntime } from "@/lib/ide/node-runtime.server";
 import { advanceTasks, planJob, type AgentRole, type AgentTask, type TaskStatus } from "@/lib/workspace/team";
 import {
   buildDailyUpdate,
@@ -122,6 +124,7 @@ type ForgeState = {
   gitNative: boolean;
   fathom: FathomReport | null;
   lints: Lint[];
+  nodeRuntime: NodeRuntime | null;
   setDraft: (draft: string) => void;
   grant: () => void;
   setBusy: (busy: boolean) => void;
@@ -199,6 +202,8 @@ type ForgeState = {
   runChecks: () => void;
   resetWorkspace: () => void;
   formatActive: () => void;
+  refreshNode: () => void;
+  useNode: (version: string) => void;
 };
 
 const welcome: ChatMessage = {
@@ -289,6 +294,7 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   gitNative: false,
   fathom: null,
   lints: [],
+  nodeRuntime: null,
   setDraft: (draft) => set({ draft }),
   grant: () =>
     set({
@@ -660,6 +666,7 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
         `LIVE Fathom ${report.score.pct}% · WASM ${report.wasm.ready ? report.wasm.engine : "STUB"} · ${report.wasm.bytes}B`,
       );
     });
+    get().refreshNode();
   },
   installExtension: (id) => {
     if (get().extraExt.includes(id)) return;
@@ -709,10 +716,35 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       return;
     }
     if (cmd === "help") {
-      get().pushTerm("ls [prefix] · cat <path> · grep <text> · test · help");
+      get().pushTerm("ls [prefix] · cat <path> · grep <text> · test · node -v · nvm/fnm/volta · help");
       return;
     }
-    get().pushTerm("STUB host command — workspace shell only understands ls, cat, grep, test.");
+    if (cmd === "node" && (rest[0] === "-v" || rest[0] === "--version" || !rest[0])) {
+      void nodeRuntimeStatus().then((n) => {
+        set({ nodeRuntime: n });
+        get().pushTerm(`LIVE ${n.tool} Node ${n.current || "none"}`);
+      });
+      return;
+    }
+    if (cmd === "nvm" || cmd === "fnm" || cmd === "volta") {
+      const sub = rest[0] || "ls";
+      const ver = rest[1] || pinnedNode(files) || "22";
+      if (sub === "ls" || sub === "list" || sub === "current") {
+        void nodeRuntimeStatus().then((n) => {
+          set({ nodeRuntime: n });
+          get().pushTerm(`LIVE ${n.tool} ${n.current} · ${n.versions.join(" ")}`);
+        });
+        return;
+      }
+      if (sub === "use" || sub === "install" || sub === "pin") {
+        get().pushTerm(`LIVE ${cmd} ${sub} ${ver}…`);
+        get().useNode(ver);
+        return;
+      }
+      get().pushTerm(`${cmd} ls | ${cmd} use <ver> | ${cmd} install <ver>`);
+      return;
+    }
+    get().pushTerm("STUB host command — workspace shell only understands ls, cat, grep, test, node, nvm, fnm, volta.");
   },
   setPhase: (phase) => set({ phase }),
   setSpendCap: (cap) => {
@@ -768,6 +800,19 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
     get().writeActive(formatFile(path, text));
     get().saveActive();
     set({ lints: diagnostics(get().files) });
+  },
+  refreshNode: () => {
+    void nodeRuntimeStatus().then((nodeRuntime) => {
+      const pin = pinnedNode(get().files);
+      set({ nodeRuntime: pin ? { ...nodeRuntime, pin } : nodeRuntime });
+      get().pushTerm(`LIVE Node ${nodeRuntime.current || "none"} (${nodeRuntime.tool})`);
+    });
+  },
+  useNode: (version) => {
+    void nodeRuntimeUse({ data: version }).then((n) => {
+      set({ nodeRuntime: n });
+      get().pushTerm(n.log ? `LIVE Node ${n.current} · ${n.log}` : `LIVE Node ${n.current}`);
+    });
   },
   resetWorkspace: () => {
     const files = seedFiles();

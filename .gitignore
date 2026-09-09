@@ -6,6 +6,7 @@ artifacts/
 screenshots/
 data/
 runtime/node/
+runtime/fnm-root/
 .venv*/
 __pycache__/
 *.pyc
