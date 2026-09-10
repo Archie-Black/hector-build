@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { enumerate, hidPolicy, plug } from "./bus.ts";
-import { drainJobs, enqueueJob, holdDevice, startDevice } from "./print.ts";
+import { enqueueJob, holdDevice, startDevice } from "./print.ts";
 import { advertise, isPaired, pair, unpair } from "./sdp.ts";
 
 describe("device bus", () => {

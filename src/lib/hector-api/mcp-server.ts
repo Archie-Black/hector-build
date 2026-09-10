@@ -91,7 +91,7 @@ export async function handleMcp(raw: Rpc) {
       return ok(id, toolText(text));
     }
     if (name === "cloud_status") return ok(id, toolText(cloudStatus()));
-    if (name === "cloud_fn_list") return ok(id, toolText(listFunctions().map(({ source, ...rest }) => rest)));
+    if (name === "cloud_fn_list") return ok(id, toolText(listFunctions().map(({ source: _source, ...rest }) => rest)));
     if (name === "cloud_fn_deploy") return ok(id, toolText(deployFunction({ name: String(args.name), source: args.source ? String(args.source) : undefined, entry: args.entry ? String(args.entry) : undefined })));
     if (name === "cloud_fn_invoke") return ok(id, toolText(await invokeFunction(String(args.name), args.event ?? {})));
     if (name === "cloud_fn_delete") return ok(id, toolText({ deleted: deleteFunction(String(args.name)) }));

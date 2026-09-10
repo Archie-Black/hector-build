@@ -18,6 +18,7 @@ import { loadExt } from "@/lib/workspace/extensions-store";
 import { loadHome } from "@/lib/ollama/home";
 import { spoolFor } from "@/lib/spool/client";
 import { isPublishJob, slugFromPrompt } from "@/lib/host/names";
+import { speakDone, speakOnIt } from "@/lib/partner/speak";
 
 export function useAgentSend(voice: "hector" | "hx" = "hx") {
   const software = useForgeStore((s) => s.software);
@@ -64,7 +65,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         store.pushMessage({
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "Briefing Spectral HX. Assignment: add hello() to demo/main.py.",
+          content: speakOnIt(prompt),
           mode: "swarm",
           speaker: "hector",
         });
@@ -78,10 +79,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
       store.pushMessage({
         id: crypto.randomUUID(),
         role: "assistant",
-        content:
-          voice === "hector"
-            ? "Spectral HX finished. hello() is in demo/main.py."
-            : "Done. hello() is in demo/main.py.",
+        content: "Done. hello() is in demo/main.py.",
         mode: "swarm",
         speaker: voice,
       });
@@ -130,7 +128,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
           id: crypto.randomUUID(),
           role: "assistant",
           content: url
-            ? `Live on doomchat.ca, same job as grok.me.\n${url}\n${site.path && site.path !== url ? site.path : ""}`.trim()
+            ? speakDone({ written: [], proof: { done: true, fail: 0, tests: [], lints: [], stubs: [], note: "" }, url })
             : site.error?.message || "Could not publish.",
           mode: "swarm",
           speaker: voice,
@@ -154,7 +152,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
       store.pushMessage({
         id: crypto.randomUUID(),
         role: "assistant",
-        content: `Briefing Spectral HX parallel bots. Assignment: ${prompt.slice(0, 140)}.`,
+        content: speakOnIt(prompt),
         mode,
         speaker: "hector",
       });

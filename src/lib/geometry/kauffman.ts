@@ -1,4 +1,4 @@
-import { STRANDS, reduceBraid, writhe } from "./braid.ts";
+import { STRANDS, writhe } from "./braid.ts";
 import { pAdd, pClean, pFormat, pMul, type Poly } from "./poly.ts";
 
 const CAP = 12;
@@ -77,7 +77,7 @@ export function kauffmanBracket(word: number[]) {
 export function jonesPoly(word: number[]) {
   const w = word.slice(0, CAP);
   const wr = writhe(w);
-  let bracket = kauffmanBracket(w);
+  const bracket = kauffmanBracket(w);
   const factorExp = -3 * wr;
   const sign = wr % 2 === 0 ? 1 : -1;
   const shifted: Poly = {};

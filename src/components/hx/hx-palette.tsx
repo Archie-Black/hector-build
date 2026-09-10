@@ -11,7 +11,6 @@ type Props = {
 
 export function HxPalette({ open, onClose, onSend }: Props) {
   const [q, setQ] = useState("");
-  const files = useForgeStore((s) => s.files);
   const plan = useForgeStore((s) => s.plan);
 
   const items = useMemo<Item[]>(() => {

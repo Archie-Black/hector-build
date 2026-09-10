@@ -11,7 +11,6 @@ import {
   kindOf,
   type FileHead,
   type Note,
-  type Peer,
   type PeerKind,
   type Room,
   type ShareLink,

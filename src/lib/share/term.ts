@@ -101,7 +101,8 @@ export async function execSsh(input: {
     });
   }
 
-  return new Promise<{ ok: boolean; output: string }>(async (resolve) => {
+  return new Promise<{ ok: boolean; output: string }>((resolve) => {
+    void (async () => {
     const conn = new Client();
     const onion = isOnionHost(host);
     if (onion) startOnionDaemon();
@@ -154,6 +155,7 @@ export async function execSsh(input: {
         readyTimeout: onion ? 45000 : 12000,
         ...(sock ? { sock } : {}),
       });
+    })();
   });
 }
 

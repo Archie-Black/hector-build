@@ -176,8 +176,8 @@ function count(re: RegExp, text: string) {
 
 function sampleStyle(text: string, dna: Dna) {
   const tabs = count(/^\t/gm, text);
-  const two = count(/^  \S/gm, text);
-  const four = count(/^    \S/gm, text);
+  const two = count(/^ {2}\S/gm, text);
+  const four = count(/^ {4}\S/gm, text);
   if (tabs > two && tabs > four) dna.indent = "tab";
   else if (four > two * 1.4) dna.indent = "4";
   else dna.indent = "2";

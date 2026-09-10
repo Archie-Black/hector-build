@@ -46,13 +46,13 @@ export async function fathomAssure(files: Record<string, string>): Promise<Fatho
   setKind(services, "wasm.wasi", wasmOk ? "LIVE" : "STUB", filled);
 
   const smoke = wasmOk ? rustSearch(files, "lattice", 3) : null;
-  setKind(services, "wasm.search", Boolean(smoke?.hits) ? "LIVE" : "STUB", filled);
+  setKind(services, "wasm.search", smoke?.hits ? "LIVE" : "STUB", filled);
 
   const emb = wasmOk ? rustEmbed("spectral hx fathom") : null;
-  setKind(services, "wasm.embed", Boolean(emb && emb.dim) ? "LIVE" : "STUB", filled);
+  setKind(services, "wasm.embed", emb && emb.dim ? "LIVE" : "STUB", filled);
 
   const fath = wasmOk ? rustFathom(files) : null;
-  setKind(services, "wasm.fathom", Boolean(fath && fath.wasm) ? "LIVE" : "STUB", filled);
+  setKind(services, "wasm.fathom", fath && fath.wasm ? "LIVE" : "STUB", filled);
 
   const host = bootExtensionHost();
   setKind(services, "ext.host", host.loaded > 0 ? "LIVE" : "STUB", filled);

@@ -4,7 +4,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { RESERVED, isSafeSlug, slugify, urls } from "./names.ts";
+import { isSafeSlug, slugify, urls } from "./names.ts";
 
 export type Access = "private" | "link" | "public";
 export type SiteMeta = {

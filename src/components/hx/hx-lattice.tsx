@@ -17,8 +17,14 @@ export function HxLattice() {
   const [run, setRun] = useState(0);
   const [density, setDensity] = useState<Density | null>(null);
   const points = useMemo(() => writeLattice(files), [files]);
-  const rows = useMemo(() => benchRoutes(files, query), [files, query, run]);
-  const hits = useMemo(() => executeLattice(files, query, 6).hits, [files, query, run]);
+  const rows = useMemo(() => {
+    void run;
+    return benchRoutes(files, query);
+  }, [files, query, run]);
+  const hits = useMemo(() => {
+    void run;
+    return executeLattice(files, query, 6).hits;
+  }, [files, query, run]);
   const winner = pickWinner(rows);
   const seal = useMemo(() => knotSeal(Object.values(files).join("\n").slice(0, 8000)), [files]);
 

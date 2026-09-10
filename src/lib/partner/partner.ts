@@ -90,7 +90,7 @@ export function styleOf(files: Record<string, string>) {
     .join("\n")
     .slice(0, 20_000);
   const tabs = (sample.match(/^\t/gm) || []).length;
-  const spaces = (sample.match(/^  \S/gm) || []).length;
+  const spaces = (sample.match(/^ {2}\S/gm) || []).length;
   const single = (sample.match(/'/g) || []).length;
   const double = (sample.match(/"/g) || []).length;
   const semi = (sample.match(/;$/gm) || []).length;

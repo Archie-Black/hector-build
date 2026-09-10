@@ -1,4 +1,4 @@
-import { diffsFrom } from "./tools";
+import { diffsFrom } from "./diffs";
 
 export function isHelloJob(prompt: string) {
   return /hello function|add a hello|hello\(\)/i.test(prompt) && /main\.py/i.test(prompt);

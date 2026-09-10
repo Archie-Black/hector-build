@@ -8,7 +8,7 @@ import { normalizePath, pathAllowed } from "./acl";
 import { diagnostics, formatFile, findDefinition, findReferences, renameSymbol } from "@/lib/ide/symbols";
 import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
 import { gate } from "@/lib/horsemen/gateway.ts";
-import { ackNote, ingestInbox, joinPeer, leasePath, listLinks, materializeShare, postNote, registerLink, shareStatus, syncFile } from "@/lib/share/room";
+import { ingestInbox, joinPeer, leasePath, listLinks, materializeShare, postNote, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { isOnionHost, safeSshHost } from "@/lib/share/wire";
 import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";

@@ -11,23 +11,23 @@ export function CommandPalette() {
     if (open) setQ("");
   }, [open]);
 
-  const actions = [
-    { id: "save", label: "Save file", run: () => useForgeStore.getState().saveActive() },
-    { id: "format", label: "Format document", run: () => useForgeStore.getState().formatActive() },
-    { id: "test", label: "Run checks", run: () => useForgeStore.getState().runChecks() },
-    { id: "undo", label: "Undo apply", run: () => useForgeStore.getState().undoApply() },
-    { id: "search", label: "Search workspace", run: () => useForgeStore.getState().setSearchOpen(true) },
-    { id: "problems", label: "Problems", run: () => useForgeStore.getState().setBottomPane("problems") },
-    { id: "term", label: "Terminal", run: () => useForgeStore.getState().setBottomPane("term") },
-    { id: "diff", label: "Diff", run: () => useForgeStore.getState().setBottomPane("diff") },
-    { id: "chat", label: "Toggle host chat", run: () => useForgeStore.getState().setHostChatOpen(!useForgeStore.getState().hostChatOpen) },
-    { id: "node22", label: "Use Node 22", run: () => useForgeStore.getState().useNode("22") },
-    { id: "node20", label: "Use Node 20", run: () => useForgeStore.getState().useNode("20") },
-    { id: "node24", label: "Use Node 24", run: () => useForgeStore.getState().useNode("24") },
-    { id: "nodels", label: "List Node versions", run: () => useForgeStore.getState().refreshNode() },
-  ];
   const paths = Object.keys(files);
   const items = useMemo(() => {
+    const actions = [
+      { id: "save", label: "Save file", run: () => useForgeStore.getState().saveActive() },
+      { id: "format", label: "Format document", run: () => useForgeStore.getState().formatActive() },
+      { id: "test", label: "Run checks", run: () => useForgeStore.getState().runChecks() },
+      { id: "undo", label: "Undo apply", run: () => useForgeStore.getState().undoApply() },
+      { id: "search", label: "Search workspace", run: () => useForgeStore.getState().setSearchOpen(true) },
+      { id: "problems", label: "Problems", run: () => useForgeStore.getState().setBottomPane("problems") },
+      { id: "term", label: "Terminal", run: () => useForgeStore.getState().setBottomPane("term") },
+      { id: "diff", label: "Diff", run: () => useForgeStore.getState().setBottomPane("diff") },
+      { id: "chat", label: "Toggle host chat", run: () => useForgeStore.getState().setHostChatOpen(!useForgeStore.getState().hostChatOpen) },
+      { id: "node22", label: "Use Node 22", run: () => useForgeStore.getState().useNode("22") },
+      { id: "node20", label: "Use Node 20", run: () => useForgeStore.getState().useNode("20") },
+      { id: "node24", label: "Use Node 24", run: () => useForgeStore.getState().useNode("24") },
+      { id: "nodels", label: "List Node versions", run: () => useForgeStore.getState().refreshNode() },
+    ];
     const n = q.trim().toLowerCase();
     const fileHits = paths
       .filter((p) => !n || p.toLowerCase().includes(n))

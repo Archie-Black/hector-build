@@ -87,6 +87,8 @@ function MazePlay({ room }: { room: string }) {
           remotes.current[from] = { x: d.x, y: d.y };
         }
       }),
+    // p2p identity is stable enough; onMessage is the subscribe handle.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [p2p.onMessage],
   );
 
@@ -99,7 +101,7 @@ function MazePlay({ room }: { room: string }) {
     const agent = new Image();
     agent.src = "/hector/agent-v2.png";
 
-    let map = makeMap();
+    const map = makeMap();
     let px = 1;
     let py = 1;
     let bombs: { x: number; y: number; t: number; range: number }[] = [];
@@ -281,6 +283,7 @@ function MazePlay({ room }: { room: string }) {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p2p.broadcast]);
 
   return (

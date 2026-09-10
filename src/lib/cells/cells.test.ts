@@ -1,6 +1,5 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { executeIsa } from "../chips/die.ts";
 import {
   autophagy,
   entangle,

@@ -24,7 +24,7 @@ import { dapContinue, dapNext, pickAdapter, workspaceLaunch, type DapSession } f
 import { silentIndex, type IndexSnapshot } from "@/lib/ide/indexer";
 import { fathomAssure, type FathomReport } from "@/lib/ide/fathom-agent";
 import { pinnedNode } from "@/lib/ide/node-pin";
-import { nodeRuntimeStatus, nodeRuntimeUse, type NodeRuntime } from "@/lib/ide/node-runtime.server";
+import { nodeRuntimeStatus, nodeRuntimeUse, type NodeRuntime } from "@/lib/ide/node-runtime";
 import { advanceTasks, planJob, type AgentRole, type AgentTask, type TaskStatus } from "@/lib/workspace/team";
 import {
   buildDailyUpdate,

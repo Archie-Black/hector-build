@@ -34,18 +34,10 @@ export function MonacoPane({ onEdit }: Props) {
     void (async () => {
       const monaco = await import("monaco-editor");
       if (dead || !host.current) return;
-      const editorWorker = await import("monaco-editor/esm/vs/editor/editor.worker.js?worker");
-      const jsonWorker = await import("monaco-editor/esm/vs/language/json/json.worker.js?worker");
-      const cssWorker = await import("monaco-editor/esm/vs/language/css/css.worker.js?worker");
-      const htmlWorker = await import("monaco-editor/esm/vs/language/html/html.worker.js?worker");
-      const tsWorker = await import("monaco-editor/esm/vs/language/typescript/ts.worker.js?worker");
       self.MonacoEnvironment = {
-        getWorker(_id: string, label: string) {
-          if (label === "json") return new jsonWorker.default();
-          if (label === "css" || label === "scss" || label === "less") return new cssWorker.default();
-          if (label === "html" || label === "handlebars" || label === "razor") return new htmlWorker.default();
-          if (label === "typescript" || label === "javascript") return new tsWorker.default();
-          return new editorWorker.default();
+        getWorker() {
+          const src = "self.onmessage=function(){};";
+          return new Worker(URL.createObjectURL(new Blob([src], { type: "text/javascript" })));
         },
       };
       monaco.editor.defineTheme("spectral-hx", {
