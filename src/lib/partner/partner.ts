@@ -147,15 +147,15 @@ export function wantsVisual(prompt: string) {
   return /(figma|screenshot|mockup|wireframe|pixel|layout|spacing)/i.test(prompt);
 }
 
-export async function healLoop(prompt: string, files: Record<string, string>, max = 3) {
+export async function healLoop(prompt: string, files: Record<string, string>, max?: number) {
   const traces: { name: string; ok: boolean; detail: string }[] = [];
   let next = { ...files };
   let proof: Proof = prove(next);
   let rounds = 0;
-  while (!proof.done && rounds < max) {
+  const cap = max ?? (await import("../ide/overclock.ts")).clockRounds();
+  while (!proof.done && rounds < cap) {
     rounds += 1;
     const { synthesizeFiles } = await import("../hector-api/synthesize.ts");
-    rounds += 1;
     const extra = iacOf(prompt);
     const gen = synthesizeFiles(`Fix until prove passes. ${proof.note}. Job: ${prompt.slice(0, 400)}`, next);
     next = { ...next, ...gen, ...extra };

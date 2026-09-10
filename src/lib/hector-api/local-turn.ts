@@ -8,6 +8,7 @@ import { silentCouple } from "@/lib/chips/silent.ts";
 import { recordTurn } from "@/lib/os/mm";
 import { learn } from "@/lib/lingo/lingua";
 import { logExec, markAgent, noteCorrection, watchHuman } from "@/lib/xp/experience";
+import { ingest, retrieveFor } from "@/lib/tune/tuner";
 import { healLoop, iacOf, rememberRepo, wantsVisual } from "@/lib/partner/partner";
 import { speakDone, speakPlan, speakScout } from "@/lib/partner/speak";
 
@@ -42,6 +43,8 @@ export async function runLocalTurn(input: {
   }
   const arch = rememberRepo(files, prompt);
   if (arch.hits[0]) traces.push({ name: "arch", ok: true, detail: arch.hits.map((h) => h.path).slice(0, 4).join(", ") });
+  const rag = retrieveFor(prompt, files);
+  if (rag[0]) traces.push({ name: "rag", ok: true, detail: rag.map((h) => h.path || h.kind).slice(0, 4).join(", ") });
 
   if (mode === "scout") {
     const lint = diagnostics(files).slice(0, 12);
@@ -96,6 +99,7 @@ export async function runLocalTurn(input: {
   recordTurn({ agent: "hx", prompt, ok: p.done, note: p.note });
   logExec(prompt, p, files);
   markAgent(files);
+  ingest({ prompt, proof: p, files });
   const diffs = diffsFrom(before, files);
   const written = Object.keys(generated);
   return {

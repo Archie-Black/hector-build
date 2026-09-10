@@ -18,6 +18,7 @@ import { executeExtension, EXTENSION_TOOLS, isExtensionTool } from "@/lib/hector
 import { silentCouple } from "@/lib/chips/silent.ts";
 import { learn, render } from "@/lib/lingo/lingua";
 import { logExec, markAgent, noteCorrection, watchHuman, xpContext } from "@/lib/xp/experience";
+import { ingest, retrieveFor } from "@/lib/tune/tuner";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -552,7 +553,8 @@ export const runForgeTurn = createServerFn({ method: "POST" })
 
     const recalled = await recallMemory({ data: data.prompt });
     silentCouple(data.prompt, data.files);
-    const lessons = [...(data.lessons ?? []), ...formatRecall(recalled), ...lessonsFor("hx", data.prompt).slice(0, 6), ...lessonsFor("hector", data.prompt).slice(0, 4), ...xpContext(data.prompt).split("\n").filter(Boolean).slice(0, 10)];
+    const ragLines = retrieveFor(data.prompt, data.files).map((h) => h.text.slice(0, 120));
+    const lessons = [...(data.lessons ?? []), ...formatRecall(recalled), ...lessonsFor("hx", data.prompt).slice(0, 6), ...lessonsFor("hector", data.prompt).slice(0, 4), ...xpContext(data.prompt).split("\n").filter(Boolean).slice(0, 10), ...ragLines.slice(0, 4)];
     const mode = data.mode;
     const compact = engine.kind === "ollama" || engine.kind === "lmstudio";
     const system = compact
@@ -758,6 +760,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     const p = prove(files);
     logExec(data.prompt, p, files);
     markAgent(files);
+    ingest({ prompt: data.prompt, proof: p, files });
 
     return {
       ok: true,
