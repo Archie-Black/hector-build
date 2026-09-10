@@ -9,6 +9,7 @@ import { recallMemory } from "@/lib/memory/warehouse";
 import { rustSearchNative } from "@/lib/geometry/mdv-native";
 import { critique, revisionPrompt } from "@/lib/align/cai";
 import { harmScan } from "@/lib/align/asimov";
+import { runLocalTurn } from "@/lib/hector-api/local-turn";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -292,8 +293,15 @@ type TurnInput = {
 type Msg = Record<string, unknown>;
 
 export const probeOwnerKey = createServerFn({ method: "POST" }).handler(async () => {
-  return { ownerReady: Boolean(process.env.XAI_API_KEY) };
+  return { ownerReady: true, engine: "hector-api" as const };
 });
+
+function useLocalEngine(baseUrl: string, model: string, apiKey: string) {
+  if (!apiKey) return true;
+  if (/hector-hx|spectral-hx|hx-local/.test(model)) return true;
+  const root = safeChatBase(baseUrl) || "";
+  return root === "/api/v1" || root.endsWith("/api/v1");
+}
 
 async function webSearch(query: string) {
   const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
@@ -342,16 +350,15 @@ export const runForgeTurn = createServerFn({ method: "POST" })
         tests: runWorkspaceTests(data.files),
       };
     }
-    if (!apiKey) {
-      return {
-        ok: false,
-        needKey: true,
-        error: "Connect a chatbot to work.",
-        reply: "",
+    const baseUrl = data.baseUrl || "/api/v1";
+    const requested = (data.model || "").trim();
+    if (useLocalEngine(baseUrl, requested, apiKey)) {
+      return runLocalTurn({
+        prompt: data.prompt,
         files: data.files,
-        traces: [],
-        tests: runWorkspaceTests(data.files),
-      };
+        mode: data.mode,
+        history: data.history,
+      });
     }
 
     const recalled = await recallMemory({ data: data.prompt });
@@ -372,8 +379,6 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     let plan = "";
     let reply = "";
     const maxRounds = mode === "swarm" ? 16 : mode === "patch" ? 8 : mode === "plan" ? 6 : 5;
-    const requested = (data.model || "").trim();
-    const baseUrl = data.baseUrl || "https://api.x.ai/v1";
     let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : "gpt-4.1");
 
     for (let round = 0; round < maxRounds; round++) {

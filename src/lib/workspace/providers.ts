@@ -1,4 +1,4 @@
-export type ChatProviderId = "xai" | "openai" | "groq" | "openrouter" | "custom";
+export type ChatProviderId = "hector" | "xai" | "openai" | "groq" | "openrouter" | "custom";
 
 export type ChatProvider = {
   id: ChatProviderId;
@@ -10,6 +10,14 @@ export type ChatProvider = {
 };
 
 export const CHAT_PROVIDERS: ChatProvider[] = [
+  {
+    id: "hector",
+    name: "Hector API",
+    baseUrl: "/api/v1",
+    model: "hector-hx",
+    keysUrl: "",
+    hint: "Built in. No cloud key. Other chatbots can point at /api/v1 (OpenAI-compatible). Add a cloud key only to boost.",
+  },
   {
     id: "xai",
     name: "Grok (xAI)",
@@ -92,6 +100,8 @@ export function saveProvider(next: { id: ChatProviderId; baseUrl: string; model:
 }
 
 export function safeChatBase(raw: string): string | null {
+  const t = raw.trim();
+  if (t === "/api/v1" || t === "hector" || t.endsWith("/api/v1")) return "/api/v1";
   try {
     const url = new URL(raw);
     const host = url.hostname.toLowerCase();

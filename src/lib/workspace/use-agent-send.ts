@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForgeStore } from "@/lib/forge-store";
 import { explainTrace, pickMode } from "@/lib/workspace/intent";
-import { isApiKey } from "@/lib/workspace/keys";
 import { probeOwnerKey, runForgeTurn } from "@/lib/workspace/run-turn";
 import { hashFiles, knotSeals } from "@/lib/workspace/hash";
 import { isHelloJob, localApply } from "@/lib/workspace/local-job";
@@ -105,11 +104,6 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
       return;
     }
 
-    if (!store.ownerReady && !isApiKey(store.visitorKey)) {
-      store.setNeedKey(true);
-      setError("Connect a chatbot first.");
-      return;
-    }
     if (/(install|npm i |pip install|apt install)/i.test(prompt)) {
       store.pushTerm("STUB install — preview host will not run package managers.");
     }

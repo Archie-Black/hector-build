@@ -45,10 +45,6 @@ export function HxConnect({ onReady }: Props) {
   }
 
   function connect() {
-    if (!isApiKey(key) && !haveKey && !ownerReady) {
-      setError("Paste an API key from your chatbot.");
-      return;
-    }
     useForgeStore.getState().setChatProvider({
       id,
       baseUrl,
@@ -68,7 +64,7 @@ export function HxConnect({ onReady }: Props) {
         <SpectreStage busy={false} ghosts={3} />
         <h1 className="mt-5 text-center text-3xl font-medium tracking-tight">Spectral HX</h1>
         <p className="mt-2 text-center text-sm text-muted text-pretty">
-          Coding floor. Maps this machine, then talks to any chatbot.
+          Coding floor. Hector API is built in. Other chatbots optional.
         </p>
         {scan ? (
           <p className="mt-3 text-center font-mono text-[10px] text-subtle">{scanLines(scan).slice(0, 3).join(" · ")}</p>
@@ -142,6 +138,7 @@ export function HxConnect({ onReady }: Props) {
           placeholder="model id"
           className="mt-3 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
         />
+        {id !== "hector" ? (
         <input
           type="password"
           value={key}
@@ -150,6 +147,9 @@ export function HxConnect({ onReady }: Props) {
           autoComplete="off"
           className="mt-3 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
         />
+        ) : (
+          <p className="mt-3 text-center text-xs text-subtle">No cloud key. Point other tools at /api/v1 · model hector-hx.</p>
+        )}
         {error ? <p className="mt-2 text-sm text-fail">{error}</p> : null}
         <Button type="button" className="mt-5 h-12 w-full" onClick={connect}>
           Start building
