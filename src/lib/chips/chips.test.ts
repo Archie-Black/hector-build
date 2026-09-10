@@ -60,6 +60,6 @@ describe("agent chips", () => {
     assert.equal(o.lead, "death");
     assert.equal(o.chips.length, 4);
     assert.equal(o.chips[0].die.kind, "death");
-    assert.ok(o.brief.startsWith("Hector leads"));
+    assert.equal(o.brief, "");
   });
 });

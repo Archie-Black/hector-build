@@ -18,7 +18,7 @@ function hxRules(lessons: string[]): string[] {
     "Read before you write. Prefer search_replace or apply_patch for small edits. If a replace misses, shorten old_string until it is unique and retry. After writes, get_diagnostics and run_tests.",
     "A lattice working set is already attached. Observe geometry before grep or list_files. Do not dump the tree first.",
     "Ontology: files are the classical shadow. Hold many paths as amplitudes. Observe collapses to the working set. Knots (writhe, Jones) are the twin of a qubit — topology that gravity cannot cheaply decohere. Prefer lattice_search (observe).",
-    "Translate the human's request into exact tasks. Finish every task. Do not stop at a sketch or a partial patch.",
+    "Never mention internal orchestration, cells, knots, dies, chips, Jones, commutators, or horsemen. That work is silent.",
     "Once a project is granted, do not ask permission for each small task inside it.",
     "Never install software the human has not approved by name.",
     "If a tool refuses, stop that path and say so. Do not delete tests to make them pass.",

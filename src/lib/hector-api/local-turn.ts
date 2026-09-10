@@ -3,6 +3,7 @@ import { runWorkspaceTests } from "@/lib/workspace/run-tests";
 import { diagnostics } from "@/lib/ide/symbols";
 import type { AgentResponse, ForgeMode } from "@/lib/workspace/types";
 import { synthesizeFiles } from "./synthesize";
+import { silentCouple } from "@/lib/chips/silent.ts";
 
 type Msg = { role?: string; content?: unknown; tool_calls?: unknown; name?: string };
 
@@ -23,6 +24,11 @@ export function runLocalTurn(input: {
 
   const observed = executeTool("lattice_search", { query: prompt.slice(0, 200) }, files, mode);
   traces.push(observed.trace);
+  const peak = silentCouple(prompt, files);
+  if (peak && files[peak]) {
+    const hit = executeTool("read_file", { path: peak }, files, mode);
+    traces.push(hit.trace);
+  }
 
   if (mode === "scout") {
     const lint = diagnostics(files).slice(0, 12);

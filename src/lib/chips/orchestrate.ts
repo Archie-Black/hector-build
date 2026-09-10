@@ -1,6 +1,7 @@
-import { dieStatus, eepromWrite, executeIsa, mintDie, snapshot, type DieState } from "./die.ts";
+import { dieStatus, eepromWrite, snapshot, type DieState } from "./die.ts";
 import { couple, residueOf, type Emergent, type Residue } from "./substrate.ts";
-import { HECTOR_ID, hectorDelegate, type HorsemanId } from "../horsemen/index.ts";
+import { type HorsemanId } from "../horsemen/index.ts";
+import { cellStatus, entangle, mintCell, mitosis, repair, transcribe, tunnel, type Cell } from "../cells/cell.ts";
 
 export type ChipReport = {
   die: ReturnType<typeof dieStatus>;
@@ -12,6 +13,7 @@ export type Orchestra = {
   prompt: string;
   chips: ChipReport[];
   emergent: Emergent[];
+  tissue: string[][];
   brief: string;
 };
 
@@ -31,61 +33,58 @@ function pathsOf(files: Record<string, string>, query: string) {
 }
 
 function bootCard(files: Record<string, string>) {
-  const hector = mintDie("death", "hector");
-  hector.snap = snapshot(hector);
+  const hector = mintCell("death", "hector");
+  hector.die.snap = snapshot(hector.die);
   for (const [path, body] of Object.entries(files).slice(0, 24)) {
     try {
-      eepromWrite(hector, path, body.slice(0, 4000));
+      eepromWrite(hector.die, path, body.slice(0, 4000));
     } catch {
       break;
     }
   }
-  const riders = RIDERS.map((k) => mintDie(k));
+  const riders = RIDERS.map((k) => mintCell(k));
   return { hector, riders };
 }
 
-/** Hector mints three dies, they never share RAM, substrate couples them. */
+/** Hector's germline mints immortal somatic cells. No die shares RAM. */
 export function orchestrate(prompt: string, files: Record<string, string>): Orchestra {
   const { hector, riders } = bootCard(files);
-  executeIsa(hector, prompt.slice(0, 240));
+  transcribe(hector, prompt.slice(0, 240));
 
   const residues: Residue[] = [];
   const chips: ChipReport[] = [];
 
-  const views = [
-    { die: riders[0], q: prompt },
-    { die: riders[1], q: `${prompt} isolate audit policy deny` },
-    { die: riders[2], q: `${prompt} test check prove` },
+  const views: { cell: Cell; q: string }[] = [
+    { cell: riders[0]!, q: prompt },
+    { cell: riders[1]!, q: `${prompt} isolate audit policy deny` },
+    { cell: riders[2]!, q: `${prompt} test check prove` },
   ];
 
   for (const v of views) {
-    executeIsa(v.die, v.q.slice(0, 240));
+    transcribe(v.cell, v.q.slice(0, 240));
+    repair(v.cell);
+    tunnel(v.cell, hector);
+    entangle(v.cell, hector);
     const top = pathsOf(files, v.q);
-    residues.push(residueOf(v.die, top));
-    chips.push({ die: dieStatus(v.die), top: top.slice(0, 3) });
+    residues.push(residueOf(v.cell.die, top));
+    chips.push({ die: cellStatus(v.cell), top: top.slice(0, 3) });
   }
 
-  residues.unshift(residueOf(hector, pathsOf(files, prompt)));
-  chips.unshift({ die: dieStatus(hector), top: pathsOf(files, prompt).slice(0, 3) });
+  residues.unshift(residueOf(hector.die, pathsOf(files, prompt)));
+  chips.unshift({ die: cellStatus(hector), top: pathsOf(files, prompt).slice(0, 3) });
 
   const emergent = couple(residues);
-  const del = hectorDelegate(prompt);
-  const peak = emergent[0];
-  const knot = peak?.knot;
-  const brief = [
-    `Hector leads ${riders.length} dies on one card.`,
-    peak ? `Emergent ${peak.path}.` : "No coupling yet.",
-    knot ? `Knot: commutator=${knot.commutator} Jones=${knot.jones} split=${knot.split}.` : "",
-    del.text,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  return { lead: "death", prompt: prompt.slice(0, 240), chips, emergent, brief };
+  const tissueIds = [
+    [hector.die.spec.id, ...hector.entangled],
+    ...riders.map((r) => [r.die.spec.id, ...r.entangled]),
+  ];
+  return { lead: "death", prompt: prompt.slice(0, 240), chips, emergent, tissue: tissueIds, brief: "" };
 }
 
 export function mintSpawn(parent: DieState, task: string) {
-  const child = mintDie("spawn", `${parent.spec.id}:spawn`);
-  executeIsa(child, task);
-  return { parent: dieStatus(parent), child: dieStatus(child) };
+  const host = mintCell(parent.spec.kind, parent.spec.id);
+  host.die = parent;
+  const { daughter } = mitosis(host);
+  transcribe(daughter, task);
+  return { parent: dieStatus(parent), child: dieStatus(daughter.die) };
 }

@@ -1,7 +1,5 @@
 import { arcadeAuthorize, arcadeCtx, arcadeExecute, arcadeList } from "./arcade";
 import { gcpCall, gcpCtx, gcpList, GCP_MCP_SERVERS } from "./gcp-mcp";
-import { askBot, HECTOR_ID, superBotBrief } from "@/lib/horsemen/index.ts";
-import { orchestrate } from "@/lib/chips/orchestrate.ts";
 import {
   cloudStatus,
   deleteFunction,
@@ -120,41 +118,6 @@ export const EXTENSION_TOOLS = [
       },
     },
   },
-  {
-    type: "function" as const,
-    function: {
-      name: "horsemen_roster",
-      description: "List the four horsemen. Hector (Death) is the leader.",
-      parameters: { type: "object", properties: {} },
-    },
-  },
-  {
-    type: "function" as const,
-    function: {
-      name: "horsemen_ask",
-      description: "Hector delegates one hop to Conquest, War, or Famine.",
-      parameters: {
-        type: "object",
-        properties: {
-          target: { type: "string", description: "conquest | war | famine" },
-          message: { type: "string" },
-        },
-        required: ["target"],
-      },
-    },
-  },
-  {
-    type: "function" as const,
-    function: {
-      name: "chip_orchestrate",
-      description: "Hector mints isolated dies and couples them by knot commutator / Jones split test.",
-      parameters: {
-        type: "object",
-        properties: { prompt: { type: "string" } },
-        required: ["prompt"],
-      },
-    },
-  },
 ];
 
 export function isExtensionTool(name: string) {
@@ -170,10 +133,7 @@ export function isExtensionTool(name: string) {
     name === "cloud_object_put" ||
     name === "cloud_object_get" ||
     name === "cloud_object_list" ||
-    name === "cloud_status" ||
-    name === "horsemen_roster" ||
-    name === "horsemen_ask" ||
-    name === "chip_orchestrate"
+    name === "cloud_status"
   );
 }
 
@@ -228,15 +188,6 @@ export async function executeExtension(name: string, args: Record<string, unknow
     if (name === "cloud_object_put") return { ok: true, detail: String(args.key), payload: putObject(String(args.key), String(args.body ?? "")) };
     if (name === "cloud_object_get") return { ok: true, detail: String(args.key), payload: getObject(String(args.key)) };
     if (name === "cloud_object_list") return { ok: true, detail: "objects", payload: listObjects() };
-    if (name === "horsemen_roster") return { ok: true, detail: "hector leads", payload: superBotBrief() };
-    if (name === "horsemen_ask") {
-      const target = String(args.target ?? "death");
-      const payload = askBot(HECTOR_ID, target as "conquest" | "war" | "famine" | "death", String(args.message ?? ""), 0);
-      return { ok: true, detail: payload.from, payload };
-    }
-    if (name === "chip_orchestrate") {
-      return { ok: true, detail: "orchestra", payload: orchestrate(String(args.prompt ?? ""), {}) };
-    }
     return { ok: false, detail: `Unknown extension ${name}`, payload: { error: name } };
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);

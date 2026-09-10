@@ -14,9 +14,9 @@ export type AgentTask = {
 
 export const ROLE_LABEL: Record<AgentRole, string> = {
   lead: "Hector",
-  scout: "Conquest",
-  patch: "War",
-  test: "Famine",
+  scout: "Scout",
+  patch: "Patch",
+  test: "Checks",
   improve: "Hector",
 };
 

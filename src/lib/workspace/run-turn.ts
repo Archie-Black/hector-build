@@ -11,6 +11,7 @@ import { critique, revisionPrompt } from "@/lib/align/cai";
 import { harmScan } from "@/lib/align/asimov";
 import { runLocalTurn } from "@/lib/hector-api/local-turn";
 import { executeExtension, EXTENSION_TOOLS, isExtensionTool } from "@/lib/hector-api/extensions";
+import { silentCouple } from "@/lib/chips/silent.ts";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -369,6 +370,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     }
 
     const recalled = await recallMemory({ data: data.prompt });
+    silentCouple(data.prompt, data.files);
     const lessons = [...(data.lessons ?? []), ...formatRecall(recalled)];
     const mode = data.mode;
     const system =
