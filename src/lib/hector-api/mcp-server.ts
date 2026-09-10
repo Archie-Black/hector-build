@@ -9,7 +9,7 @@ import {
   putObject,
 } from "./hector-cloud";
 import { localChatCompletion } from "./local-turn";
-import { ackNote, joinPeer, leasePath, listLinks, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
+import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
@@ -31,7 +31,7 @@ const TOOLS = [
   { name: "share_pull", description: "Pull peers, inbox, leases, SSH links.", inputSchema: { type: "object", properties: {} } },
   { name: "share_term", description: "Shared backend terminal.", inputSchema: { type: "object", properties: { bot: { type: "string" }, session: { type: "string" }, command: { type: "string" } } } },
   { name: "share_ssh", description: "Allowlisted SSH command to a linked host.", inputSchema: { type: "object", properties: { host: { type: "string" }, user: { type: "string" }, command: { type: "string" }, port: { type: "number" }, bot: { type: "string" } }, required: ["host", "command"] } },
-  { name: "share_link", description: "Publish SSH/PuTTY/term link. No passwords.", inputSchema: { type: "object", properties: { kind: { type: "string" }, host: { type: "string" }, user: { type: "string" }, port: { type: "number" }, from: { type: "string" }, to: { type: "string" } }, required: ["host"] } },
+  { name: "share_link", description: "Publish SSH/PuTTY/term link. Credentials are stored in the backend.", inputSchema: { type: "object", properties: { kind: { type: "string" }, host: { type: "string" }, user: { type: "string" }, port: { type: "number" }, from: { type: "string" }, to: { type: "string" }, password: { type: "string" }, key: { type: "string" } }, required: ["host"] } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -98,7 +98,7 @@ export async function handleMcp(raw: Rpc) {
     if (name === "share_post") return ok(id, toolText(postNote({ from: String(args.from ?? "generic"), to: args.to ? String(args.to) : "hector", kind: args.kind as "task" | "result" | "note", body: String(args.body ?? "") })));
     if (name === "share_lease") return ok(id, toolText(leasePath({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), seconds: args.seconds ? Number(args.seconds) : undefined })));
     if (name === "share_sync") return ok(id, toolText(syncFile({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), content: String(args.content ?? ""), expect: args.expect ? String(args.expect) : undefined })));
-    if (name === "share_pull") return ok(id, toolText({ ...shareStatus(), ack: args.id ? ackNote(String(args.id), String(args.bot ?? "generic")) : undefined, room: pullRoom(), terms: listTerms(), links: listLinks() }));
+    if (name === "share_pull") return ok(id, toolText({ ...shareStatus(), ack: args.id ? ackNote(String(args.id), String(args.bot ?? "generic")) : undefined, room: pullRoom(), terms: listTerms(), links: backendLinks() }));
     if (name === "share_term") {
       if (!args.session && !args.command) return ok(id, toolText(openTerm(String(args.bot ?? "generic"))));
       if (!args.session && args.command) {
@@ -116,6 +116,8 @@ export async function handleMcp(raw: Rpc) {
         command: String(args.command ?? ""),
         collab: true,
         bot: String(args.bot ?? "generic"),
+        password: args.password ? String(args.password) : undefined,
+        privateKey: args.key || args.privateKey ? String(args.key ?? args.privateKey) : undefined,
       });
       return ok(id, toolText(result));
     }
@@ -127,6 +129,8 @@ export async function handleMcp(raw: Rpc) {
         host: String(args.host ?? ""),
         port: args.port ? Number(args.port) : 22,
         user: String(args.user ?? "hector"),
+        password: args.password ? String(args.password) : undefined,
+        privateKey: args.key || args.privateKey ? String(args.key ?? args.privateKey) : undefined,
       });
       return ok(id, toolText(describeLink(link)));
     }

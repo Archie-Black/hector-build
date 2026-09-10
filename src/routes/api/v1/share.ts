@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { jsonApi } from "@/lib/hector-api/complete";
-import { ackNote, joinPeer, leasePath, listLinks, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
+import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 
 const CORS = {
@@ -12,7 +12,7 @@ const CORS = {
 export const Route = createFileRoute("/api/v1/share")({
   server: {
     handlers: {
-      GET: () => jsonApi({ object: "hector.share", ...shareStatus(), room: pullRoom() }),
+      GET: () => jsonApi({ object: "hector.share", ...shareStatus(), room: pullRoom(), links: backendLinks(), terms: listTerms() }),
       POST: async ({ request }: { request: Request }) => {
         const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
         const op = String(body?.op ?? body?.action ?? "");
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/v1/share")({
         if (op === "ack") return jsonApi({ note: ackNote(String(body?.id ?? ""), String(body?.bot ?? "generic")) });
         if (op === "lease") return jsonApi(leasePath({ bot: String(body?.bot ?? "generic"), path: String(body?.path ?? ""), seconds: body?.seconds ? Number(body.seconds) : undefined }));
         if (op === "sync") return jsonApi(syncFile({ bot: String(body?.bot ?? "generic"), path: String(body?.path ?? ""), content: String(body?.content ?? ""), expect: body?.expect ? String(body.expect) : undefined }));
-        if (op === "pull") return jsonApi({ room: pullRoom(), terms: listTerms(), links: listLinks() });
+        if (op === "pull") return jsonApi({ room: pullRoom(), terms: listTerms(), links: backendLinks() });
         if (op === "link") {
           const link = registerLink({
             from: String(body?.from ?? "generic"),
@@ -31,6 +31,8 @@ export const Route = createFileRoute("/api/v1/share")({
             port: body?.port ? Number(body.port) : 22,
             user: String(body?.user ?? "hector"),
             session: body?.session ? String(body.session) : undefined,
+            password: body?.password ? String(body.password) : undefined,
+            privateKey: body?.key || body?.privateKey ? String(body.key ?? body.privateKey) : undefined,
           });
           return jsonApi(describeLink(link));
         }

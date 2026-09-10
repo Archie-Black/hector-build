@@ -55,7 +55,9 @@ export function redactSecrets(text: string) {
     .replace(/sk-or-[A-Za-z0-9_-]{8,}/g, "sk-or-***")
     .replace(/sk-[A-Za-z0-9_-]{8,}/g, "sk-***")
     .replace(/gsk_[A-Za-z0-9_-]{8,}/g, "gsk_***")
-    .replace(/Bearer\s+\S+/gi, "Bearer ***");
+    .replace(/Bearer\s+\S+/gi, "Bearer ***")
+    .replace(/(password|passwd|pwd)\s*[:=]\s*\S+/gi, "$1=***")
+    .replace(/-pw\s+\S+/g, "-pw ***");
 }
 
 function slotKey(slot: string) {

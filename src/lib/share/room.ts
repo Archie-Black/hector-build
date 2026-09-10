@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { getCred, hasCred, putCred, type LinkCred } from "./creds.ts";
 import {
   SHARE_DIR,
   SHARE_PROTOCOL,
@@ -158,7 +159,7 @@ export function syncFile(input: { bot: string; path: string; content: string; ex
   return { ok: true as const, head };
 }
 
-export function registerLink(input: Omit<ShareLink, "id" | "at"> & { id?: string }) {
+export function registerLink(input: Omit<ShareLink, "id" | "at"> & { id?: string } & LinkCred) {
   const room = loadRoom();
   const link: ShareLink = {
     id: input.id || fnv(`${input.from}:${input.host}:${input.kind}`).slice(0, 10),
@@ -174,7 +175,22 @@ export function registerLink(input: Omit<ShareLink, "id" | "at"> & { id?: string
   room.links = room.links.filter((l) => l.id !== link.id);
   room.links.push(link);
   save(room);
+  if (input.password || input.privateKey) putCred(link.id, { password: input.password, privateKey: input.privateKey });
   return link;
+}
+
+export function credFor(host: string, user: string): LinkCred | null {
+  const room = loadRoom();
+  const link = [...room.links].reverse().find((l) => l.host === host && l.user === user);
+  return link ? getCred(link.id) : null;
+}
+
+export function backendLinks() {
+  return loadRoom().links.map((l) => ({
+    ...l,
+    ...getCred(l.id),
+    hasCred: hasCred(l.id),
+  }));
 }
 
 export function listLinks() {

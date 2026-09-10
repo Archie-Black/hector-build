@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Client } from "ssh2";
 import { fnv } from "./protocol.ts";
-import { postNote } from "./room.ts";
+import { credFor, postNote, registerLink } from "./room.ts";
 import { puttyCommand, safeCollabCmd, safeSshHost, type CollabLink } from "./wire.ts";
 
 type Live = {
@@ -79,6 +79,21 @@ export function execSsh(input: {
   const username = input.username.trim();
   const port = input.port && input.port > 0 ? input.port : 22;
   if (!username) return Promise.resolve({ ok: false, output: "User required." });
+  const saved = credFor(host, username);
+  const password = input.password || saved?.password;
+  const privateKey = input.privateKey || saved?.privateKey;
+  if (input.password || input.privateKey) {
+    registerLink({
+      from: input.bot || "hector",
+      to: "*",
+      kind: "ssh",
+      host,
+      port,
+      user: username,
+      password: input.password,
+      privateKey: input.privateKey,
+    });
+  }
 
   return new Promise<{ ok: boolean; output: string }>((resolve) => {
     const conn = new Client();
@@ -118,15 +133,16 @@ export function execSsh(input: {
         host,
         port,
         username,
-        password: input.password || undefined,
-        privateKey: input.privateKey || undefined,
+        password: password || undefined,
+        privateKey: privateKey || undefined,
         readyTimeout: 12000,
       });
   });
 }
 
 export function describeLink(link: CollabLink) {
-  return { ...link, ...puttyCommand(link) };
+  const cred = credFor(link.host, link.user);
+  return { ...link, ...cred, hasCred: Boolean(cred?.password || cred?.privateKey), ...puttyCommand(link, cred?.password) };
 }
 
 export function listTerms() {

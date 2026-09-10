@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { detectFolderBots, fnv, kindOf } from "./protocol.ts";
-import { joinPeer, leasePath, postNote, registerLink, syncFile, materializeShare } from "./room.ts";
+import { joinPeer, leasePath, postNote, registerLink, syncFile, materializeShare, credFor } from "./room.ts";
 import { puttyCommand, safeCollabCmd, safeSshHost } from "./wire.ts";
 
 describe("shared workspace", () => {
@@ -58,5 +58,21 @@ describe("shared workspace", () => {
     assert.equal(safeCollabCmd("uname -a; cat /etc/shadow"), null);
     const link = registerLink({ from: "hector", to: "grok-build", kind: "putty", host: "127.0.0.1", port: 22, user: "dev" });
     assert.ok(puttyCommand(link).putty.includes("dev@127.0.0.1"));
+  });
+
+  it("keeps passwords in the backend, not the project tree", () => {
+    registerLink({
+      from: "hector",
+      to: "grok-build",
+      kind: "ssh",
+      host: "192.168.1.20",
+      port: 22,
+      user: "dev",
+      password: "hunter2",
+    });
+    const saved = credFor("192.168.1.20", "dev");
+    assert.equal(saved?.password, "hunter2");
+    const files = materializeShare({ "README.md": "x" });
+    assert.equal(files[".hector/share/links.json"]?.includes("hunter2"), false);
   });
 });

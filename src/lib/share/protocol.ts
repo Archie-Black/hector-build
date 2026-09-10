@@ -96,7 +96,8 @@ Any build bot can work this folder with Hector.
 4. Sync a file: { "op":"sync", "bot":"<id>", "path":"src/app.ts", "content":"..." }
 5. Pull: GET /api/v1/share
 6. Terminal: POST { "op":"term", "bot":"<id>", "command":"git status" }  (allowlisted)
-7. SSH: POST { "op":"ssh", "bot":"<id>", "host":"192.168.1.10", "user":"dev", "command":"uname -a" }
+7. SSH: POST { "op":"ssh", "bot":"<id>", "host":"192.168.1.10", "user":"dev", "password":"...", "command":"uname -a" }
+   Credentials stay in the backend (data/share/creds.json) and are reused. Not written into the project tree.
    PuTTY/plink on Windows: packaging\\\\windows\\\\hector-putty.cmd user@host
 
 Same-folder bots: drop JSON notes into \`.hector/share/inbox.jsonl\` (one object per line).

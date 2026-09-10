@@ -285,6 +285,8 @@ const TOOLS = [
           port: { type: "number" },
           command: { type: "string" },
           bot: { type: "string" },
+          password: { type: "string" },
+          key: { type: "string" },
         },
         required: ["host", "command"],
       },
@@ -294,7 +296,7 @@ const TOOLS = [
     type: "function",
     function: {
       name: "share_link",
-      description: "Publish an SSH / PuTTY / terminal link for other bots. No passwords stored.",
+      description: "Publish an SSH / PuTTY / terminal link. Passwords and keys are stored in the backend and reused.",
       parameters: {
         type: "object",
         properties: {
@@ -305,6 +307,8 @@ const TOOLS = [
           from: { type: "string" },
           to: { type: "string" },
           session: { type: "string" },
+          password: { type: "string" },
+          key: { type: "string" },
         },
         required: ["host"],
       },

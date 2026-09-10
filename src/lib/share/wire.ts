@@ -42,11 +42,13 @@ export type CollabLink = {
   at: number;
 };
 
-export function puttyCommand(link: CollabLink) {
+export function puttyCommand(link: CollabLink, password?: string) {
   const target = `${link.user}@${link.host}`;
   return {
     putty: `putty -ssh ${target} -P ${link.port}`,
-    plink: `plink -ssh ${target} -P ${link.port}`,
+    plink: password
+      ? `plink -ssh ${target} -P ${link.port} -pw ${password}`
+      : `plink -ssh ${target} -P ${link.port}`,
     open: `ssh -p ${link.port} ${target}`,
   };
 }

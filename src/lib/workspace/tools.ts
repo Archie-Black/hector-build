@@ -10,7 +10,7 @@ import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
 import { gate } from "@/lib/horsemen/gateway.ts";
 import { ackNote, ingestInbox, joinPeer, leasePath, listLinks, materializeShare, postNote, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
-import { puttyCommand, safeSshHost } from "@/lib/share/wire";
+import { safeSshHost } from "@/lib/share/wire";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -246,8 +246,10 @@ export async function executeTool(
         port: args.port ? Number(args.port) : 22,
         user: String(args.user ?? "hector"),
         session: args.session ? String(args.session) : undefined,
+        password: args.password ? String(args.password) : undefined,
+        privateKey: args.key || args.privateKey ? String(args.key ?? args.privateKey) : undefined,
       });
-      return ok(materializeShare(files), name, { link, ...describeLink(link), putty: puttyCommand(link) }, `${kind} ${link.user}@${link.host}`);
+      return ok(materializeShare(files), name, describeLink(link), `${kind} ${link.user}@${link.host}`);
     }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];
