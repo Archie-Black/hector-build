@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { GhostSprite } from "@/components/forge/ghost-sprite";
 
 type Ghost = { id: number; x: number; y: number; delay: number; scale: number };
 
@@ -12,10 +13,10 @@ function spawn(): Ghost {
   };
 }
 
-type Props = { on: boolean; beat: number };
+type Props = { on: boolean; beat: number; layer?: "front" | "back" };
 
 /** Click-through. Never steals keyboard or mouse. */
-export function GhostVis({ on, beat }: Props) {
+export function GhostVis({ on, beat, layer = "front" }: Props) {
   const [ghosts, setGhosts] = useState<Ghost[]>([]);
   useEffect(() => {
     if (!on) {
@@ -34,12 +35,11 @@ export function GhostVis({ on, beat }: Props) {
   }, [on]);
   if (!on) return null;
   return (
-    <div className="ghost-desktop" aria-hidden>
+    <div className={"ghost-desktop" + (layer === "back" ? " ghost-desktop-back" : "")} aria-hidden>
       {ghosts.map((g) => (
-        <img
+        <GhostSprite
           key={g.id}
-          src="/hector/agent-v2.png"
-          alt=""
+          kind="agent"
           className="ghost-float"
           style={{
             left: g.x + "%",

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { GhostVis } from "@/components/forge/ghost-vis";
 import { SpectreStage } from "@/components/forge/spectre-stage";
 import { useForgeStore } from "@/lib/forge-store";
 import {
@@ -14,7 +15,7 @@ import { sendVerifyMail } from "@/lib/auth/mailer";
 import { scanEnvironment, scanLines, type EnvScan } from "@/lib/hw/env-scan";
 import { lockPlatform } from "@/lib/workspace/platform";
 import { createVault, vaultExists } from "@/lib/security/vault";
-import { CREDIT, FREE_API_URL, FREE_LINE } from "@/lib/legal/copy";
+import { CREDIT } from "@/lib/legal/copy";
 import { GROK_PROVIDERS, authEnabled, signIn as signInOAuth } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import QRCode from "qrcode";
@@ -63,16 +64,15 @@ export function GateScreen() {
   }, [step]);
 
   return (
-    <div className="relative flex h-dvh items-center justify-center px-6">
-      <div className="w-full max-w-md rounded-lg px-8 py-10 text-center glass-window">
-        <SpectreStage busy={false} ghosts={3} />
-        <h1 className="mt-4 text-3xl font-medium tracking-tight text-balance">Hector Build</h1>
-        <p className="mt-2 text-sm text-muted">host intelligence · Spectral HX inside</p>
+    <div className="relative flex h-dvh flex-col items-center justify-end overflow-hidden px-4 pb-6">
+      <GhostVis on beat={0.2} layer="back" />
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <SpectreStage busy ghosts={8} size="page" />
+      </div>
+      <div className="relative z-10 w-full max-w-md rounded-lg px-8 py-7 text-center glass-window">
+        <h1 className="text-3xl font-medium tracking-tight text-balance">DooMChaT</h1>
+        <p className="mt-1 text-sm text-muted">Hector Build · Spectral HX</p>
         <p className="mt-1 text-xs tracking-[0.14em] text-subtle uppercase">{CREDIT}</p>
-        <p className="mt-3 text-xs text-muted text-pretty">{FREE_LINE}</p>
-        <a href={FREE_API_URL} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-accent">
-          Free Groq API key
-        </a>
 
         {step === "login" ? (
           <div className="mt-8 flex flex-col gap-2 text-left">

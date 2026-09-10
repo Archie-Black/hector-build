@@ -3,6 +3,7 @@ import { ArrowUp, ChevronLeft, LoaderCircle } from "lucide-react";
 import { SettingsButton, SettingsHost } from "@/components/forge/settings-menu";
 import { UserButton } from "@/lib/auth/gates";
 import { SpectreStage } from "@/components/forge/spectre-stage";
+import { GhostSprite } from "@/components/forge/ghost-sprite";
 import { useForgeStore } from "@/lib/forge-store";
 
 const STARTERS = [
@@ -95,7 +96,7 @@ export function LlmChat({ onSend, error, onBack }: Props) {
                   </article>
                 ) : (
                   <article key={m.id} className="mb-6 flex gap-3">
-                    <img src="/hector/hector-v2.png" alt="" className="mt-1 h-8 w-8 shrink-0 object-contain" />
+                    <GhostSprite kind="hector" className="mt-1 h-8 w-8 shrink-0" />
                     <p className="min-w-0 flex-1 whitespace-pre-wrap text-pretty leading-relaxed">{m.content}</p>
                   </article>
                 ),

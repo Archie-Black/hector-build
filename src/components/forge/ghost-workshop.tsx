@@ -1,5 +1,6 @@
 import { useForgeStore } from "@/lib/forge-store";
 import { ROLE_LABEL } from "@/lib/workspace/team";
+import { GhostSprite } from "@/components/forge/ghost-sprite";
 
 export function GhostWorkshop() {
   const busy = useForgeStore((s) => s.busy);
@@ -24,16 +25,15 @@ export function GhostWorkshop() {
           className="workshop-ghost"
           style={{ animationDelay: `${i * -1.4}s`, top: `${18 + i * 16}%` }}
         >
-          <img src="/hector/agent-v2.png" alt="" className="h-14 w-14 object-contain" />
+          <GhostSprite kind="agent" className="h-14 w-14" />
           <span className="mt-1 block max-w-28 truncate text-center text-[10px] text-muted">
             {ROLE_LABEL[task.assignee]} · {task.status}
           </span>
         </div>
       ))}
-      <img
-        src="/hector/hector-v2.png"
-        alt=""
-        className="hector-foreman pointer-events-none absolute right-3 bottom-2 h-20 w-20 object-contain"
+      <GhostSprite
+        kind="hector"
+        className="hector-foreman pointer-events-none absolute right-3 bottom-2 h-20 w-20"
       />
     </div>
   );

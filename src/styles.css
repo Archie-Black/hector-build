@@ -113,7 +113,7 @@ html[data-theme="light"] {
   width: 2.5rem;
   height: 2.5rem;
   margin: -1.25rem;
-  object-fit: contain;
+  overflow: visible;
   animation: ghost-orbit 8s linear infinite;
 }
 
@@ -205,12 +205,32 @@ html[data-theme="light"] {
   }
 }
 
-@keyframes ghost-orbit-sm {
+.hector-hero-page {
+  width: 11rem;
+  height: 11rem;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 36px color-mix(in oklab, var(--color-accent) 55%, transparent));
+}
+
+.ghost-orbit-page {
+  width: 3.15rem;
+  height: 3.15rem;
+  margin: -1.57rem;
+  animation-name: ghost-orbit-page;
+  animation-duration: 14s;
+}
+
+.ghost-orbit-page:nth-child(odd) {
+  animation-duration: 18s;
+  animation-direction: reverse;
+}
+
+@keyframes ghost-orbit-page {
   from {
-    transform: rotate(0deg) translateX(1.35rem) rotate(0deg);
+    transform: rotate(0deg) translateX(12rem) rotate(0deg);
   }
   to {
-    transform: rotate(360deg) translateX(1.35rem) rotate(-360deg);
+    transform: rotate(360deg) translateX(12rem) rotate(-360deg);
   }
 }
 
@@ -328,11 +348,8 @@ html[data-theme="light"] {
   background: color-mix(in oklab, var(--color-fail) 12%, transparent);
 }
 
-.ghost-desktop {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  pointer-events: none;
+.ghost-desktop-back {
+  z-index: 1;
 }
 
 .ghost-float {
