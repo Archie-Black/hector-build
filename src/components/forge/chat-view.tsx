@@ -6,6 +6,7 @@ import { todayStamp } from "@/lib/workspace/updates";
 import { loadMdvWasm } from "@/lib/geometry/mdv-wasm";
 import { useAgentSend } from "@/lib/workspace/use-agent-send";
 import { idleSpool, spoolFor } from "@/lib/spool/client";
+import { bootOs } from "@/lib/os/client";
 
 export function ChatView() {
   const memory = useForgeStore((s) => s.memory);
@@ -19,6 +20,7 @@ export function ChatView() {
     store.grant();
     void loadMdvWasm();
     void idleSpool();
+    bootOs();
     void probe().then((r) => useForgeStore.getState().setOwnerReady(r.ownerReady));
     if (store.updates.lastBuildDay !== todayStamp()) store.queueDailyUpdate();
     store.maybeSilentInstall();

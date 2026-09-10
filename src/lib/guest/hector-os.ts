@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { osStatus } from "../os/kernel.ts";
 
 const SCRIPT = join(process.cwd(), "packaging/guest/hector-guest.sh");
 const ISO = join(process.cwd(), "packaging/guest/alpine-virt-x86_64.iso");
@@ -28,12 +29,14 @@ export const guestStatus = createServerFn({ method: "GET" }).handler(async () =>
     existsSync("/usr/bin/qemu-system-x86_64") ||
     existsSync("/usr/local/bin/qemu-system-x86_64");
   const out = await run(["status"]);
+  const os = osStatus();
   return {
     qemu,
     iso: existsSync(ISO),
     kvm: existsSync("/dev/kvm"),
     text: out,
-    live: out.startsWith("LIVE"),
+    live: out.startsWith("LIVE") || os.session.phase === "live",
+    os,
   };
 });
 

@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { getCred, hasCred, putCred, type LinkCred } from "./creds.ts";
+import { pair, sdpStatus } from "../devices/sdp.ts";
 import {
   SHARE_DIR,
   SHARE_PROTOCOL,
@@ -78,6 +79,7 @@ export function joinPeer(input: { name: string; kind?: PeerKind; id?: string }) 
     room.peers.push({ id, name: input.name || id, kind, seen: Date.now() });
   }
   save(room);
+  pair(id, input.name || id);
   return { peer: room.peers.find((p) => p.id === id)!, room };
 }
 
@@ -251,5 +253,6 @@ export function shareStatus() {
     leases: room.leases.length,
     links: room.links.length,
     terms: true,
+    sdp: sdpStatus().self,
   };
 }

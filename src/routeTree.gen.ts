@@ -23,11 +23,13 @@ import { Route as ApiShareRouteImport } from './routes/api/share'
 import { Route as HxSessionRouteImport } from './routes/hx.session'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiV1CloudRouteImport } from './routes/api/v1/cloud'
+import { Route as ApiV1DevicesRouteImport } from './routes/api/v1/devices'
 import { Route as ApiV1EmbeddingsRouteImport } from './routes/api/v1/embeddings'
 import { Route as ApiV1ExtensionsRouteImport } from './routes/api/v1/extensions'
 import { Route as ApiV1FunctionsRouteImport } from './routes/api/v1/functions'
 import { Route as ApiV1McpRouteImport } from './routes/api/v1/mcp'
 import { Route as ApiV1ModelsRouteImport } from './routes/api/v1/models'
+import { Route as ApiV1OsRouteImport } from './routes/api/v1/os'
 import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
 import { Route as ApiV1SpoolRouteImport } from './routes/api/v1/spool'
 import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
@@ -103,6 +105,11 @@ const ApiV1CloudRoute = ApiV1CloudRouteImport.update({
   path: '/api/v1/cloud',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1DevicesRoute = ApiV1DevicesRouteImport.update({
+  id: '/api/v1/devices',
+  path: '/api/v1/devices',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1EmbeddingsRoute = ApiV1EmbeddingsRouteImport.update({
   id: '/api/v1/embeddings',
   path: '/api/v1/embeddings',
@@ -126,6 +133,11 @@ const ApiV1McpRoute = ApiV1McpRouteImport.update({
 const ApiV1ModelsRoute = ApiV1ModelsRouteImport.update({
   id: '/api/v1/models',
   path: '/api/v1/models',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1OsRoute = ApiV1OsRouteImport.update({
+  id: '/api/v1/os',
+  path: '/api/v1/os',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1ShareRoute = ApiV1ShareRouteImport.update({
@@ -164,11 +176,13 @@ export interface FileRoutesByFullPath {
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/cloud': typeof ApiV1CloudRoute
+  '/api/v1/devices': typeof ApiV1DevicesRoute
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
@@ -189,11 +203,13 @@ export interface FileRoutesByTo {
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/cloud': typeof ApiV1CloudRoute
+  '/api/v1/devices': typeof ApiV1DevicesRoute
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
@@ -215,11 +231,13 @@ export interface FileRoutesById {
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/cloud': typeof ApiV1CloudRoute
+  '/api/v1/devices': typeof ApiV1DevicesRoute
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
@@ -242,11 +260,13 @@ export interface FileRouteTypes {
     | '/hx/session'
     | '/api/auth/$'
     | '/api/v1/cloud'
+    | '/api/v1/devices'
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
     | '/api/v1/chat/completions'
@@ -267,11 +287,13 @@ export interface FileRouteTypes {
     | '/hx/session'
     | '/api/auth/$'
     | '/api/v1/cloud'
+    | '/api/v1/devices'
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
     | '/api/v1/chat/completions'
@@ -292,11 +314,13 @@ export interface FileRouteTypes {
     | '/hx/session'
     | '/api/auth/$'
     | '/api/v1/cloud'
+    | '/api/v1/devices'
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
     | '/api/v1/chat/completions'
@@ -317,11 +341,13 @@ export interface RootRouteChildren {
   ApiShareRoute: typeof ApiShareRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiV1CloudRoute: typeof ApiV1CloudRoute
+  ApiV1DevicesRoute: typeof ApiV1DevicesRoute
   ApiV1EmbeddingsRoute: typeof ApiV1EmbeddingsRoute
   ApiV1ExtensionsRoute: typeof ApiV1ExtensionsRoute
   ApiV1FunctionsRoute: typeof ApiV1FunctionsRoute
   ApiV1McpRoute: typeof ApiV1McpRoute
   ApiV1ModelsRoute: typeof ApiV1ModelsRoute
+  ApiV1OsRoute: typeof ApiV1OsRoute
   ApiV1ShareRoute: typeof ApiV1ShareRoute
   ApiV1SpoolRoute: typeof ApiV1SpoolRoute
   ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
@@ -428,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1CloudRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/devices': {
+      id: '/api/v1/devices'
+      path: '/api/v1/devices'
+      fullPath: '/api/v1/devices'
+      preLoaderRoute: typeof ApiV1DevicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/embeddings': {
       id: '/api/v1/embeddings'
       path: '/api/v1/embeddings'
@@ -461,6 +494,13 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/models'
       fullPath: '/api/v1/models'
       preLoaderRoute: typeof ApiV1ModelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/os': {
+      id: '/api/v1/os'
+      path: '/api/v1/os'
+      fullPath: '/api/v1/os'
+      preLoaderRoute: typeof ApiV1OsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/share': {
@@ -518,11 +558,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiShareRoute: ApiShareRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiV1CloudRoute: ApiV1CloudRoute,
+  ApiV1DevicesRoute: ApiV1DevicesRoute,
   ApiV1EmbeddingsRoute: ApiV1EmbeddingsRoute,
   ApiV1ExtensionsRoute: ApiV1ExtensionsRoute,
   ApiV1FunctionsRoute: ApiV1FunctionsRoute,
   ApiV1McpRoute: ApiV1McpRoute,
   ApiV1ModelsRoute: ApiV1ModelsRoute,
+  ApiV1OsRoute: ApiV1OsRoute,
   ApiV1ShareRoute: ApiV1ShareRoute,
   ApiV1SpoolRoute: ApiV1SpoolRoute,
   ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,

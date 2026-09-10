@@ -9,6 +9,8 @@ import {
   guestWipe,
 } from "@/lib/guest/hector-os";
 
+type Os = { session?: { id?: string; phase?: string; persist?: boolean }; kind?: string; note?: string };
+
 export function GuestPanel() {
   const [text, setText] = useState("…");
   const [con, setCon] = useState("");
@@ -16,6 +18,7 @@ export function GuestPanel() {
   const [qemu, setQemu] = useState(false);
   const [iso, setIso] = useState(false);
   const [live, setLive] = useState(false);
+  const [os, setOs] = useState<Os | null>(null);
 
   async function refresh() {
     const s = await guestStatus();
@@ -25,6 +28,12 @@ export function GuestPanel() {
     setLive(s.live);
     const c = await guestConsole();
     setCon(c.text);
+    try {
+      const r = await fetch("/api/v1/os");
+      setOs((await r.json()) as Os);
+    } catch {
+      setOs(null);
+    }
   }
 
   useEffect(() => {
@@ -33,27 +42,27 @@ export function GuestPanel() {
 
   return (
     <div>
-      <p className="text-xs tracking-[0.14em] text-subtle uppercase">Hector Guest</p>
+      <p className="text-xs tracking-[0.14em] text-subtle uppercase">Hector Transient OS</p>
       <p className="mt-2 text-sm text-muted text-pretty">
-        Alpine in QEMU. Virtio disk, balloon, rng, 9p share of this workspace, SSH on 2222, serial
-        console. You approve start. Wipe deletes the disk and logs.
+        Hector is the OS. Spectral HX is userland. The host is firmware. RAM-first. The vault is the
+        only disk. Optional QEMU is a disposable hardware jail, not the OS itself.
       </p>
       <p className="mt-2 font-mono text-xs text-muted">
-        QEMU {qemu ? "LIVE" : "STUB (install qemu-system-x86_64)"} · ISO {iso ? "ready" : "missing"} ·{" "}
-        {live ? "running" : "down"}
+        OS {os?.session?.phase === "live" ? "LIVE" : "down"} · {os?.session?.id || "—"} · persist{" "}
+        {os?.session?.persist ? "on" : "off"}
+      </p>
+      <p className="mt-3 text-xs tracking-[0.14em] text-subtle uppercase">Hardware jail (optional)</p>
+      <p className="mt-2 font-mono text-xs text-muted">
+        QEMU {qemu ? "LIVE" : "off"} · ISO {iso ? "ready" : "missing"} · {live ? "running" : "down"}
       </p>
       <p className="mt-2 font-mono text-xs">{text}</p>
       <label className="mt-3 flex items-center gap-2 text-sm">
         <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} />
-        I approve starting the guest on this machine
+        I approve starting the hardware jail on this machine
       </label>
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button
-          type="button"
-          disabled={!ok}
-          onClick={() => void guestStart().then(() => refresh())}
-        >
-          Start guest
+        <Button type="button" disabled={!ok} onClick={() => void guestStart().then(() => refresh())}>
+          Start jail
         </Button>
         <Button type="button" variant="line" onClick={() => void guestStop().then(() => refresh())}>
           Stop
@@ -68,11 +77,6 @@ export function GuestPanel() {
       <pre className="mt-3 max-h-40 overflow-auto rounded-md bg-inset p-2 font-mono text-[10px] text-muted">
         {con || "serial quiet"}
       </pre>
-      <p className="mt-2 text-xs text-subtle text-pretty">
-        Inside the guest: <code>mount -t 9p -o trans=virtio hector /mnt</code>. SSH:{" "}
-        <code>ssh -p 2222 root@127.0.0.1</code> after you set a password. This is not Damn Small Linux
-        — it is a current Alpine virtio machine branded Hector Guest.
-      </p>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { lookAhead, type Lane } from "./look-ahead.ts";
 import { listTerms, openTerm } from "../share/term.ts";
 import { ollamaOrigins } from "../ollama/home.ts";
+import { startDevice } from "../devices/print.ts";
 
 type Slot = { lane: Lane; at: number; pid?: number; note: string; child?: ChildProcess };
 
@@ -74,11 +75,13 @@ async function spoolLane(lane: Lane) {
   if (lane === "git") {
     const child = warm("git", ["status", "-sb", "--porcelain=v1"]);
     mark("git", existsSync(join(process.cwd(), ".git")) ? "git status" : "git", child);
+    startDevice("git");
     return slots.get(lane);
   }
   if (lane === "term") {
     if (!listTerms().length) openTerm("spool");
     mark("term", "bash warm");
+    startDevice("term");
     return slots.get(lane);
   }
   if (lane === "model") {
@@ -86,6 +89,7 @@ async function spoolLane(lane: Lane) {
     void ping(`${origin}/api/tags`);
     void ping("http://127.0.0.1:8080/api/v1/models");
     mark("model", "models pinged");
+    startDevice("model");
     return slots.get(lane);
   }
   if (lane === "browser") {
@@ -93,6 +97,7 @@ async function spoolLane(lane: Lane) {
     if (bin) {
       const child = warm(bin, ["--no-startup-window", "--no-first-run", "--disable-extensions", "--disable-background-networking"]);
       mark("browser", bin, child);
+      startDevice("browser");
     } else mark("browser", "no browser bin");
     return slots.get(lane);
   }
