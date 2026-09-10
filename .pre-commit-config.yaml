@@ -1,0 +1,38 @@
+# https://pre-commit.com — local git hook framework
+default_stages: [pre-commit]
+exclude: |
+  (?x)^(
+    node_modules/|
+    dist/|
+    data/|
+    artifacts/|
+    runtime/|
+    public/element/|
+    public/downloads/|
+    public/.*\.wasm$|
+    package-lock\.json|
+    crates/.*/target/|
+    attachments/
+  )
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: detect-private-key
+      - id: check-yaml
+      - id: check-symlinks
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+  - repo: local
+    hooks:
+      - id: hector-secrets
+        name: Hector secret scan
+        language: system
+        entry: node scripts/hook-scan.mjs
+        pass_filenames: true
+        types: [file]

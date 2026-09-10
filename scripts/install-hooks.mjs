@@ -16,3 +16,10 @@ for (const name of readdirSync(dir)) {
     /* windows */
   }
 }
+const env = { ...process.env, PATH: `${process.env.HOME || ""}/.local/bin:${process.env.PATH || ""}` };
+try {
+  execSync("pre-commit --version", { stdio: "ignore", env });
+  execSync("pre-commit install-hooks", { stdio: "inherit", env });
+} catch {
+  console.warn("pre-commit not on PATH; .githooks/pre-commit will use the local secret scan.");
+}

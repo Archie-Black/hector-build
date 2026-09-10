@@ -4,4 +4,13 @@ cd "$(git rev-parse --show-toplevel)"
 if [ "${HECTOR_HOOKS:-1}" = "0" ]; then
   exit 0
 fi
-git diff --cached --name-only --diff-filter=ACM | node scripts/hook-scan.mjs
+export PATH="${HOME}/.local/bin:/usr/local/bin:${PATH}"
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -z "$staged" ]; then
+  exit 0
+fi
+if command -v pre-commit >/dev/null 2>&1 && [ -f .pre-commit-config.yaml ]; then
+  git diff --cached --name-only --diff-filter=ACM -z | xargs -0 pre-commit run --files
+  exit $?
+fi
+printf '%s\n' "$staged" | node scripts/hook-scan.mjs
