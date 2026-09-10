@@ -32,6 +32,8 @@ export const SERVICES: Service[] = [
   { id: "lingua", name: "Lingua", role: "kernel", duty: "voice" },
   { id: "xp", name: "Experience", role: "kernel", duty: "lessons" },
   { id: "tuner", name: "Tuner", role: "kernel", duty: "lora" },
+  { id: "kvm", name: "KVM", role: "kernel", duty: "seats" },
+  { id: "darwin", name: "Darwin", role: "kernel", duty: "macos-seat" },
   { id: "hx", name: "Spectral HX", role: "user", duty: "coding" },
 ];
 

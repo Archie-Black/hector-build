@@ -27,4 +27,8 @@ describe("look-ahead spool", () => {
   it("spools vision for a workbench camera", () => {
     assert.ok(lookAhead("check the arduino LED on the PTZ camera").includes("vision"));
   });
+
+  it("spools kvm for a Darwin sandbox", () => {
+    assert.ok(lookAhead("boot Darwin on the Cinema Display and grab the KVM").includes("kvm"));
+  });
 });

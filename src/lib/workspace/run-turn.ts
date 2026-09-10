@@ -465,6 +465,49 @@ const TOOLS = [
   {
     type: "function",
     function: {
+      name: "kvm_status",
+      description: "Hector KVM seats: host PC, Darwin, Spectral HX.",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "kvm_switch",
+      description: "Switch KVM to host, darwin, or hx. Empty cycles.",
+      parameters: { type: "object", properties: { seat: { type: "string" } } },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "kvm_grab",
+      description: "Grab a KVM seat. Agents yield if a human holds it.",
+      parameters: {
+        type: "object",
+        properties: { who: { type: "string" }, kind: { type: "string" }, seat: { type: "string" }, exclusive: { type: "boolean" } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "darwin_boot",
+      description: "Boot the Darwin seat. Cinema 30″ 2560×1600, webconnect, Mac keymap. QEMU if an ISO is present.",
+      parameters: { type: "object", properties: { mode: { type: "string" } } },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "darwin_sysctl",
+      description: "Read Hector Darwin sysctl.",
+      parameters: { type: "object", properties: { name: { type: "string" } } },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "bash",
       description: "Sandbox command. Only ls and cat on the granted workspace.",
       parameters: {

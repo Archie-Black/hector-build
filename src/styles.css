@@ -1091,3 +1091,76 @@ html[data-os="ios"] .glass-window {
 .spatial-field.xr-live .spatial-motes {
   opacity: 0;
 }
+
+.darwin-seat {
+  margin-top: 1.1rem;
+}
+
+.darwin-glass {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgb(12 18 32 / 88%), rgb(0 0 0 / 92%)),
+    radial-gradient(80% 60% at 50% 0%, rgb(0 71 171 / 28%), transparent 70%);
+  box-shadow:
+    0 0 0 1px #0047ab,
+    0 0 0 2px color-mix(in oklab, #e6ff2a 45%, transparent),
+    0 18px 40px rgb(0 0 0 / 55%);
+}
+
+.darwin-menubar {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: #e8eef8;
+  background: rgb(8 12 22 / 72%);
+  backdrop-filter: blur(12px);
+}
+
+.darwin-win {
+  position: absolute;
+  border-radius: 8px;
+  padding: 0.35rem 0.45rem;
+  font-size: 0.62rem;
+  color: #8b97ad;
+  background: rgb(7 11 20 / 70%);
+  box-shadow: 0 0 0 1px rgb(0 71 171 / 45%);
+}
+
+.darwin-win.is-on {
+  color: #e8eef8;
+  box-shadow: 0 0 0 1px #0047ab, 0 0 0 2px color-mix(in oklab, #e6ff2a 40%, transparent);
+}
+
+.darwin-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 0.35rem;
+  transform: translateX(-50%);
+  padding: 0.2rem 0.7rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e6ff2a;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 45%);
+  box-shadow: 0 0 0 1px #0047ab;
+}
+
+.darwin-cursor {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: #e6ff2a;
+  box-shadow: 0 0 10px #e6ff2a;
+  pointer-events: none;
+}

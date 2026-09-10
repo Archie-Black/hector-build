@@ -120,6 +120,11 @@ async function spoolLane(lane: Lane) {
     mark("vision", "bench");
     return slots.get(lane);
   }
+  if (lane === "kvm") {
+    void ping("http://127.0.0.1:8080/api/v1/kvm");
+    mark("kvm", "darwin seat");
+    return slots.get(lane);
+  }
   return slots.get(lane);
 }
 

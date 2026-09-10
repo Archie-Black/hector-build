@@ -41,6 +41,9 @@ const TOOLS = [
   { name: "web_search", description: "Punisher on the surface web. Dark Horse if isolate or .onion.", inputSchema: { type: "object", properties: { query: { type: "string" }, isolate: { type: "boolean" } }, required: ["query"] } },
   { name: "web_fetch", description: "Fetch a page via Punisher or Dark Horse.", inputSchema: { type: "object", properties: { url: { type: "string" }, isolate: { type: "boolean" } }, required: ["url"] } },
   { name: "vision_scan", description: "Dual-lens workbench scan.", inputSchema: { type: "object", properties: {} } },
+  { name: "kvm_status", description: "KVM seats: host, darwin, hx.", inputSchema: { type: "object", properties: {} } },
+  { name: "kvm_switch", description: "Switch KVM seat.", inputSchema: { type: "object", properties: { seat: { type: "string" } } } },
+  { name: "darwin_boot", description: "Boot Darwin seat at Cinema 30″ 2560×1600.", inputSchema: { type: "object", properties: { mode: { type: "string" } } } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -98,6 +101,11 @@ export async function handleMcp(raw: Rpc) {
     if (name === "web_search") return ok(id, toolText(await rideSearch(String(args.query ?? ""), Boolean(args.isolate))));
     if (name === "web_fetch") return ok(id, toolText(await rideFetch(String(args.url ?? ""), Boolean(args.isolate))));
     if (name === "vision_scan") return ok(id, toolText(await embodiedTick()));
+    if (name === "kvm_status" || name === "kvm_switch" || name === "kvm_grab" || name === "darwin_boot" || name === "darwin_sysctl" || name === "darwin_status") {
+      const { executeTool } = await import("@/lib/workspace/tools");
+      const r = await executeTool(name, args, {}, "plan");
+      return ok(id, toolText(r.payload));
+    }
     if (name === "cloud_status") return ok(id, toolText(cloudStatus()));
     if (name === "cloud_fn_list") return ok(id, toolText(listFunctions().map(({ source: _source, ...rest }) => rest)));
     if (name === "cloud_fn_deploy") return ok(id, toolText(deployFunction({ name: String(args.name), source: args.source ? String(args.source) : undefined, entry: args.entry ? String(args.entry) : undefined })));

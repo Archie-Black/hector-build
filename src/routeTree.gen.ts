@@ -28,6 +28,7 @@ import { Route as ApiV1DevicesRouteImport } from './routes/api/v1/devices'
 import { Route as ApiV1EmbeddingsRouteImport } from './routes/api/v1/embeddings'
 import { Route as ApiV1ExtensionsRouteImport } from './routes/api/v1/extensions'
 import { Route as ApiV1FunctionsRouteImport } from './routes/api/v1/functions'
+import { Route as ApiV1KvmRouteImport } from './routes/api/v1/kvm'
 import { Route as ApiV1McpRouteImport } from './routes/api/v1/mcp'
 import { Route as ApiV1ModelsRouteImport } from './routes/api/v1/models'
 import { Route as ApiV1NetRouteImport } from './routes/api/v1/net'
@@ -136,6 +137,11 @@ const ApiV1FunctionsRoute = ApiV1FunctionsRouteImport.update({
   path: '/api/v1/functions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1KvmRoute = ApiV1KvmRouteImport.update({
+  id: '/api/v1/kvm',
+  path: '/api/v1/kvm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1McpRoute = ApiV1McpRouteImport.update({
   id: '/api/v1/mcp',
   path: '/api/v1/mcp',
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
   '/api/v1/functions': typeof ApiV1FunctionsRoute
+  '/api/v1/kvm': typeof ApiV1KvmRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/net': typeof ApiV1NetRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
   '/api/v1/functions': typeof ApiV1FunctionsRoute
+  '/api/v1/kvm': typeof ApiV1KvmRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/net': typeof ApiV1NetRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
   '/api/v1/functions': typeof ApiV1FunctionsRoute
+  '/api/v1/kvm': typeof ApiV1KvmRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/net': typeof ApiV1NetRoute
@@ -319,6 +328,7 @@ export interface FileRouteTypes {
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
     | '/api/v1/functions'
+    | '/api/v1/kvm'
     | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/net'
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
     | '/api/v1/functions'
+    | '/api/v1/kvm'
     | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/net'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
     | '/api/v1/functions'
+    | '/api/v1/kvm'
     | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/net'
@@ -418,6 +430,7 @@ export interface RootRouteChildren {
   ApiV1EmbeddingsRoute: typeof ApiV1EmbeddingsRoute
   ApiV1ExtensionsRoute: typeof ApiV1ExtensionsRoute
   ApiV1FunctionsRoute: typeof ApiV1FunctionsRoute
+  ApiV1KvmRoute: typeof ApiV1KvmRoute
   ApiV1McpRoute: typeof ApiV1McpRoute
   ApiV1ModelsRoute: typeof ApiV1ModelsRoute
   ApiV1NetRoute: typeof ApiV1NetRoute
@@ -567,6 +580,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1FunctionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/kvm': {
+      id: '/api/v1/kvm'
+      path: '/api/v1/kvm'
+      fullPath: '/api/v1/kvm'
+      preLoaderRoute: typeof ApiV1KvmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/mcp': {
       id: '/api/v1/mcp'
       path: '/api/v1/mcp'
@@ -683,6 +703,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1EmbeddingsRoute: ApiV1EmbeddingsRoute,
   ApiV1ExtensionsRoute: ApiV1ExtensionsRoute,
   ApiV1FunctionsRoute: ApiV1FunctionsRoute,
+  ApiV1KvmRoute: ApiV1KvmRoute,
   ApiV1McpRoute: ApiV1McpRoute,
   ApiV1ModelsRoute: ApiV1ModelsRoute,
   ApiV1NetRoute: ApiV1NetRoute,

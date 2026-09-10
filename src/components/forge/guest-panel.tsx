@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { DarwinSeat } from "@/components/forge/darwin-seat";
 import { Button } from "@/components/ui/button";
 import {
   guestConsole,
@@ -77,6 +78,7 @@ export function GuestPanel() {
       <pre className="mt-3 max-h-40 overflow-auto rounded-md bg-inset p-2 font-mono text-[10px] text-muted">
         {con || "serial quiet"}
       </pre>
+      <DarwinSeat />
     </div>
   );
 }

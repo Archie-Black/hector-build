@@ -323,6 +323,46 @@ export async function executeTool(
       const made = visualFiles(String(args.brief ?? args.prompt ?? "View"), files);
       return ok({ ...files, ...made }, name, Object.keys(made), "mockup filed");
     }
+    case "kvm_status": {
+      const { kvmStatus } = await import("@/lib/kvm/seats");
+      return ok(files, name, kvmStatus(), "kvm seats");
+    }
+    case "kvm_switch": {
+      const { kvmSwitch } = await import("@/lib/kvm/seats");
+      return ok(files, name, kvmSwitch(args.seat ? String(args.seat) : undefined), "seat switched");
+    }
+    case "kvm_grab": {
+      const { kvmGrab } = await import("@/lib/kvm/seats");
+      return ok(
+        files,
+        name,
+        kvmGrab(String(args.who ?? "hx"), args.kind === "human" ? "human" : "agent", args.seat as "host" | "darwin" | "hx" | undefined, Boolean(args.exclusive)),
+        "seat grabbed",
+      );
+    }
+    case "kvm_key": {
+      const { kvmKey } = await import("@/lib/kvm/seats");
+      return ok(files, name, kvmKey({
+        code: String(args.code ?? "KeyA"),
+        key: String(args.key ?? "a"),
+        ctrl: Boolean(args.ctrl),
+        alt: Boolean(args.alt),
+        meta: Boolean(args.meta),
+        shift: Boolean(args.shift),
+      }), "hid");
+    }
+    case "darwin_boot": {
+      const { darwinBoot } = await import("@/lib/kvm/darwin");
+      return ok(files, name, darwinBoot(args.mode ? String(args.mode) : undefined), "darwin seat");
+    }
+    case "darwin_sysctl": {
+      const { sysctl } = await import("@/lib/kvm/darwin");
+      return ok(files, name, sysctl(args.name ? String(args.name) : undefined), "sysctl");
+    }
+    case "darwin_status": {
+      const { darwinStatus, wantsDarwin } = await import("@/lib/kvm/darwin");
+      return ok(files, name, { ...darwinStatus(), hint: wantsDarwin(String(args.prompt ?? "")) }, "darwin");
+    }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];
       const todos: AgentTodo[] = raw.map((item, i) => {

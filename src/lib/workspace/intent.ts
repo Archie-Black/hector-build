@@ -77,6 +77,20 @@ export function explainTrace(name: string, detail: string, ok: boolean): string 
       return "Hector inspected the UI." + fail;
     case "mockup_code":
       return "Hector filed UI from the mockup." + fail;
+    case "kvm_status":
+      return "Hector checked the KVM seats." + fail;
+    case "kvm_switch":
+      return `Hector switched the KVM (${detail}).` + fail;
+    case "kvm_grab":
+      return `Hector grabbed a seat (${detail}).` + fail;
+    case "kvm_key":
+      return "Hector typed into the active seat." + fail;
+    case "darwin_boot":
+      return "Hector brought up the Darwin seat." + fail;
+    case "darwin_sysctl":
+      return `Darwin sysctl (${detail}).` + fail;
+    case "darwin_status":
+      return "Hector looked at Darwin." + fail;
     case "todo_write":
       return "Spectral HX updated the task board." + fail;
     case "enter_plan_mode":

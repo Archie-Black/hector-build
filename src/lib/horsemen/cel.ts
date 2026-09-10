@@ -145,6 +145,8 @@ export const DEFAULT_POLICY: ActionPolicy = {
     'tool.name == "vision_camera"',
     'tool.name == "inspect_ui"',
     'tool.name == "mockup_code"',
+    'tool.name.startsWith("kvm_")',
+    'tool.name.startsWith("darwin_")',
     'tool.name == "spawn_subagent"',
     'tool.name.startsWith("horsemen_")',
     'tool.name.startsWith("share_")',
