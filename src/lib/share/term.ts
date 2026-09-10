@@ -2,6 +2,7 @@ import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Client } from "ssh2";
+import { isOnionHost, socksConnect, startOnionDaemon } from "./onion.ts";
 import { fnv } from "./protocol.ts";
 import { credFor, postNote, registerLink } from "./room.ts";
 import { puttyCommand, safeCollabCmd, safeSshHost, type CollabLink } from "./wire.ts";
@@ -86,7 +87,7 @@ export function execSsh(input: {
     registerLink({
       from: input.bot || "hector",
       to: "*",
-      kind: "ssh",
+      kind: isOnionHost(host) ? "onion" : "ssh",
       host,
       port,
       user: username,
@@ -95,12 +96,22 @@ export function execSsh(input: {
     });
   }
 
-  return new Promise<{ ok: boolean; output: string }>((resolve) => {
+  return new Promise<{ ok: boolean; output: string }>(async (resolve) => {
     const conn = new Client();
+    const onion = isOnionHost(host);
+    if (onion) startOnionDaemon();
     const timer = setTimeout(() => {
       conn.end();
-      resolve({ ok: false, output: "SSH timed out." });
-    }, 15000);
+      resolve({ ok: false, output: onion ? "Onion SSH timed out." : "SSH timed out." });
+    }, onion ? 60000 : 15000);
+    let sock;
+    try {
+      sock = onion ? await socksConnect(host, port) : undefined;
+    } catch (err) {
+      clearTimeout(timer);
+      resolve({ ok: false, output: err instanceof Error ? err.message : "onion socks failed" });
+      return;
+    }
     conn
       .on("ready", () => {
         conn.exec(command, (err, stream) => {
@@ -135,7 +146,8 @@ export function execSsh(input: {
         username,
         password: password || undefined,
         privateKey: privateKey || undefined,
-        readyTimeout: 12000,
+        readyTimeout: onion ? 45000 : 12000,
+        ...(sock ? { sock } : {}),
       });
   });
 }

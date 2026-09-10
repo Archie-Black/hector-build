@@ -11,6 +11,8 @@ import {
 import { localChatCompletion } from "./local-turn";
 import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
+import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
+import { isOnionHost } from "@/lib/share/wire";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
 
@@ -98,7 +100,7 @@ export async function handleMcp(raw: Rpc) {
     if (name === "share_post") return ok(id, toolText(postNote({ from: String(args.from ?? "generic"), to: args.to ? String(args.to) : "hector", kind: args.kind as "task" | "result" | "note", body: String(args.body ?? "") })));
     if (name === "share_lease") return ok(id, toolText(leasePath({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), seconds: args.seconds ? Number(args.seconds) : undefined })));
     if (name === "share_sync") return ok(id, toolText(syncFile({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), content: String(args.content ?? ""), expect: args.expect ? String(args.expect) : undefined })));
-    if (name === "share_pull") return ok(id, toolText({ ...shareStatus(), ack: args.id ? ackNote(String(args.id), String(args.bot ?? "generic")) : undefined, room: pullRoom(), terms: listTerms(), links: backendLinks() }));
+    if (name === "share_pull") return ok(id, toolText({ ...shareStatus(), ack: args.id ? ackNote(String(args.id), String(args.bot ?? "generic")) : undefined, room: pullRoom(), terms: listTerms(), links: backendLinks(), onion: onionStatus() }));
     if (name === "share_term") {
       if (!args.session && !args.command) return ok(id, toolText(openTerm(String(args.bot ?? "generic"))));
       if (!args.session && args.command) {
@@ -122,11 +124,14 @@ export async function handleMcp(raw: Rpc) {
       return ok(id, toolText(result));
     }
     if (name === "share_link") {
+      const host = String(args.host ?? "");
+      const kind = isOnionHost(host) || args.kind === "onion" ? "onion" : args.kind === "putty" || args.kind === "term" ? args.kind : "ssh";
+      if (kind === "onion") startOnionDaemon();
       const link = registerLink({
         from: String(args.from ?? "generic"),
         to: String(args.to ?? "*"),
-        kind: args.kind === "putty" || args.kind === "term" ? args.kind : "ssh",
-        host: String(args.host ?? ""),
+        kind,
+        host,
         port: args.port ? Number(args.port) : 22,
         user: String(args.user ?? "hector"),
         password: args.password ? String(args.password) : undefined,

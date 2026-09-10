@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { jsonApi } from "@/lib/hector-api/complete";
 import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
+import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
+import { isOnionHost } from "@/lib/share/wire";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -12,7 +14,7 @@ const CORS = {
 export const Route = createFileRoute("/api/v1/share")({
   server: {
     handlers: {
-      GET: () => jsonApi({ object: "hector.share", ...shareStatus(), room: pullRoom(), links: backendLinks(), terms: listTerms() }),
+      GET: () => jsonApi({ object: "hector.share", ...shareStatus(), room: pullRoom(), links: backendLinks(), terms: listTerms(), onion: onionStatus() }),
       POST: async ({ request }: { request: Request }) => {
         const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
         const op = String(body?.op ?? body?.action ?? "");
@@ -21,14 +23,18 @@ export const Route = createFileRoute("/api/v1/share")({
         if (op === "ack") return jsonApi({ note: ackNote(String(body?.id ?? ""), String(body?.bot ?? "generic")) });
         if (op === "lease") return jsonApi(leasePath({ bot: String(body?.bot ?? "generic"), path: String(body?.path ?? ""), seconds: body?.seconds ? Number(body.seconds) : undefined }));
         if (op === "sync") return jsonApi(syncFile({ bot: String(body?.bot ?? "generic"), path: String(body?.path ?? ""), content: String(body?.content ?? ""), expect: body?.expect ? String(body.expect) : undefined }));
-        if (op === "pull") return jsonApi({ room: pullRoom(), terms: listTerms(), links: backendLinks() });
+        if (op === "pull") return jsonApi({ room: pullRoom(), terms: listTerms(), links: backendLinks(), onion: onionStatus() });
+        if (op === "onion") return jsonApi(startOnionDaemon());
         if (op === "link") {
+          const host = String(body?.host ?? "");
+          const kind = isOnionHost(host) || body?.kind === "onion" ? "onion" : body?.kind === "putty" || body?.kind === "term" ? body.kind : "ssh";
+          if (kind === "onion") startOnionDaemon();
           const link = registerLink({
             from: String(body?.from ?? "generic"),
             to: String(body?.to ?? "*"),
-            kind: body?.kind === "putty" || body?.kind === "term" ? body.kind : "ssh",
-            host: String(body?.host ?? ""),
-            port: body?.port ? Number(body.port) : 22,
+            kind,
+            host,
+            port: body?.port ? Number(body.port) : kind === "onion" ? 22 : 22,
             user: String(body?.user ?? "hector"),
             session: body?.session ? String(body.session) : undefined,
             password: body?.password ? String(body.password) : undefined,
@@ -58,7 +64,7 @@ export const Route = createFileRoute("/api/v1/share")({
             }),
           );
         }
-        return jsonApi({ error: { message: "op: join | post | ack | lease | sync | pull | link | term | ssh" } }, 400);
+        return jsonApi({ error: { message: "op: join | post | ack | lease | sync | pull | link | term | ssh | onion" } }, 400);
       },
       OPTIONS: () => new Response(null, { status: 204, headers: CORS }),
     },

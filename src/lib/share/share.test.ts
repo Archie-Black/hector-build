@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { detectFolderBots, fnv, kindOf } from "./protocol.ts";
 import { joinPeer, leasePath, postNote, registerLink, syncFile, materializeShare, credFor } from "./room.ts";
-import { puttyCommand, safeCollabCmd, safeSshHost } from "./wire.ts";
+import { puttyCommand, safeCollabCmd, safeSshHost, isOnionHost } from "./wire.ts";
 
 describe("shared workspace", () => {
   it("classifies grok build and other bots", () => {
@@ -53,6 +53,9 @@ describe("shared workspace", () => {
     assert.equal(safeSshHost("y.doomchat.ca", "bot"), "y.doomchat.ca");
     assert.equal(safeSshHost("169.254.1.1", "bot"), null);
     assert.equal(safeSshHost("evil.com", "bot"), null);
+    const onion = "abcdefghijklmnopqrstuvwxyz234567abcdefghijklmnopqrstuvwx.onion";
+    assert.equal(isOnionHost(onion), true);
+    assert.equal(safeSshHost(onion, "bot"), onion);
     assert.equal(safeCollabCmd("git status"), "git status");
     assert.equal(safeCollabCmd("rm -rf /"), null);
     assert.equal(safeCollabCmd("uname -a; cat /etc/shadow"), null);

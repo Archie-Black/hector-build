@@ -5,12 +5,18 @@ const APPROVED = (typeof process !== "undefined" ? process.env.HECTOR_SSH_HOSTS 
   .map((s) => s.trim().toLowerCase())
   .filter(Boolean);
 
-/** Hosts bots may SSH to: loopback, LAN, doomchat, or HECTOR_SSH_HOSTS. Humans may use any real host except link-local/metadata. */
+export function isOnionHost(host: string) {
+  const h = host.trim().toLowerCase();
+  return /^[a-z2-7]{56}\.onion$/.test(h) || /^[a-z2-7]{16}\.onion$/.test(h);
+}
+
+/** Hosts bots may SSH to: loopback, LAN, .onion, doomchat, or HECTOR_SSH_HOSTS. Humans may use any real host except link-local/metadata. */
 export function safeSshHost(raw: string, mode: "bot" | "human" = "bot") {
   const host = raw.trim().toLowerCase().replace(/^\[|\]$/g, "");
   if (!host || /\s/.test(host) || host.length > 253) return null;
   if (host === "0.0.0.0" || host.startsWith("169.254.") || host === "metadata.google.internal") return null;
   if (mode === "human") return host;
+  if (isOnionHost(host)) return host;
   if (isLoopbackHost(host) || isPrivateLan(host)) return host;
   if (host === "doomchat.ca" || host.endsWith(".doomchat.ca")) return host;
   if (APPROVED.includes(host)) return host;
@@ -28,7 +34,7 @@ export function safeCollabCmd(raw: string) {
   return SAFE_CMD.test(cmd) ? cmd : null;
 }
 
-export type LinkKind = "ssh" | "term" | "putty";
+export type LinkKind = "ssh" | "term" | "putty" | "onion";
 
 export type CollabLink = {
   id: string;

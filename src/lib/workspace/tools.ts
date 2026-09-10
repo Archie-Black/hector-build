@@ -10,7 +10,8 @@ import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
 import { gate } from "@/lib/horsemen/gateway.ts";
 import { ackNote, ingestInbox, joinPeer, leasePath, listLinks, materializeShare, postNote, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
-import { safeSshHost } from "@/lib/share/wire";
+import { isOnionHost, safeSshHost } from "@/lib/share/wire";
+import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -200,7 +201,7 @@ export async function executeTool(
     }
     case "share_pull": {
       ingestInbox(files);
-      return ok(materializeShare(files), name, { ...shareStatus(), terms: listTerms(), links: listLinks() }, "share room");
+      return ok(materializeShare(files), name, { ...shareStatus(), terms: listTerms(), links: listLinks(), onion: onionStatus() }, "share room");
     }
     case "share_term": {
       const session = args.session ? String(args.session) : "";
@@ -237,7 +238,8 @@ export async function executeTool(
     }
     case "share_link": {
       const host = String(args.host ?? "127.0.0.1");
-      const kind = args.kind === "putty" || args.kind === "term" ? args.kind : "ssh";
+      const kind = isOnionHost(host) || args.kind === "onion" ? "onion" : args.kind === "putty" || args.kind === "term" ? args.kind : "ssh";
+      if (kind === "onion") startOnionDaemon();
       const link = registerLink({
         from: String(args.from ?? "hector"),
         to: String(args.to ?? "*"),

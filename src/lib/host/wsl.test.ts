@@ -11,7 +11,7 @@ describe("embedded WSL", () => {
 
   it("only allowlists jobs", () => {
     assert.equal(isWslJob("embed"), true);
-    assert.equal(isWslJob("packages"), true);
+    assert.equal(isWslJob("onion"), true);
     assert.equal(isWslJob("rm"), false);
   });
 

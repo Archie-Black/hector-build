@@ -27,7 +27,7 @@ export type ShareLink = {
   id: string;
   from: string;
   to: string;
-  kind: "ssh" | "term" | "putty";
+  kind: "ssh" | "term" | "putty" | "onion";
   host: string;
   port: number;
   user: string;
@@ -97,6 +97,7 @@ Any build bot can work this folder with Hector.
 5. Pull: GET /api/v1/share
 6. Terminal: POST { "op":"term", "bot":"<id>", "command":"git status" }  (allowlisted)
 7. SSH: POST { "op":"ssh", "bot":"<id>", "host":"192.168.1.10", "user":"dev", "password":"...", "command":"uname -a" }
+   Onion (bot-to-bot when not on LAN): { "op":"onion" } then ssh to the .onion hostname through SOCKS 127.0.0.1:19050.
    Credentials stay in the backend (data/share/creds.json) and are reused. Not written into the project tree.
    PuTTY/plink on Windows: packaging\\\\windows\\\\hector-putty.cmd user@host
 
