@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { SpectreStage } from "@/components/forge/spectre-stage";
 import { SmokeLayer } from "@/components/forge/smoke-layer";
+import { SpatialField, SpatialFx } from "@/components/forge/spatial-field";
 import { useForgeStore } from "@/lib/forge-store";
 import {
   confirmCode,
@@ -64,15 +65,17 @@ export function GateScreen() {
   }, [step]);
 
   return (
-    <div className="gate-scene relative flex h-dvh flex-col items-center overflow-hidden px-4 pb-8 pt-6">
+    <SpatialField className="gate-scene relative flex h-dvh flex-col items-center overflow-hidden px-4 pb-8 pt-6">
       <div className="gate-scenery" aria-hidden />
       <div className="gate-bloom" aria-hidden />
       <div className="gate-mist" aria-hidden />
+      <SpatialFx />
       <SmokeLayer busy={false} />
-      <div className="pointer-events-none flex w-full shrink-0 justify-center pt-2">
+      <div className="spatial-stage pointer-events-none flex w-full shrink-0 justify-center pt-2">
         <SpectreStage busy={false} ghosts={3} size="page" />
       </div>
-      <div className="gate-card relative z-10 mt-auto w-full max-w-md px-8 py-8 text-center glass-window">
+      <div className="gate-card spatial-glass relative z-10 mt-auto w-full max-w-md px-8 py-8 text-center glass-window">
+        <span className="spatial-sheen" aria-hidden />
         <h1 className="gate-word text-balance">DooMChaT</h1>
         <p className="mt-1 text-sm text-muted">Hector Build · Spectral HX</p>
         <p className="mt-1 text-xs tracking-[0.16em] text-subtle uppercase">{CREDIT}</p>
@@ -310,6 +313,6 @@ export function GateScreen() {
 
         {error ? <p className="mt-3 text-sm text-fail">{error}</p> : null}
       </div>
-    </div>
+    </SpatialField>
   );
 }

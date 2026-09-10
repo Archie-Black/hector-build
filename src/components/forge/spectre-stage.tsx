@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { GhostSprite } from "@/components/forge/ghost-sprite";
 
 type Props = {
@@ -7,9 +8,9 @@ type Props = {
 };
 
 const RINGS = [
-  { tilt: "0deg", duration: "0.55s" },
-  { tilt: "62deg", duration: "0.72s" },
-  { tilt: "-58deg", duration: "0.4s" },
+  { tilt: "72deg", yaw: "8deg", dur: "4.6s", r: "9.1rem" },
+  { tilt: "62deg", yaw: "128deg", dur: "5.8s", r: "8.4rem" },
+  { tilt: "78deg", yaw: "-52deg", dur: "3.9s", r: "8.8rem" },
 ];
 
 export function SpectreStage({ busy, ghosts, size = "hero" }: Props) {
@@ -28,18 +29,31 @@ export function SpectreStage({ busy, ghosts, size = "hero" }: Props) {
       <span className="atom-halo" />
       {RINGS.slice(0, rings).map((ring, i) => (
         <div
-          key={ring.tilt}
-          className="atom-ring"
-          style={{ transform: `translate(-50%, -50%) rotate(${ring.tilt})` }}
+          key={ring.yaw}
+          className="atom-orbit"
+          style={
+            {
+              "--tilt": ring.tilt,
+              "--yaw": ring.yaw,
+              "--dur": ring.dur,
+              "--r": compact ? "2.15rem" : ring.r,
+              "--delay": `${i * -1.1}s`,
+            } as CSSProperties
+          }
         >
-          <GhostSprite
-            kind="agent"
-            className="atom-electron"
-            style={{ animationDuration: ring.duration, animationDelay: `${i * -0.18}s` }}
-          />
+          <div className="atom-orbit-plane">
+            <span className="atom-ring-line" />
+            <div className="atom-orbit-spin">
+              <div className="atom-electron-hold">
+                <GhostSprite kind="agent" className="atom-electron" />
+              </div>
+            </div>
+          </div>
         </div>
       ))}
-      <GhostSprite kind="hector" className="atom-nucleus" />
+      <div className="atom-nucleus-hold">
+        <GhostSprite kind="hector" className="atom-nucleus" />
+      </div>
     </div>
   );
 }

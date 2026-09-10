@@ -8,7 +8,7 @@ type Props = {
 };
 
 const SRC = {
-  hector: "/hector/hector-cut.png",
+  hector: "/hector/skull-cut.png",
   agent: "/hector/agent-cut.png",
 };
 

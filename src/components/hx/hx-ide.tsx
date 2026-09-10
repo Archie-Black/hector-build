@@ -5,6 +5,7 @@ import { useForgeStore } from "@/lib/forge-store";
 import { SettingsHost } from "@/components/forge/settings-menu";
 import { OsWindow } from "@/components/forge/os-window";
 import { SandboxStage } from "@/components/forge/sandbox-stage";
+import { SpatialField, SpatialFx } from "@/components/forge/spatial-field";
 import { scanEnvironment } from "@/lib/hw/env-scan";
 import { lockPlatform } from "@/lib/workspace/platform";
 
@@ -49,7 +50,8 @@ export function HxIde({ onSend, error, onBack }: Props) {
   }, []);
 
   return (
-    <div className="relative flex h-dvh flex-col bg-bg text-fg">
+    <SpatialField className="relative flex h-dvh flex-col bg-bg text-fg spatial-quiet">
+      <SpatialFx />
       <HxWorkbench onSend={onSend} error={error} onBack={onBack} />
       <SettingsHost />
       {overlay ? (
@@ -57,6 +59,6 @@ export function HxIde({ onSend, error, onBack }: Props) {
           <SandboxStage onClose={() => useForgeStore.getState().closeSandbox()} />
         </OsWindow>
       ) : null}
-    </div>
+    </SpatialField>
   );
 }

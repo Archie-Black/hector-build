@@ -4,6 +4,7 @@ import { SettingsButton, SettingsHost } from "@/components/forge/settings-menu";
 import { UserButton } from "@/lib/auth/gates";
 import { SpectreStage } from "@/components/forge/spectre-stage";
 import { GhostSprite } from "@/components/forge/ghost-sprite";
+import { SpatialField, SpatialFx } from "@/components/forge/spatial-field";
 import { useForgeStore } from "@/lib/forge-store";
 
 const STARTERS = [
@@ -50,7 +51,8 @@ export function LlmChat({ onSend, error, onBack }: Props) {
   const empty = visible.length === 0 && !busy;
 
   return (
-    <div className="flex h-dvh flex-col bg-bg text-fg">
+    <SpatialField className="flex h-dvh flex-col bg-bg text-fg spatial-quiet">
+      <SpatialFx />
       <header className="flex h-12 shrink-0 items-center px-2 glass-thin">
         {onBack ? (
           <button type="button" aria-label="Back" className="flex size-11 items-center justify-center rounded-md text-muted" onClick={onBack}>
@@ -155,6 +157,6 @@ export function LlmChat({ onSend, error, onBack }: Props) {
         <p className="mt-2 text-center text-xs text-subtle">Hector can make mistakes. Check important work.</p>
       </form>
       <SettingsHost />
-    </div>
+    </SpatialField>
   );
 }
