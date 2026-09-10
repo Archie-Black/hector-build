@@ -105,3 +105,42 @@ export async function ollamaTags(origin: string, ms = 800) {
     clearTimeout(t);
   }
 }
+
+/** vLLM and any OpenAI-compatible local server. */
+export async function openaiModels(origin: string, ms = 800) {
+  const root = origin.replace(/\/+$/, "").replace(/\/v1$/, "");
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(`${root}/v1/models`, { signal: ctrl.signal, headers: { Accept: "application/json" } });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { data?: { id?: string }[] };
+    return (data.data ?? []).map((m) => String(m.id ?? "")).filter(Boolean);
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/** vLLM OpenAI chat. Same shape as the cloud path. */
+export async function vllmChat(input: {
+  origin: string;
+  model: string;
+  messages: Msg[];
+  tools?: unknown;
+  temperature?: number;
+  maxTokens?: number;
+}) {
+  const origin = input.origin.replace(/\/+$/, "").replace(/\/v1$/, "");
+  const res = await postJson(`${origin}/v1/chat/completions`, {
+    model: input.model,
+    messages: input.messages,
+    tools: input.tools,
+    temperature: input.temperature ?? 0.1,
+    max_tokens: input.maxTokens ?? 3500,
+    tool_choice: "auto",
+  });
+  const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  return new Response(JSON.stringify(data), { status: res.status, headers: { "Content-Type": "application/json" } });
+}

@@ -10,7 +10,7 @@ describe("embedded WSL", () => {
   });
 
   it("only allowlists jobs", () => {
-    assert.equal(isWslJob("embed"), true);
+    assert.equal(isWslJob("vllm"), true);
     assert.equal(isWslJob("revoke"), true);
     assert.equal(isWslJob("rm"), false);
   });

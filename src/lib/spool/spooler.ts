@@ -3,7 +3,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { join } from "node:path";
 import { lookAhead, type Lane } from "./look-ahead.ts";
 import { listTerms, openTerm } from "../share/term.ts";
-import { ollamaOrigins } from "../ollama/home.ts";
+import { ollamaOrigins, vllmOrigins } from "../ollama/home.ts";
 import { startDevice } from "../devices/print.ts";
 
 type Slot = { lane: Lane; at: number; pid?: number; note: string; child?: ChildProcess };
@@ -87,6 +87,7 @@ async function spoolLane(lane: Lane) {
   if (lane === "model") {
     const origin = ollamaOrigins()[0];
     void ping(`${origin}/api/tags`);
+    for (const v of vllmOrigins()) void ping(`${v}/v1/models`);
     void ping("http://127.0.0.1:8080/api/v1/models");
     mark("model", "models pinged");
     startDevice("model");

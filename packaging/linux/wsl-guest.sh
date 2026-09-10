@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs inside WSL Ubuntu (or native Linux). Jobs: status | embed | packages | ollama | models | onion | revoke
+# Runs inside WSL Ubuntu (or native Linux). Jobs: status | embed | packages | ollama | models | vllm | onion | revoke
 set -euo pipefail
 JOB="${1:-status}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -37,6 +37,9 @@ case "$JOB" in
     ;;
   models)
     bash "$ROOT/packaging/linux/hector-home-models.sh" || true
+    ;;
+  vllm)
+    bash "$ROOT/packaging/linux/vllm-serve.sh" || true
     ;;
   onion)
     bash "$ROOT/packaging/linux/onion-setup.sh"

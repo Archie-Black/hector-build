@@ -64,3 +64,13 @@ export function ollamaOrigins(homeUrl?: string) {
   }
   return out;
 }
+
+export function vllmOrigins(homeUrl?: string) {
+  const out: string[] = [];
+  const env = typeof process !== "undefined" ? (process.env.HECTOR_VLLM_URL || "").trim() : "";
+  for (const raw of [homeUrl ?? "", env, "http://127.0.0.1:8000"]) {
+    const origin = safeOllamaOrigin(raw);
+    if (origin && !out.includes(origin)) out.push(origin);
+  }
+  return out.filter((o) => !ollamaOrigins(homeUrl).includes(o) || /:8000$/.test(o));
+}

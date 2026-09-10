@@ -7,7 +7,7 @@ import { isApiKey } from "./keys";
 import { safeChatBase } from "./providers";
 import { resolveEngine } from "./engines";
 import { hectorHostPrompt, spectralHxPrompt, compactHxPrompt, compactHectorPrompt } from "@/lib/spectral-hx";
-import { ollamaChat } from "@/lib/ollama/client";
+import { ollamaChat, vllmChat } from "@/lib/ollama/client";
 import { formatRecall } from "@/lib/memory/lattice";
 import { recallMemory } from "@/lib/memory/warehouse";
 import { lessonsFor } from "@/lib/os/mm";
@@ -556,7 +556,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     const ragLines = retrieveFor(data.prompt, data.files).map((h) => h.text.slice(0, 120));
     const lessons = [...(data.lessons ?? []), ...formatRecall(recalled), ...lessonsFor("hx", data.prompt).slice(0, 6), ...lessonsFor("hector", data.prompt).slice(0, 4), ...xpContext(data.prompt).split("\n").filter(Boolean).slice(0, 10), ...ragLines.slice(0, 4)];
     const mode = data.mode;
-    const compact = engine.kind === "ollama" || engine.kind === "lmstudio";
+    const compact = engine.kind === "ollama" || engine.kind === "vllm" || engine.kind === "lmstudio";
     const system = compact
       ? data.voice === "hector"
         ? compactHectorPrompt(mode, lessons)
@@ -579,7 +579,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     let plan = "";
     let reply = "";
     const maxRounds = compact ? (mode === "swarm" ? 10 : 6) : mode === "swarm" ? 16 : mode === "patch" ? 8 : mode === "plan" ? 6 : 5;
-    let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : "llama3.2");
+    let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : engine.kind === "vllm" ? "Qwen/Qwen2.5-Coder-7B-Instruct" : engine.kind === "ollama" ? "qwen2.5-coder:7b" : "llama3.2");
     const maxTokens = compact ? (mode === "scout" ? 1200 : 3500) : mode === "scout" ? 1800 : 5000;
     const sample = (mdl: string) =>
       engine.kind === "ollama" && engine.origin
@@ -591,6 +591,15 @@ export const runForgeTurn = createServerFn({ method: "POST" })
             temperature: 0.1,
             maxTokens,
           })
+        : engine.kind === "vllm" && engine.origin
+          ? vllmChat({
+              origin: engine.origin,
+              model: mdl,
+              messages,
+              tools: toolset,
+              temperature: 0.1,
+              maxTokens,
+            })
         : complete(baseUrl, apiKey, mdl, {
             temperature: compact ? 0.1 : 0.15,
             max_tokens: maxTokens,

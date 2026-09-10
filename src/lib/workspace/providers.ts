@@ -24,15 +24,15 @@ export const CHAT_PROVIDERS: ChatProvider[] = [
     baseUrl: "/api/v1",
     model: "hector-hx",
     keysUrl: "",
-    hint: "Built in. Always on. No bill. Ollama is used automatically if it is running.",
+    hint: "Built in. Always on. No bill. Ollama or vLLM is used automatically if a coder model is running.",
   },
   {
     id: "ollama",
     name: "Ollama",
     baseUrl: "http://127.0.0.1:11434/v1",
-    model: "llama3.2",
+    model: "qwen2.5-coder:7b",
     keysUrl: "https://ollama.com/download",
-    hint: "Local open-source models. No key. Desktop/WSL.",
+    hint: "Local. Hector picks Qwen2.5-Coder or DeepSeek-Coder-V2-Lite when they are pulled.",
   },
   {
     id: "lmstudio",
