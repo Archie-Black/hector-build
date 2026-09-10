@@ -3,6 +3,7 @@ import { runWorkspaceTests } from "@/lib/workspace/run-tests";
 import { diagnostics } from "@/lib/ide/symbols";
 import type { AgentResponse, ForgeMode } from "@/lib/workspace/types";
 import { synthesizeFiles } from "./synthesize";
+import { prove, proofLine } from "@/lib/workspace/prove";
 import { silentCouple } from "@/lib/chips/silent.ts";
 
 type Msg = { role?: string; content?: unknown; tool_calls?: unknown; name?: string };
@@ -79,20 +80,20 @@ export function runLocalTurn(input: {
   traces.push(lints.trace);
 
   const written = Object.keys(generated);
-  const checks = runWorkspaceTests(files);
+  const p = prove(files);
+  traces.push({ name: "prove", ok: p.done, detail: p.note });
   return {
     ok: true,
     reply: [
       `Hector API applied ${written.length} file(s) on the local engine.`,
-      written.map((p) => `• ${p}`).join("\n"),
-      checks.every((t) => t.pass) ? "Checks passed." : `Checks: ${checks.filter((t) => !t.pass).map((t) => t.name).join(", ")} still open.`,
-      "Boost with an xAI / OpenAI key in settings when you want a larger model. The IDE agent already works.",
+      written.map((path) => `• ${path}`).join("\n"),
+      proofLine(p),
     ]
       .filter(Boolean)
       .join("\n"),
     files,
     traces,
-    tests: checks,
+    tests: p.tests.map((t) => ({ name: t.name, pass: t.pass, detail: "" })),
     diffs: diffsFrom(before, files),
   };
 }

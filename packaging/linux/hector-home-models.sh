@@ -5,4 +5,6 @@ command -v ollama >/dev/null || { echo "Install Ollama first: https://ollama.com
 ollama pull qwen2.5-coder:7b
 ollama pull qwen2.5-coder:14b || ollama pull qwen2.5-coder:7b
 ollama pull qwen2.5-coder:32b || true
-echo "Hector will pick the strongest coder on this box. Keep Ollama running."
+ollama pull granite4.2:8b || true
+ollama pull granite4.2:3b || true
+echo "Hector will pick the strongest coder/Granite on this box. Keep Ollama running."

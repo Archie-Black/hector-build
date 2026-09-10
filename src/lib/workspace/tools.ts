@@ -3,6 +3,7 @@ import { grepFiles, globFiles, listFilePaths } from "./search";
 import { executeLattice } from "@/lib/geometry/lattice";
 import { observe, ontologyLine } from "@/lib/geometry/ontology";
 import { runWorkspaceTests } from "./run-tests";
+import { prove, proofLine } from "./prove";
 import { normalizePath, pathAllowed } from "./acl";
 import { diagnostics, formatFile, findDefinition, findReferences, renameSymbol } from "@/lib/ide/symbols";
 import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
@@ -111,7 +112,7 @@ export function executeTool(
       const original = files[path];
       if (original === undefined) return refuse(files, name, `Missing file: ${path}`);
       const all = Boolean(args.replace_all);
-      const updated = replaceInFile(original, oldText, nextText, all);
+      const updated = replaceInFile(original, oldText, nextText, all) ?? shrinkReplace(original, oldText, nextText, all);
       if (!updated) {
         const near = executeLattice({ [path]: original }, oldText, 2).hits[0];
         const hint = near ? ` Nearest chunk @${near.offset}: ${near.text.slice(0, 80)}` : "";
@@ -155,6 +156,15 @@ export function executeTool(
       const tests = runWorkspaceTests(files);
       const failed = tests.filter((t) => !t.pass).length;
       return ok(files, name, tests, `${tests.length - failed}/${tests.length} passing`);
+    }
+    case "prove": {
+      const p = prove(files);
+      return ok(files, name, p, proofLine(p));
+    }
+    case "close_job": {
+      const p = prove(files);
+      if (!p.done) return refuse(files, name, proofLine(p));
+      return ok(files, name, p, "HOLD");
     }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];
@@ -219,4 +229,16 @@ function replaceInFile(src: string, oldText: string, nextText: string, all: bool
     }
   }
   return hit ? copy.join("\n") : null;
+}
+
+function shrinkReplace(src: string, oldText: string, nextText: string, all: boolean): string | null {
+  const lines = oldText.replace(/\r\n/g, "\n").split("\n");
+  if (lines.length < 3) return null;
+  for (let drop = 1; drop <= lines.length - 2; drop++) {
+    const head = lines.slice(0, lines.length - drop).join("\n");
+    const tail = lines.slice(drop).join("\n");
+    const hit = replaceInFile(src, head, nextText, all) ?? replaceInFile(src, tail, nextText, all);
+    if (hit) return hit;
+  }
+  return null;
 }

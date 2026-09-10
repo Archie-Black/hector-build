@@ -178,6 +178,8 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         gcpToken: ext.gcpToken || undefined,
         gcpProject: ext.gcpProject || undefined,
         gcpMcp: ext.gcpMcp || undefined,
+        ibmForge: ext.ibmForge || undefined,
+        ibmForgeToken: ext.ibmForgeToken || undefined,
       };
       const lanes =
         mode === "scout"
@@ -188,6 +190,21 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
               { mode: "swarm" as const, prompt: `CHECKS LANE. Add and run tests.\n${prompt}\n${extra}` },
             ];
       const results = await Promise.all(lanes.map((lane) => runForgeTurn({ data: { ...shared, mode: lane.mode, prompt: lane.prompt } })));
+      const last = results[results.length - 1];
+      if (mode !== "scout" && last?.ok) {
+        const fail = (last.tests ?? []).filter((t) => !t.pass).length;
+        if (fail) {
+          const closer = await runForgeTurn({
+            data: {
+              ...shared,
+              files: last.files,
+              mode: "swarm",
+              prompt: `CLOSE. prove then fix. Do not stop. Failures remain. Original job:\n${prompt.slice(0, 2000)}`,
+            },
+          });
+          results.push(closer);
+        }
+      }
       for (const result of results) {
         if (result.needKey) useForgeStore.getState().setNeedKey(true);
         if (!result.ok && result.error) setError(result.error);

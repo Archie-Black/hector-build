@@ -1,5 +1,6 @@
 import { arcadeAuthorize, arcadeCtx, arcadeExecute, arcadeList } from "./arcade";
 import { gcpCall, gcpCtx, gcpList, GCP_MCP_SERVERS } from "./gcp-mcp";
+import { forgeCall, forgeCtx, forgeHealth, forgeListTools } from "../ibm/contextforge";
 import {
   cloudStatus,
   deleteFunction,
@@ -17,6 +18,8 @@ export type ExtInput = {
   gcpToken?: string;
   gcpProject?: string;
   gcpMcp?: string;
+  ibmForge?: string;
+  ibmForgeToken?: string;
 };
 
 export const EXTENSION_TOOLS = [
@@ -77,6 +80,34 @@ export const EXTENSION_TOOLS = [
   {
     type: "function" as const,
     function: {
+      name: "ibm_forge_health",
+      description: "Ping IBM ContextForge MCP gateway (Apache 2.0). Optional self-host on :4444.",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "ibm_forge_list",
+      description: "List tools federated by IBM ContextForge.",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "ibm_forge_call",
+      description: "Call a tool on IBM ContextForge by name.",
+      parameters: {
+        type: "object",
+        properties: { tool: { type: "string" }, arguments: { type: "object" } },
+        required: ["tool"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
       name: "cloud_fn_list",
       description: "List functions on Hector Cloud (this app is the cloud).",
       parameters: { type: "object", properties: {} },
@@ -126,6 +157,9 @@ export function isExtensionTool(name: string) {
     name === "arcade_execute" ||
     name === "gcp_mcp_list" ||
     name === "gcp_mcp_call" ||
+    name === "ibm_forge_health" ||
+    name === "ibm_forge_list" ||
+    name === "ibm_forge_call" ||
     name === "cloud_fn_list" ||
     name === "cloud_fn_deploy" ||
     name === "cloud_fn_invoke" ||
@@ -174,6 +208,24 @@ export async function executeExtension(name: string, args: Record<string, unknow
       const payload = await gcpCall(ctx, String(args.tool ?? args.name ?? ""), (args.arguments as Record<string, unknown>) ?? {});
       return { ok: true, detail: String(args.tool ?? ""), payload };
     }
+    if (name === "ibm_forge_health") {
+      const ctx = forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken });
+      if (!ctx) return { ok: false, detail: "Set IBM ContextForge URL (http://127.0.0.1:4444).", payload: { need: "ibm" } };
+      const payload = await forgeHealth(ctx);
+      return { ok: true, detail: ctx.origin, payload };
+    }
+    if (name === "ibm_forge_list") {
+      const ctx = forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken });
+      if (!ctx) return { ok: false, detail: "Set IBM ContextForge URL.", payload: { need: "ibm" } };
+      const payload = await forgeListTools(ctx);
+      return { ok: true, detail: "contextforge tools", payload };
+    }
+    if (name === "ibm_forge_call") {
+      const ctx = forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken });
+      if (!ctx) return { ok: false, detail: "Set IBM ContextForge URL.", payload: { need: "ibm" } };
+      const payload = await forgeCall(ctx, String(args.tool ?? args.name ?? ""), (args.arguments as Record<string, unknown>) ?? {});
+      return { ok: true, detail: String(args.tool ?? ""), payload };
+    }
     if (name === "cloud_status") return { ok: true, detail: "hector-cloud", payload: cloudStatus() };
     if (name === "cloud_fn_list") return { ok: true, detail: "functions", payload: listFunctions().map(({ source: _s, ...r }) => r) };
     if (name === "cloud_fn_deploy") {
@@ -200,6 +252,7 @@ export function extensionStatus(ext: ExtInput) {
     hectorCloud: true,
     arcade: Boolean(arcadeCtx({ apiKey: ext.arcadeKey, userId: ext.arcadeUser })),
     gcp: Boolean(gcpCtx({ token: ext.gcpToken, project: ext.gcpProject, server: ext.gcpMcp })),
+    ibmForge: Boolean(forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken })),
     gcpServers: Object.keys(GCP_MCP_SERVERS),
     mcp: "/api/v1/mcp",
     functions: "/api/v1/functions",

@@ -5,4 +5,4 @@ export const ASSISTANT_NAME = "Grok";
 export const AGENT_LICENSE = "MIT";
 
 export const AGENT_TAGLINE =
-  "Hector Build is the host intelligence. Grok is Hector’s assistant. Spectral HX is the coding floor.";
+  "Looks like a chat window. Builds like a floor. Spectral HX does the work. A key is optional.";

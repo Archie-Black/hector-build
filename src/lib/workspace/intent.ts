@@ -41,6 +41,10 @@ export function explainTrace(name: string, detail: string, ok: boolean): string 
       return `HX Patch edited ${detail}.` + fail;
     case "run_tests":
       return `HX Checks ran tests (${detail}).` + fail;
+    case "prove":
+      return `HX proved the job (${detail}).` + fail;
+    case "close_job":
+      return ok ? "HX closed the job. HOLD." : `HX would not close (${detail}).`;
     case "web_search":
       return `Spectral HX searched the web (${detail}).` + fail;
     case "web_fetch":

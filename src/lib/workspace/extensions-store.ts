@@ -6,10 +6,12 @@ export type ClientExt = {
   gcpToken: string;
   gcpProject: string;
   gcpMcp: string;
+  ibmForge: string;
+  ibmForgeToken: string;
 };
 
 export function defaultExt(): ClientExt {
-  return { arcadeKey: "", arcadeUser: "", gcpToken: "", gcpProject: "", gcpMcp: "cli" };
+  return { arcadeKey: "", arcadeUser: "", gcpToken: "", gcpProject: "", gcpMcp: "cli", ibmForge: "", ibmForgeToken: "" };
 }
 
 export function loadExt(): ClientExt {

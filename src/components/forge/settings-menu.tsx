@@ -200,6 +200,21 @@ export function SettingsPanel() {
                 </button>
               ))}
             </div>
+            <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">IBM ContextForge</p>
+            <p className="mt-1 text-sm text-muted text-pretty">Optional MCP gateway. Apache 2.0. Self-host on :4444 or https://mcp.doomchat.ca.</p>
+            <input
+              value={ext.ibmForge}
+              onChange={(e) => setExt({ ...ext, ibmForge: e.target.value })}
+              placeholder="http://127.0.0.1:4444"
+              className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+            />
+            <input
+              type="password"
+              value={ext.ibmForgeToken}
+              onChange={(e) => setExt({ ...ext, ibmForgeToken: e.target.value })}
+              placeholder="Bearer token (optional)"
+              className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+            />
             <Button
               type="button"
               className="mt-3 h-11 w-full"

@@ -58,44 +58,58 @@ export function redactSecrets(text: string) {
     .replace(/Bearer\s+\S+/gi, "Bearer ***");
 }
 
-export async function sealPrivateKey(raw: string) {
+function slotKey(slot: string) {
+  return slot === "chat" ? CIPHER : `${CIPHER}.${slot}`;
+}
+
+export async function sealSlot(slot: string, raw: string) {
   if (typeof window === "undefined") return;
   const value = raw.trim();
+  const keyName = slotKey(slot);
   if (!value || value === "local") {
-    localStorage.removeItem(CIPHER);
-    localStorage.removeItem(LEGACY);
+    localStorage.removeItem(keyName);
+    if (slot === "chat") localStorage.removeItem(LEGACY);
     return;
   }
   const key = await deviceKey();
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const cipher = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv as BufferSource }, key, new TextEncoder().encode(value));
-  localStorage.setItem(CIPHER, JSON.stringify({ iv: b64(iv), cipher: b64(new Uint8Array(cipher)) }));
-  localStorage.removeItem(LEGACY);
+  localStorage.setItem(keyName, JSON.stringify({ iv: b64(iv), cipher: b64(new Uint8Array(cipher)) }));
+  if (slot === "chat") localStorage.removeItem(LEGACY);
 }
 
-export async function openPrivateKey(): Promise<string> {
+export async function openSlot(slot: string): Promise<string> {
   if (typeof window === "undefined") return "";
   try {
-    const legacy = localStorage.getItem(LEGACY) ?? "";
-    const wrapped = localStorage.getItem(CIPHER);
-    if (wrapped) {
-      const parsed = JSON.parse(wrapped) as { iv: string; cipher: string };
-      const key = await deviceKey();
-      const raw = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: unb64(parsed.iv) as BufferSource },
-        key,
-        unb64(parsed.cipher) as BufferSource,
-      );
-      return new TextDecoder().decode(raw);
+    const wrapped = localStorage.getItem(slotKey(slot));
+    if (!wrapped) {
+      if (slot !== "chat") return "";
+      const legacy = localStorage.getItem(LEGACY) ?? "";
+      if (legacy && !/\s/.test(legacy) && legacy.length >= 12) {
+        await sealSlot("chat", legacy);
+        return legacy;
+      }
+      return "";
     }
-    if (legacy && !/\s/.test(legacy) && legacy.length >= 12) {
-      await sealPrivateKey(legacy);
-      return legacy;
-    }
+    const parsed = JSON.parse(wrapped) as { iv: string; cipher: string };
+    const key = await deviceKey();
+    const raw = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: unb64(parsed.iv) as BufferSource },
+      key,
+      unb64(parsed.cipher) as BufferSource,
+    );
+    return new TextDecoder().decode(raw);
   } catch {
     return "";
   }
-  return "";
+}
+
+export async function sealPrivateKey(raw: string) {
+  return sealSlot("chat", raw);
+}
+
+export async function openPrivateKey(): Promise<string> {
+  return openSlot("chat");
 }
 
 export async function clearPrivateKey() {

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { diffsFrom, executeTool } from "./tools";
 import { runWorkspaceTests } from "./run-tests";
+import { prove } from "./prove";
 import { isApiKey } from "./keys";
 import { safeChatBase } from "./providers";
 import { resolveEngine } from "./engines";
@@ -9,7 +10,6 @@ import { ollamaChat } from "@/lib/ollama/client";
 import { formatRecall } from "@/lib/memory/lattice";
 import { recallMemory } from "@/lib/memory/warehouse";
 import { rustSearchNative } from "@/lib/geometry/mdv-native";
-import { critique, revisionPrompt } from "@/lib/align/cai";
 import { harmScan } from "@/lib/align/asimov";
 import { runLocalTurn } from "@/lib/hector-api/local-turn";
 import { executeExtension, EXTENSION_TOOLS, isExtensionTool } from "@/lib/hector-api/extensions";
@@ -186,6 +186,22 @@ const TOOLS = [
   {
     type: "function",
     function: {
+      name: "prove",
+      description: "Gate. Tests + error lints + stub scan. done is false until all clear. Use before you claim finished.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "close_job",
+      description: "Refuse unless prove is clear. Returns HOLD only when the job actually holds.",
+      parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "todo_write",
       description: "Replace the task board.",
       parameters: {
@@ -291,6 +307,8 @@ const CORE_TOOL_NAMES = new Set([
   "search_replace",
   "get_diagnostics",
   "run_tests",
+  "prove",
+  "close_job",
   "todo_write",
 ]);
 
@@ -315,6 +333,8 @@ type TurnInput = {
   gcpToken?: string;
   gcpProject?: string;
   gcpMcp?: string;
+  ibmForge?: string;
+  ibmForgeToken?: string;
 };
 
 type Msg = Record<string, unknown>;
@@ -489,6 +509,8 @@ export const runForgeTurn = createServerFn({ method: "POST" })
               gcpToken: data.gcpToken,
               gcpProject: data.gcpProject,
               gcpMcp: data.gcpMcp,
+              ibmForge: data.ibmForge,
+              ibmForgeToken: data.ibmForgeToken,
             });
             traces.push({ name, ok: payload.ok, detail: payload.detail });
             messages.push({
@@ -568,25 +590,21 @@ export const runForgeTurn = createServerFn({ method: "POST" })
       }
 
       if (!toolCalls.length) {
-        const checks = runWorkspaceTests(files);
-        const fail = checks.filter((t) => !t.pass);
-        const cai = critique({
-          reply: content,
-          fail: fail.length,
-          traces,
-          diffs: diffsFrom(before, files),
-        });
-        if ((!cai.ok || fail.length) && round < maxRounds - 1 && (mode === "swarm" || mode === "patch")) {
+        const p = prove(files);
+        traces.push({ name: "prove", ok: p.done, detail: p.note });
+        if (!p.done && round < maxRounds - 1 && (mode === "swarm" || mode === "patch")) {
           messages.push(msg);
           messages.push({
             role: "user",
-            content: fail.length
-              ? `Checks still fail: ${fail.map((t) => t.name).join(", ")}. Do not give up. Be better. Fix them and continue.`
-              : revisionPrompt(cai),
+            content: `${p.note} ${JSON.stringify({
+              tests: p.tests.filter((t) => !t.pass).slice(0, 8),
+              lints: p.lints.slice(0, 8),
+              stubs: p.stubs.slice(0, 8),
+            })} Do not give up. Fix, prove, continue.`,
           });
           continue;
         }
-        reply = content || "The job is finished.";
+        reply = p.done ? content || "HOLD." : content || p.note;
         if (mode === "plan" && !plan) plan = reply;
         break;
       }

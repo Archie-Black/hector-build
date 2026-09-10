@@ -5,6 +5,8 @@ export function modelScore(name: string) {
   if (/embed|vision|llava|minicpm-v|nomic/.test(n)) return -1000;
   let s = 0;
   if (/coder|codestral|deepseek|devstral|starcoder|qwen2\.5-coder|qwen3-coder/.test(n)) s += 60;
+  if (/granite/.test(n)) s += 50;
+  if (/granite4\.2/.test(n)) s += 10;
   if (/instruct|chat/.test(n)) s += 4;
   const b = n.match(/(\d+(?:\.\d+)?)\s*b/);
   if (b) s += Math.min(90, Number(b[1]));
@@ -34,6 +36,7 @@ export function pickPair(names: string[]) {
 export function ctxFor(name: string) {
   const n = name.toLowerCase();
   if (/\b(70|72)b\b/.test(n)) return 16_384;
+  if (/granite/.test(n)) return 32_768;
   if (/\b(32|34|27)b\b/.test(n)) return 24_576;
   if (/\b(14|22)b\b/.test(n)) return 32_768;
   return 32_768;

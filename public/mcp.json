@@ -3,6 +3,10 @@
     "hector-cloud": {
       "url": "/api/v1/mcp",
       "transport": "http"
+    },
+    "ibm-contextforge": {
+      "url": "http://127.0.0.1:4444/rpc",
+      "transport": "http"
     }
   }
 }
