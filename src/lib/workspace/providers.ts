@@ -16,7 +16,7 @@ export const CHAT_PROVIDERS: ChatProvider[] = [
     baseUrl: "/api/v1",
     model: "hector-hx",
     keysUrl: "",
-    hint: "Built in. No cloud key. Other chatbots can point at /api/v1 (OpenAI-compatible). Add a cloud key only to boost.",
+    hint: "Built in. Always on. Other tools POST to /api/v1/chat/completions (OpenAI-compatible). Cloud keys only boost.",
   },
   {
     id: "xai",

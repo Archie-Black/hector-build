@@ -139,7 +139,3 @@ export function localChatCompletion(body: {
   };
 }
 
-export const HECTOR_MODELS = [
-  { id: "hector-hx", owned_by: "hector-build", object: "model" as const },
-  { id: "spectral-hx", owned_by: "hector-build", object: "model" as const },
-];

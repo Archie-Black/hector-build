@@ -8,11 +8,13 @@ import { isApiKey } from "@/lib/workspace/keys";
 import { VaultPanel } from "@/components/forge/vault-panel";
 import { GuestPanel } from "@/components/forge/guest-panel";
 import { CREDIT, DISCLAIMER, FREE_API_URL, FREE_LINE, ONE_MAN, SUPPORT_EMAIL } from "@/lib/legal/copy";
+import { installHint } from "@/lib/workspace/host-settings";
+import { osLabel } from "@/lib/workspace/platform";
 import { loadSession } from "@/lib/auth/local-account";
 import { requestSupport } from "@/lib/support/session";
 import { sfx } from "@/lib/sfx/hector";
 
-const TABS = ["Look", "Chatbot", "Agent", "Updates", "Vault", "Guest", "About"] as const;
+const TABS = ["Look", "System", "Chatbot", "Agent", "Updates", "Vault", "Guest", "About"] as const;
 
 export function SettingsButton() {
   return (
@@ -36,6 +38,8 @@ export function SettingsPanel() {
   const allowlist = useForgeStore((s) => s.allowlist);
   const updates = useForgeStore((s) => s.updates);
   const providerId = useForgeStore((s) => s.providerId);
+  const host = useForgeStore((s) => s.host);
+  const platform = useForgeStore((s) => s.platform);
   const baseUrl = useForgeStore((s) => s.baseUrl);
   const model = useForgeStore((s) => s.model);
   const [tab, setTab] = useState<(typeof TABS)[number]>("Look");
@@ -101,6 +105,53 @@ export function SettingsPanel() {
             <p className="mt-3 text-sm text-muted text-pretty">
               Dark is black and cobalt. Frosted glass stays on both themes.
             </p>
+          </>
+        ) : null}
+        {tab === "System" ? (
+          <>
+            <p className="text-xs tracking-[0.14em] text-subtle uppercase">This device</p>
+            <p className="mt-2 text-sm">{osLabel(platform)}</p>
+            <p className="mt-1 font-mono text-xs text-muted">{installHint(platform).path}</p>
+            <p className="mt-2 text-sm text-muted text-pretty">{installHint(platform).how}</p>
+            <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">Local API</p>
+            <p className="mt-2 text-sm text-pretty">
+              Always on at <span className="font-mono">/api/v1</span>. Model <span className="font-mono">hector-hx</span>.
+              Cloud is optional: paste a key and pick Grok / OpenAI / Groq.
+            </p>
+            <div className="mt-4 grid gap-2">
+              {(
+                [
+                  ["ghosts", "Ghosts"],
+                  ["verbose", "Verbose"],
+                  ["notifications", "Notifications"],
+                  ["reducedMotion", "Less motion"],
+                  ["autoStart", "Start with OS"],
+                ] as const
+              ).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={"flex h-11 items-center justify-between rounded-md px-3 text-sm " + (host[key] ? "bg-accent text-accent-fg" : "glass-thin")}
+                  onClick={() => useForgeStore.getState().setHost({ [key]: !host[key] })}
+                >
+                  <span>{label}</span>
+                  <span>{host[key] ? "on" : "off"}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">Keyboard</p>
+            <div className="mt-2 flex gap-2">
+              {(["auto", "desktop", "touch"] as const).map((kb) => (
+                <button
+                  key={kb}
+                  type="button"
+                  className={"h-11 flex-1 rounded-md text-sm " + (host.keyboard === kb ? "bg-accent text-accent-fg" : "glass-thin")}
+                  onClick={() => useForgeStore.getState().setHost({ keyboard: kb })}
+                >
+                  {kb}
+                </button>
+              ))}
+            </div>
           </>
         ) : null}
         {tab === "Chatbot" ? (

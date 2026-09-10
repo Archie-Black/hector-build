@@ -14,10 +14,8 @@ import { saveVolume } from "@/lib/geopack/persist";
 import { loadProvider, saveProvider, type ChatProviderId } from "@/lib/workspace/providers";
 import { computeProgress } from "@/lib/workspace/progress";
 import { SEED_LIBRARY, type LibraryProject } from "@/lib/workspace/library";
-import {
-  resolveImmutablePlatform,
-  type LockedPlatform,
-} from "@/lib/workspace/platform";
+import { resolveImmutablePlatform, type LockedPlatform } from "@/lib/workspace/platform";
+import { applyHost, loadHost, saveHost, type HostSettings } from "@/lib/workspace/host-settings";
 import { applyTheme, loadTheme, type ThemeName } from "@/lib/workspace/theme";
 import { loadBench, saveBench } from "@/lib/workspace/bench";
 import { pathAllowed } from "@/lib/workspace/acl";
@@ -80,6 +78,7 @@ type ForgeState = {
   hxDetached: boolean;
   updates: UpdateSettings;
   platform: LockedPlatform;
+  host: HostSettings;
   theme: ThemeName;
   library: LibraryProject[];
   sandbox: boolean;
@@ -157,6 +156,7 @@ type ForgeState = {
   maybeSilentInstall: () => void;
   hydrateChrome: () => void;
   setTheme: (theme: ThemeName) => void;
+  setHost: (patch: Partial<HostSettings>) => void;
   setRailOpen: (open: boolean) => void;
   toggleSandbox: () => void;
   openSandbox: () => Promise<void>;
@@ -249,7 +249,17 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
   hxOpen: false,
   hxDetached: false,
   updates: defaultUpdateSettings(),
-  platform: "desktop",
+  platform: "linux",
+  host: {
+    os: "linux",
+    verbose: false,
+    ghosts: true,
+    notifications: true,
+    reducedMotion: false,
+    fontScale: 1,
+    keyboard: "desktop",
+    autoStart: true,
+  },
   theme: "dark",
   library: SEED_LIBRARY,
   sandbox: false,
@@ -416,8 +426,12 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
     applyTheme(theme);
     const bench = loadBench();
     const provider = loadProvider();
+    const os = resolveImmutablePlatform();
+    const host = loadHost(os);
+    applyHost(host);
     set({
-      platform: resolveImmutablePlatform(),
+      platform: os,
+      host,
       theme,
       spendCap: bench.spendCap,
       allowlist: bench.allowlist,
@@ -426,6 +440,11 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       model: provider.model,
       visitorKey: provider.key || loadVisitorKey(),
     });
+  },
+  setHost: (patch) => {
+    const host = saveHost({ ...get().host, ...patch, os: get().platform });
+    applyHost(host);
+    set({ host });
   },
   setTheme: (theme) => {
     applyTheme(theme);

@@ -65,6 +65,8 @@ fi
 
 command -v update-desktop-database >/dev/null 2>&1 && update-desktop-database "$APP" >/dev/null 2>&1 || true
 
+bash "$APPDIR/packaging/linux/configure.sh" || true
+
 echo
 echo "Installed."
 echo "  Hector Build  →  hector-build"

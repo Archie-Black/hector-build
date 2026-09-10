@@ -43,6 +43,7 @@ html[data-theme="light"] {
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-size: calc(16px * var(--ui-scale, 1));
   }
 
   html,
@@ -605,4 +606,24 @@ html[data-theme="light"] {
   .atom-electron {
     animation: none;
   }
+}
+
+html[data-ghosts="off"] .atom-electron,
+html[data-ghosts="off"] .atom-ring {
+  display: none;
+}
+
+html[data-kb="touch"] button,
+html[data-kb="touch"] [role="button"] {
+  min-height: 2.75rem;
+}
+
+html[data-motion="reduce"] * {
+  animation: none !important;
+  transition: none !important;
+}
+
+html[data-os="android"] .glass-window,
+html[data-os="ios"] .glass-window {
+  backdrop-filter: blur(14px);
 }

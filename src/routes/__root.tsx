@@ -9,14 +9,18 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: APP_NAME },
       {
         name: "description",
         content:
           "Hector Build is the host intelligence. Grok is Hector’s assistant. Spectral HX is the coding floor.",
       },
-      { name: "theme-color", content: "#0a0909" },
+      { name: "theme-color", content: "#000000" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "Hector Build" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
