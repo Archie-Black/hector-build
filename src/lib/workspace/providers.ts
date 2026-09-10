@@ -24,39 +24,7 @@ export const CHAT_PROVIDERS: ChatProvider[] = [
     baseUrl: "/api/v1",
     model: "hector-hx",
     keysUrl: "",
-    hint: "Built in. Always on. Other tools POST to /api/v1/chat/completions (OpenAI-compatible). Cloud keys only boost.",
-  },
-  {
-    id: "xai",
-    name: "Grok (xAI)",
-    baseUrl: "https://api.x.ai/v1",
-    model: "grok-4.5",
-    keysUrl: "https://console.x.ai/team/default/api-keys",
-    hint: "Create an API key at console.x.ai. Paste the xai- key. Model grok-4.5.",
-  },
-  {
-    id: "openai",
-    name: "OpenAI",
-    baseUrl: "https://api.openai.com/v1",
-    model: "gpt-4.1",
-    keysUrl: "https://platform.openai.com/api-keys",
-    hint: "Create a key at platform.openai.com/api-keys. Paste the sk- key. Model gpt-4.1.",
-  },
-  {
-    id: "groq",
-    name: "Groq",
-    baseUrl: "https://api.groq.com/openai/v1",
-    model: "llama-3.3-70b-versatile",
-    keysUrl: "https://console.groq.com/keys",
-    hint: "Best free API key for this app. Create one at console.groq.com/keys. OpenAI-compatible.",
-  },
-  {
-    id: "openrouter",
-    name: "OpenRouter",
-    baseUrl: "https://openrouter.ai/api/v1",
-    model: "anthropic/claude-sonnet-4",
-    keysUrl: "https://openrouter.ai/keys",
-    hint: "One key, many models. Paste the sk-or- key and set the model id.",
+    hint: "Built in. Always on. No bill. Ollama is used automatically if it is running.",
   },
   {
     id: "ollama",
@@ -64,7 +32,7 @@ export const CHAT_PROVIDERS: ChatProvider[] = [
     baseUrl: "http://127.0.0.1:11434/v1",
     model: "llama3.2",
     keysUrl: "https://ollama.com/download",
-    hint: "Local. No key. Run Ollama, then ollama pull llama3.2. Works on the desktop/WSL install — not the hosted preview.",
+    hint: "Local open-source models. No key. Desktop/WSL.",
   },
   {
     id: "lmstudio",
@@ -72,20 +40,51 @@ export const CHAT_PROVIDERS: ChatProvider[] = [
     baseUrl: "http://127.0.0.1:1234/v1",
     model: "local-model",
     keysUrl: "https://lmstudio.ai",
-    hint: "Local OpenAI-compatible server. Start the server in LM Studio. No key.",
+    hint: "Local OpenAI-compatible server. No key.",
+  },
+  {
+    id: "groq",
+    name: "Groq (optional)",
+    baseUrl: "https://api.groq.com/openai/v1",
+    model: "llama-3.3-70b-versatile",
+    keysUrl: "https://console.groq.com/keys",
+    hint: "Optional free cloud key.",
+  },
+  {
+    id: "xai",
+    name: "Grok (private key)",
+    baseUrl: "https://api.x.ai/v1",
+    model: "grok-4.5",
+    keysUrl: "https://console.x.ai/team/default/api-keys",
+    hint: "Optional. Your key stays in a device lockbox. Never required.",
+  },
+  {
+    id: "openai",
+    name: "OpenAI (private key)",
+    baseUrl: "https://api.openai.com/v1",
+    model: "gpt-4.1",
+    keysUrl: "https://platform.openai.com/api-keys",
+    hint: "Optional private key. Encrypted on this device.",
+  },
+  {
+    id: "openrouter",
+    name: "OpenRouter (private key)",
+    baseUrl: "https://openrouter.ai/api/v1",
+    model: "anthropic/claude-sonnet-4",
+    keysUrl: "https://openrouter.ai/keys",
+    hint: "Optional. One key, many models.",
   },
   {
     id: "custom",
-    name: "Custom (OpenAI-compatible)",
+    name: "Custom",
     baseUrl: "https://api.example.com/v1",
     model: "your-model",
     keysUrl: "",
-    hint: "Any OpenAI-compatible chatbot: llama.cpp, Together, Azure, a proxy.",
+    hint: "Any OpenAI-compatible endpoint.",
   },
 ];
 
 const STORE = "spectral-hx-provider";
-const KEY_STORE = "hector-visitor-xai";
 
 export function isApiKey(value: string): boolean {
   const t = value.trim();
@@ -101,12 +100,11 @@ export function loadProvider(): { id: ChatProviderId; baseUrl: string; model: st
     const raw = window.localStorage.getItem(STORE);
     const parsed = raw ? (JSON.parse(raw) as { id?: ChatProviderId; baseUrl?: string; model?: string }) : {};
     const preset = CHAT_PROVIDERS.find((p) => p.id === parsed.id) ?? fallback;
-    const key = window.localStorage.getItem(KEY_STORE) ?? "";
     return {
       id: preset.id,
       baseUrl: parsed.baseUrl || preset.baseUrl,
       model: parsed.model || preset.model,
-      key: isApiKey(key) ? key : "",
+      key: "",
     };
   } catch {
     return { id: fallback.id, baseUrl: fallback.baseUrl, model: fallback.model, key: "" };
@@ -119,9 +117,6 @@ export function saveProvider(next: { id: ChatProviderId; baseUrl: string; model:
     STORE,
     JSON.stringify({ id: next.id, baseUrl: next.baseUrl.trim(), model: next.model.trim() }),
   );
-  if (isApiKey(next.key)) window.localStorage.setItem(KEY_STORE, next.key.trim());
-  else if (next.id === "ollama" || next.id === "lmstudio") window.localStorage.setItem(KEY_STORE, "local");
-  else window.localStorage.removeItem(KEY_STORE);
 }
 
 export function safeChatBase(raw: string): string | null {

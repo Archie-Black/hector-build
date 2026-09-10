@@ -7,7 +7,7 @@ import {
   mergeLessons,
   type MetaMemory,
 } from "@/lib/workspace/memory";
-import { loadVisitorKey, saveVisitorKey } from "@/lib/workspace/keys";
+import { forgetVisitorKey, loadVisitorKeyAsync, saveVisitorKey } from "@/lib/workspace/keys";
 import { openHxSoftware, openSandboxWindow, publishLive } from "@/lib/hx/live";
 import { packFiles, statsOf, type PackStats } from "@/lib/geopack/volume";
 import { saveVolume } from "@/lib/geopack/persist";
@@ -318,19 +318,24 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       progress: computeProgress(busy, get().traces, get().tests),
     }),
   setStatus: (status) => set({ status }),
-  setOwnerReady: (ownerReady) => set({ ownerReady, needKey: !ownerReady && !get().visitorKey }),
+  setOwnerReady: (ownerReady) => set({ ownerReady }),
   setVisitorKey: (key) => {
     saveVisitorKey(key);
-    set({ visitorKey: key, needKey: !key && !get().ownerReady });
+    set({ visitorKey: key, needKey: false });
   },
   setChatProvider: (next) => {
     saveProvider(next);
+    if (next.id === "xai" || next.id === "openai" || next.id === "groq" || next.id === "openrouter" || next.id === "custom") {
+      saveVisitorKey(next.key);
+    } else {
+      forgetVisitorKey();
+    }
     set({
       providerId: next.id,
       baseUrl: next.baseUrl,
       model: next.model,
       visitorKey: next.key,
-      needKey: !next.key && !get().ownerReady,
+      needKey: false,
     });
   },
   setNeedKey: (needKey) => set({ needKey }),
@@ -419,8 +424,7 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
     });
     publishLive({ type: "tasks", tasks, busy: get().busy });
   },
-  hydrateMemory: (memory) =>
-    set({ memory, visitorKey: loadVisitorKey(), updates: loadUpdateSettings() }),
+  hydrateMemory: (memory) => set({ memory, updates: loadUpdateSettings() }),
   hydrateChrome: () => {
     const theme = loadTheme();
     applyTheme(theme);
@@ -438,7 +442,9 @@ export const useForgeStore = create<ForgeState>()((set, get) => ({
       providerId: provider.id,
       baseUrl: provider.baseUrl,
       model: provider.model,
-      visitorKey: provider.key || loadVisitorKey(),
+    });
+    void loadVisitorKeyAsync().then((key) => {
+      if (key) set({ visitorKey: key });
     });
   },
   setHost: (patch) => {

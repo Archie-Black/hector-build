@@ -3,6 +3,7 @@ import { diffsFrom, executeTool } from "./tools";
 import { runWorkspaceTests } from "./run-tests";
 import { isApiKey } from "./keys";
 import { isLoopbackChat, safeChatBase } from "./providers";
+import { resolveEngine } from "./engines";
 import { hectorHostPrompt, spectralHxPrompt } from "@/lib/spectral-hx";
 import { formatRecall } from "@/lib/memory/lattice";
 import { recallMemory } from "@/lib/memory/warehouse";
@@ -288,6 +289,7 @@ type TurnInput = {
   history: HistoryItem[];
   lessons: string[];
   visitorKey?: string;
+  providerId?: import("./providers").ChatProviderId;
   baseUrl?: string;
   model?: string;
   voice?: "hector" | "hx";
@@ -303,15 +305,6 @@ type Msg = Record<string, unknown>;
 export const probeOwnerKey = createServerFn({ method: "POST" }).handler(async () => {
   return { ownerReady: true, engine: "hector-api" as const };
 });
-
-function useLocalEngine(baseUrl: string, model: string, apiKey: string) {
-  if (isLoopbackChat(baseUrl)) return false;
-  if (/hector-hx|spectral-hx|hx-local/.test(model)) return true;
-  const root = safeChatBase(baseUrl) || "";
-  if (root === "/api/v1" || root.endsWith("/api/v1")) return true;
-  if (!apiKey) return true;
-  return false;
-}
 
 async function webSearch(query: string) {
   const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
@@ -349,7 +342,12 @@ export const runForgeTurn = createServerFn({ method: "POST" })
   .validator((input: TurnInput) => input)
   .handler(async ({ data }): Promise<AgentResponse> => {
     const visitor = isApiKey(data.visitorKey ?? "") ? data.visitorKey!.trim() : "";
-    const apiKey = visitor || process.env.XAI_API_KEY || (isLoopbackChat(data.baseUrl || "") ? "local" : "");
+    const engine = await resolveEngine({
+      providerId: data.providerId,
+      baseUrl: data.baseUrl,
+      model: data.model,
+      key: visitor,
+    });
     const harm = harmScan(data.prompt);
     if (harm.harm) {
       return {
@@ -360,16 +358,18 @@ export const runForgeTurn = createServerFn({ method: "POST" })
         tests: runWorkspaceTests(data.files),
       };
     }
-    const baseUrl = data.baseUrl || "/api/v1";
-    const requested = (data.model || "").trim();
-    if (useLocalEngine(baseUrl, requested, apiKey)) {
-      return runLocalTurn({
+    const local = () =>
+      runLocalTurn({
         prompt: data.prompt,
         files: data.files,
         mode: data.mode,
         history: data.history,
       });
-    }
+    if (engine.kind === "hector-local") return local();
+
+    const apiKey = engine.key;
+    const baseUrl = engine.baseUrl;
+    const requested = engine.model;
 
     const recalled = await recallMemory({ data: data.prompt });
     silentCouple(data.prompt, data.files);
@@ -393,13 +393,18 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : isLoopbackChat(baseUrl) ? "llama3.2" : "gpt-4.1");
 
     for (let round = 0; round < maxRounds; round++) {
-      let res = await complete(baseUrl, apiKey, model, {
-        temperature: 0.15,
-        max_tokens: mode === "scout" ? 1800 : 5000,
-        tools: TOOLS,
-        tool_choice: "auto",
-        messages,
-      });
+      let res: Response;
+      try {
+        res = await complete(baseUrl, apiKey, model, {
+          temperature: 0.15,
+          max_tokens: mode === "scout" ? 1800 : 5000,
+          tools: TOOLS,
+          tool_choice: "auto",
+          messages,
+        });
+      } catch {
+        return local();
+      }
       if (!res.ok && baseUrl.includes("x.ai") && (res.status === 400 || res.status === 404) && model === "grok-4.5") {
         model = "grok-4";
         res = await complete(baseUrl, apiKey, model, {
@@ -412,19 +417,18 @@ export const runForgeTurn = createServerFn({ method: "POST" })
       }
 
       if (!res.ok) {
-        const errText = await res.text().catch(() => "");
-        const needKey = res.status === 401 || res.status === 403;
-        return {
-          ok: false,
-          needKey,
-          error: needKey
-            ? "That xAI key was refused. Sign in at xAI and create a fresh key."
-            : `Refused mid-turn (${res.status}). ${errText.slice(0, 160)}`,
-          reply: "",
-          files,
-          traces,
-          tests: runWorkspaceTests(files),
-        };
+        if (engine.kind === "cloud" && (res.status === 401 || res.status === 403)) {
+          return {
+            ok: false,
+            needKey: true,
+            error: "Private key refused. Hector's free engine is still on.",
+            reply: "",
+            files,
+            traces,
+            tests: runWorkspaceTests(files),
+          };
+        }
+        return local();
       }
 
       const body = (await res.json()) as { choices?: { message?: Msg }[] };

@@ -4,7 +4,7 @@ export const FREE_API_URL = "https://console.groq.com/keys";
 export const FREE_LOCAL = "Ollama (local, no key)";
 
 export const FREE_LINE =
-  "Free to use. Not a demo. A chatbot API key is required for full work — Groq has a free key, or run Ollama on your machine.";
+  "Free to use. Not a demo. Hector's engine is always on. If Ollama is running, it is used automatically. Paid keys (xAI, OpenAI) are optional — never required.";
 
 export const ONE_MAN = `Built by one person, DeltaKingZero. Years of nights, missed days, and the kind of stubbornness that does not clock out. No team. No round. Just the work.`;
 

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { OsWindow } from "@/components/forge/os-window";
 import { useForgeStore } from "@/lib/forge-store";
 import { CHAT_PROVIDERS, type ChatProviderId } from "@/lib/workspace/providers";
-import { isApiKey } from "@/lib/workspace/keys";
+import { forgetVisitorKey, isApiKey, maskKey } from "@/lib/workspace/keys";
 import { VaultPanel } from "@/components/forge/vault-panel";
 import { GuestPanel } from "@/components/forge/guest-panel";
 import { CREDIT, DISCLAIMER, FREE_API_URL, FREE_LINE, ONE_MAN, SUPPORT_EMAIL } from "@/lib/legal/copy";
@@ -238,17 +238,38 @@ export function SettingsPanel() {
               placeholder="model id"
               className="mt-3 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
             />
-            {pid === "ollama" || pid === "lmstudio" ? (
-              <p className="mt-2 text-xs text-muted">No API key. Local engine.</p>
-            ) : (
-            <input
-              type="password"
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              placeholder="API key (leave blank to keep current)"
-              className="mt-3 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
-            />
-            )}
+            {CHAT_PROVIDERS.find((p) => p.id === pid)?.hint ? (
+              <p className="mt-2 text-xs text-muted">{CHAT_PROVIDERS.find((p) => p.id === pid)?.hint}</p>
+            ) : null}
+            {pid === "xai" || pid === "openai" || pid === "groq" || pid === "openrouter" || pid === "custom" ? (
+              <>
+                <input
+                  type="password"
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={key}
+                  onChange={(e) => setKey(e.target.value)}
+                  placeholder="Private key — encrypted on this device"
+                  className="mt-3 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+                />
+                {useForgeStore.getState().visitorKey ? (
+                  <p className="mt-2 text-xs text-muted">
+                    Lockbox {maskKey(useForgeStore.getState().visitorKey)}.{" "}
+                    <button
+                      type="button"
+                      className="underline"
+                      onClick={() => {
+                        forgetVisitorKey();
+                        setKey("");
+                        useForgeStore.getState().setVisitorKey("");
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </p>
+                ) : null}
+              </>
+            ) : null}
             <Button type="button" className="mt-3 h-11 w-full" onClick={saveChat}>
               Save chatbot
             </Button>

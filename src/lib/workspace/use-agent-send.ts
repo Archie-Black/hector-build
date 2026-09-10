@@ -165,7 +165,10 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         files: snap,
         history,
         lessons: [...store.memory.lessons, ...valueLessons()],
-        visitorKey: store.visitorKey || undefined,
+        visitorKey: store.providerId === "hector" || store.providerId === "ollama" || store.providerId === "lmstudio"
+          ? undefined
+          : store.visitorKey || undefined,
+        providerId: store.providerId,
         baseUrl: store.baseUrl,
         model: store.model,
         arcadeKey: ext.arcadeKey || undefined,
