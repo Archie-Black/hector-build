@@ -510,6 +510,7 @@ async function complete(baseUrl: string, apiKey: string, model: string, body: ob
 export const runForgeTurn = createServerFn({ method: "POST" })
   .validator((input: TurnInput) => input)
   .handler(async ({ data }): Promise<AgentResponse> => {
+    void import("@/lib/spool/spooler").then((m) => m.spoolFor(data.prompt)).catch(() => undefined);
     const visitor = isApiKey(data.visitorKey ?? "") ? data.visitorKey!.trim() : "";
     const engine = await resolveEngine({
       providerId: data.providerId,

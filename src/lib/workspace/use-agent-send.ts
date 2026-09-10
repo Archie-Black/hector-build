@@ -16,6 +16,7 @@ import { diagnostics } from "@/lib/ide/symbols";
 import { gitNativeStatus } from "@/lib/ide/native-git";
 import { loadExt } from "@/lib/workspace/extensions-store";
 import { loadHome } from "@/lib/ollama/home";
+import { spoolFor } from "@/lib/spool/client";
 
 export function useAgentSend(voice: "hector" | "hx" = "hx") {
   const software = useForgeStore((s) => s.software);
@@ -41,6 +42,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
     const store = useForgeStore.getState();
     const incoming = (raw ?? store.draft).trim();
     if (!incoming || store.busy) return;
+    void spoolFor(incoming);
     await yieldToDevice();
     const applyNow = incoming.startsWith("Execute the approved plan");
     const prompt = incoming.replace(/^\/(plan|scout|patch|swarm|hx)\s+/i, "");

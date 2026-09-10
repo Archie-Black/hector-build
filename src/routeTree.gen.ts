@@ -29,6 +29,7 @@ import { Route as ApiV1FunctionsRouteImport } from './routes/api/v1/functions'
 import { Route as ApiV1McpRouteImport } from './routes/api/v1/mcp'
 import { Route as ApiV1ModelsRouteImport } from './routes/api/v1/models'
 import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
+import { Route as ApiV1SpoolRouteImport } from './routes/api/v1/spool'
 import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
 import { Route as ApiV1HostWslRouteImport } from './routes/api/v1/host/wsl'
 
@@ -132,6 +133,11 @@ const ApiV1ShareRoute = ApiV1ShareRouteImport.update({
   path: '/api/v1/share',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1SpoolRoute = ApiV1SpoolRouteImport.update({
+  id: '/api/v1/spool',
+  path: '/api/v1/spool',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1ChatCompletionsRoute = ApiV1ChatCompletionsRouteImport.update({
   id: '/api/v1/chat/completions',
   path: '/api/v1/chat/completions',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
+  '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
+  '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
+  '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/share'
+    | '/api/v1/spool'
     | '/api/v1/chat/completions'
     | '/api/v1/host/wsl'
   fileRoutesByTo: FileRoutesByTo
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/share'
+    | '/api/v1/spool'
     | '/api/v1/chat/completions'
     | '/api/v1/host/wsl'
   id:
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/share'
+    | '/api/v1/spool'
     | '/api/v1/chat/completions'
     | '/api/v1/host/wsl'
   fileRoutesById: FileRoutesById
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   ApiV1McpRoute: typeof ApiV1McpRoute
   ApiV1ModelsRoute: typeof ApiV1ModelsRoute
   ApiV1ShareRoute: typeof ApiV1ShareRoute
+  ApiV1SpoolRoute: typeof ApiV1SpoolRoute
   ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
   ApiV1HostWslRoute: typeof ApiV1HostWslRoute
 }
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ShareRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/spool': {
+      id: '/api/v1/spool'
+      path: '/api/v1/spool'
+      fullPath: '/api/v1/spool'
+      preLoaderRoute: typeof ApiV1SpoolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/chat/completions': {
       id: '/api/v1/chat/completions'
       path: '/api/v1/chat/completions'
@@ -504,6 +524,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1McpRoute: ApiV1McpRoute,
   ApiV1ModelsRoute: ApiV1ModelsRoute,
   ApiV1ShareRoute: ApiV1ShareRoute,
+  ApiV1SpoolRoute: ApiV1SpoolRoute,
   ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,
   ApiV1HostWslRoute: ApiV1HostWslRoute,
 }

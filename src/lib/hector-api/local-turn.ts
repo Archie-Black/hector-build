@@ -14,6 +14,7 @@ export async function runLocalTurn(input: {
   mode: ForgeMode;
   history?: { role: string; content: string }[];
 }): Promise<AgentResponse> {
+  void import("@/lib/spool/spooler").then((m) => m.spoolFor(input.prompt)).catch(() => undefined);
   const before = { ...input.files };
   let files = { ...input.files };
   const traces: AgentResponse["traces"] = [];

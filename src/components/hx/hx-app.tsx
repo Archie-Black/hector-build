@@ -10,6 +10,7 @@ import { todayStamp } from "@/lib/workspace/updates";
 import { loadMdvWasm } from "@/lib/geometry/mdv-wasm";
 import { useAgentSend } from "@/lib/workspace/use-agent-send";
 import { SupportOverlay } from "@/components/forge/support-overlay";
+import { idleSpool } from "@/lib/spool/client";
 
 function isLiveFloor() {
   if (typeof window === "undefined") return false;
@@ -28,6 +29,7 @@ export function HxApp() {
     store.hydrateChrome();
     store.grant();
     void loadMdvWasm();
+    void idleSpool();
     void probe().then((r) => useForgeStore.getState().setOwnerReady(r.ownerReady));
     if (store.updates.lastBuildDay !== todayStamp()) store.queueDailyUpdate();
     store.maybeSilentInstall();
