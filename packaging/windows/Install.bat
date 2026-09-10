@@ -1,8 +1,14 @@
 @echo off
 cd /d "%~dp0"
-if exist "%~dp0HectorBuild-Setup.exe" (
-  start "" "%~dp0HectorBuild-Setup.exe"
-  exit /b 0
+echo Hector Build — Windows 11
+echo If SmartScreen appears: More info, then Run anyway.
+echo.
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0install.ps1"
+if errorlevel 1 (
+  echo.
+  echo Install failed. Need Node 22 from https://nodejs.org
+  pause
+  exit /b 1
 )
-echo HectorBuild-Setup.exe missing.
+echo.
 pause

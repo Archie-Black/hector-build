@@ -88,14 +88,24 @@ function ping() {
 
 async function ensureServer() {
   if (await ping()) return true;
-  const npm = existsSync(join(ROOT, "runtime/node/bin/npm"))
-    ? join(ROOT, "runtime/node/bin/npm")
-    : "npm";
+  const isWin = process.platform === "win32";
+  const npm = isWin
+    ? "npm.cmd"
+    : existsSync(join(ROOT, "runtime/node/bin/npm"))
+      ? join(ROOT, "runtime/node/bin/npm")
+      : "npm";
   const child = spawn(npm, ["run", "dev"], {
     cwd: ROOT,
-    env: { ...process.env, PORT, PATH: `${join(ROOT, "runtime/node/bin")}:${process.env.PATH || ""}` },
+    env: {
+      ...process.env,
+      PORT,
+      PATH: isWin
+        ? process.env.PATH
+        : `${join(ROOT, "runtime/node/bin")}:${process.env.PATH || ""}`,
+    },
     stdio: "ignore",
     detached: true,
+    shell: isWin,
   });
   child.unref();
   const start = Date.now();

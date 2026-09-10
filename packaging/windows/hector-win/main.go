@@ -33,17 +33,13 @@ func runSetup() {
 	}
 	ps1 := filepath.Join(filepath.Dir(exe), "install.ps1")
 	if _, err := os.Stat(ps1); err != nil {
-		alert("Hector Build", "Unzip the full app first. Keep HectorBuild-Setup.exe next to install.ps1.")
-		return
-	}
-	if wslPath() == "" {
-		alert("Hector Build", "WSL is missing.\n\nOpen PowerShell as Administrator and run:\n\n    wsl --install\n\nReboot, open Ubuntu once, then run this Setup again.")
+		alert("Hector Build", "Unzip the full GitHub source first.\nKeep HectorBuild-Setup.exe next to install.ps1.\n\nhttps://github.com/Archie-Black/hector-build")
 		return
 	}
 	cmd := exec.Command("powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1)
 	cmd.Dir = filepath.Dir(exe)
 	if err := cmd.Run(); err != nil {
-		alert("Hector Build", "Install failed.\n\n"+err.Error()+"\n\nIf WSL is new, open Ubuntu once, then run Setup again.")
+		alert("Hector Build", "Install failed.\n\n"+err.Error()+"\n\nNeed Node 22 from https://nodejs.org\nIf Windows SmartScreen blocked the exe: More info → Run anyway.")
 		return
 	}
 	copyLaunchers(filepath.Dir(exe))
@@ -67,9 +63,32 @@ func runUninstall() {
 }
 
 func runLaunch(bin string) {
+	exe, err := os.Executable()
+	if err != nil {
+		alert("Hector Build", "Could not locate this program.")
+		return
+	}
+	root := filepath.Clean(filepath.Join(filepath.Dir(exe), "..", ".."))
+	marker := filepath.Join(os.Getenv("LOCALAPPDATA"), "HectorBuild")
+	cmdPath := filepath.Join(marker, "launch.cmd")
+	if strings.Contains(bin, "hx") || strings.Contains(bin, "spectral") {
+		cmdPath = filepath.Join(marker, "launch-hx.cmd")
+	}
+	if _, err := os.Stat(cmdPath); err != nil {
+		cmdPath = filepath.Join(marker, "launch.cmd")
+	}
+	if _, err := os.Stat(cmdPath); err == nil {
+		cmd := exec.Command("cmd.exe", "/c", cmdPath)
+		cmd.Dir = root
+		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+		if err := cmd.Start(); err != nil {
+			alert("Hector Build", "Could not start.\n\n"+err.Error())
+		}
+		return
+	}
 	wsl := wslPath()
 	if wsl == "" {
-		alert("Hector Build", "WSL is missing. Run HectorBuild-Setup.exe first.\n\nOr as Administrator: wsl --install")
+		alert("Hector Build", "Not installed yet.\n\nUnzip the GitHub source, then run HectorBuild-Setup.exe\n(More info → Run anyway if Windows blocks it).\nNeed Node 22: https://nodejs.org")
 		return
 	}
 	script := "export PATH=$HOME/.local/bin:$PATH; export NVM_DIR=$HOME/.nvm; [ -s $NVM_DIR/nvm.sh ] && . $NVM_DIR/nvm.sh; command -v " + bin + " >/dev/null || { echo missing; exit 42; }; exec " + bin
