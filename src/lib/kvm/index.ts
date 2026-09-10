@@ -21,3 +21,5 @@ export { detectAccel, qemuArgs, spawnDarwin, darwinIso } from "./hv.ts";
 export { kvmBoot, kvmStatus, kvmSwitch, kvmGrab, kvmRelease, kvmPointer, kvmKey, scene } from "./seats.ts";
 export { darwinBoot, darwinStatus, sysctl, wantsDarwin, DARWIN_SYSCTL } from "./darwin.ts";
 export { webconnectCfg, frame, input } from "./webconnect.ts";
+export { ALL_MAP, resolve, productionSpec } from "./map.ts";
+export { keystoneRun, keystoneStatus, wantsKeystone } from "./keystone.ts";

@@ -91,6 +91,8 @@ export function explainTrace(name: string, detail: string, ok: boolean): string 
       return `Darwin sysctl (${detail}).` + fail;
     case "darwin_status":
       return "Hector looked at Darwin." + fail;
+    case "keystone_map":
+      return "Keystone mapped Mac software for the app and production." + fail;
     case "todo_write":
       return "Spectral HX updated the task board." + fail;
     case "enter_plan_mode":

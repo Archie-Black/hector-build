@@ -363,6 +363,11 @@ export async function executeTool(
       const { darwinStatus, wantsDarwin } = await import("@/lib/kvm/darwin");
       return ok(files, name, { ...darwinStatus(), hint: wantsDarwin(String(args.prompt ?? "")) }, "darwin");
     }
+    case "keystone_map": {
+      const { keystoneRun } = await import("@/lib/kvm/keystone");
+      const needed = Array.isArray(args.needed) ? (args.needed as string[]) : [];
+      return ok(files, name, keystoneRun(needed), "keystone mapped");
+    }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];
       const todos: AgentTodo[] = raw.map((item, i) => {

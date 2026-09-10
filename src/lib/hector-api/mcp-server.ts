@@ -44,6 +44,7 @@ const TOOLS = [
   { name: "kvm_status", description: "KVM seats: host, darwin, hx.", inputSchema: { type: "object", properties: {} } },
   { name: "kvm_switch", description: "Switch KVM seat.", inputSchema: { type: "object", properties: { seat: { type: "string" } } } },
   { name: "darwin_boot", description: "Boot Darwin seat at Cinema 30″ 2560×1600.", inputSchema: { type: "object", properties: { mode: { type: "string" } } } },
+  { name: "keystone_map", description: "Keystone maps Mach/Mac software for app and production.", inputSchema: { type: "object", properties: { needed: { type: "array", items: { type: "string" } } } } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -101,7 +102,7 @@ export async function handleMcp(raw: Rpc) {
     if (name === "web_search") return ok(id, toolText(await rideSearch(String(args.query ?? ""), Boolean(args.isolate))));
     if (name === "web_fetch") return ok(id, toolText(await rideFetch(String(args.url ?? ""), Boolean(args.isolate))));
     if (name === "vision_scan") return ok(id, toolText(await embodiedTick()));
-    if (name === "kvm_status" || name === "kvm_switch" || name === "kvm_grab" || name === "darwin_boot" || name === "darwin_sysctl" || name === "darwin_status") {
+    if (name === "kvm_status" || name === "kvm_switch" || name === "kvm_grab" || name === "darwin_boot" || name === "darwin_sysctl" || name === "darwin_status" || name === "keystone_map") {
       const { executeTool } = await import("@/lib/workspace/tools");
       const r = await executeTool(name, args, {}, "plan");
       return ok(id, toolText(r.payload));

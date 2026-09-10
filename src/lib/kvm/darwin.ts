@@ -6,6 +6,7 @@ import { machBoot } from "./mach.ts";
 import { kvmBoot, kvmStatus } from "./seats.ts";
 import { detectAccel, darwinIso, qemuBin, spawnDarwin } from "./hv.ts";
 import { retinaOf } from "./retina.ts";
+import { keystoneRun } from "./keystone.ts";
 
 export const DARWIN_SYSCTL = {
   "kern.ostype": "Darwin",
@@ -44,6 +45,7 @@ export function darwinBoot(mode?: string) {
   machBoot();
   launchctlLoad();
   kvmBoot(mode);
+  const map = keystoneRun();
   const hv = spawnDarwin();
   const script = join(process.cwd(), "packaging/darwin/darwin-guest.sh");
   if (existsSync(script)) {
@@ -53,7 +55,7 @@ export function darwinBoot(mode?: string) {
       /* compositor is enough */
     }
   }
-  return { ...darwinStatus(), hv };
+  return { ...darwinStatus(), hv, keystone: { done: map.done, blocked: map.blocked, agents: map.agents.map((a) => a.id) } };
 }
 
 export function wantsDarwin(text: string) {

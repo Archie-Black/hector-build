@@ -1,0 +1,23 @@
+{
+  "object": "hector.darwin.production",
+  "ostype": "Darwin",
+  "release": "25.0.0",
+  "retina": "2560x1600",
+  "ratio": "16:10",
+  "webconnect": 6081,
+  "vnc": 5901,
+  "ssh": 2223,
+  "accel": {
+    "darwin": "hvf",
+    "linux": "kvm",
+    "win32": "whpx",
+    "fallback": "tcg"
+  },
+  "appSupport": "~/Library/Application Support/HectorBuild",
+  "launchAgents": "~/Library/LaunchAgents",
+  "brew": "/opt/homebrew",
+  "electron": "electron-builder --mac dir",
+  "iso": "packaging/darwin/darwin.iso",
+  "hostPriv": "hector",
+  "keymap": "pc-ctrl = mac-command"
+}

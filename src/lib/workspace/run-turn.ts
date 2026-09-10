@@ -508,6 +508,17 @@ const TOOLS = [
   {
     type: "function",
     function: {
+      name: "keystone_map",
+      description: "Keystone super agent. Maps Mach/Mac software for the app and production. Spawns a team and delegates several tasks per agent.",
+      parameters: {
+        type: "object",
+        properties: { needed: { type: "array", items: { type: "string" } } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
       name: "bash",
       description: "Sandbox command. Only ls and cat on the granted workspace.",
       parameters: {

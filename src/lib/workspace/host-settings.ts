@@ -81,7 +81,7 @@ export function installHint(os: HostOs) {
   if (os === "macos") {
     return {
       path: "~/Library/Application Support/HectorBuild",
-      how: "Node 22, then npm install && npm run desktop. Darwin seat is native here (HVF). Same glass as Linux.",
+      how: "bash packaging/macos/install.sh then npm run desktop. Keystone maps Mach and production. HVF Darwin seat.",
     };
   }
   if (os === "android") {

@@ -147,6 +147,7 @@ export const DEFAULT_POLICY: ActionPolicy = {
     'tool.name == "mockup_code"',
     'tool.name.startsWith("kvm_")',
     'tool.name.startsWith("darwin_")',
+    'tool.name == "keystone_map"',
     'tool.name == "spawn_subagent"',
     'tool.name.startsWith("horsemen_")',
     'tool.name.startsWith("share_")',

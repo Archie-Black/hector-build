@@ -35,6 +35,13 @@ const BOOTSTRAP: Omit<LaunchJob, "state">[] = [
     keepAlive: true,
     agent: "hx",
   },
+  {
+    label: "com.hector.keystone",
+    program: "hector-keystone",
+    args: ["--map", "--production"],
+    keepAlive: true,
+    agent: "keystone",
+  },
 ];
 
 export function launchctlLoad() {

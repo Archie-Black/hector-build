@@ -5,6 +5,7 @@ import { kvmGrab, kvmRelease, kvmStatus, kvmSwitch } from "@/lib/kvm/seats";
 import { frame, input } from "@/lib/kvm/webconnect";
 import { machStatus } from "@/lib/kvm/mach";
 import { listJobs } from "@/lib/kvm/launchd";
+import { keystoneRun } from "@/lib/kvm/keystone";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/api/v1/kvm")({
         if (op === "grab") return jsonApi(kvmGrab(String(body?.who ?? "human"), body?.kind === "agent" ? "agent" : "human", body?.seat as "host" | "darwin" | "hx" | undefined, Boolean(body?.exclusive)));
         if (op === "release") return jsonApi(kvmRelease(String(body?.who ?? "human"), body?.seat as "host" | "darwin" | "hx" | undefined));
         if (op === "sysctl") return jsonApi(sysctl(body?.name ? String(body.name) : undefined));
+        if (op === "keystone") return jsonApi(keystoneRun(Array.isArray(body?.needed) ? (body?.needed as string[]) : []));
         if (op === "frame") return jsonApi(frame());
         if (op === "input") return jsonApi(input(body ?? {}));
         if (op === "status") return jsonApi(kvmStatus());
