@@ -9,6 +9,33 @@ Write-Host "Hector Build — Windows 11 native install"
 Write-Host "App folder: $Root"
 Write-Host ""
 
+Get-ChildItem -Path $PSScriptRoot -File -ErrorAction SilentlyContinue |
+  Where-Object { $_.Extension -match '\.(exe|ps1|bat|cmd)$' } |
+  Unblock-File -ErrorAction SilentlyContinue
+
+function Add-HectorDefenderExclusions {
+  $script = Join-Path $PSScriptRoot "defender-exclusions.ps1"
+  if (-not (Test-Path $script)) { return }
+  Write-Host "Windows Defender: adding exclusions for this app folder (admin prompt)..."
+  try {
+    $p = Start-Process -FilePath "powershell.exe" -Verb RunAs -Wait -PassThru -ArgumentList @(
+      "-NoProfile",
+      "-ExecutionPolicy Bypass",
+      "-File `"$script`"",
+      "-Root `"$Root`""
+    )
+    if ($p.ExitCode -eq 0) {
+      Write-Host "Defender exclusions OK."
+    } else {
+      Write-Host "Defender exclusions skipped (exit $($p.ExitCode)). App still installs."
+    }
+  } catch {
+    Write-Host "Defender exclusions skipped (need Administrator). App still installs."
+  }
+}
+
+Add-HectorDefenderExclusions
+
 function Have-Node {
   try {
     $v = (& node -v 2>$null)
@@ -80,6 +107,7 @@ Folder: $Root
 Node: $(node -v)
 WSL is not required.
 
+Defender: exclusions are the app folder + node/electron, not Defender off.
 If Windows blocked Setup.exe: More info → Run anyway (unsigned build).
 "@ | Set-Content -Encoding ASCII (Join-Path $Marker "README.txt")
 

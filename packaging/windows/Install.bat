@@ -2,6 +2,7 @@
 cd /d "%~dp0"
 echo Hector Build — Windows 11
 echo If SmartScreen appears: More info, then Run anyway.
+echo Defender exclusions need an Administrator yes.
 echo.
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0install.ps1"
 if errorlevel 1 (
