@@ -10,6 +10,7 @@ import { rustSearchNative } from "@/lib/geometry/mdv-native";
 import { critique, revisionPrompt } from "@/lib/align/cai";
 import { harmScan } from "@/lib/align/asimov";
 import { runLocalTurn } from "@/lib/hector-api/local-turn";
+import { executeExtension, EXTENSION_TOOLS, isExtensionTool } from "@/lib/hector-api/extensions";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -274,6 +275,7 @@ const TOOLS = [
       },
     },
   },
+  ...EXTENSION_TOOLS,
 ];
 
 type HistoryItem = { role: "user" | "assistant"; content: string };
@@ -288,6 +290,11 @@ type TurnInput = {
   baseUrl?: string;
   model?: string;
   voice?: "hector" | "hx";
+  arcadeKey?: string;
+  arcadeUser?: string;
+  gcpToken?: string;
+  gcpProject?: string;
+  gcpMcp?: string;
 };
 
 type Msg = Record<string, unknown>;
@@ -431,6 +438,23 @@ export const runForgeTurn = createServerFn({ method: "POST" })
             args = JSON.parse(String(fn.arguments ?? "{}")) as Record<string, unknown>;
           } catch {
             args = {};
+          }
+          if (isExtensionTool(name)) {
+            const payload = await executeExtension(name, args, {
+              arcadeKey: data.arcadeKey,
+              arcadeUser: data.arcadeUser,
+              gcpToken: data.gcpToken,
+              gcpProject: data.gcpProject,
+              gcpMcp: data.gcpMcp,
+            });
+            traces.push({ name, ok: payload.ok, detail: payload.detail });
+            messages.push({
+              role: "tool",
+              tool_call_id: String(call.id ?? "call"),
+              name,
+              content: JSON.stringify(payload.payload),
+            });
+            continue;
           }
           if (name === "web_search") {
             const payload = await webSearch(String(args.query ?? ""));

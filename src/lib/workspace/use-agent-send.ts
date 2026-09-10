@@ -14,6 +14,7 @@ import { critique, learnFromTurn, valueLessons } from "@/lib/align/cai";
 import { mentionedPaths, workspaceRules, attachFiles } from "@/lib/workspace/context";
 import { diagnostics } from "@/lib/ide/symbols";
 import { gitNativeStatus } from "@/lib/ide/native-git";
+import { loadExt } from "@/lib/workspace/extensions-store";
 
 export function useAgentSend(voice: "hector" | "hx" = "hx") {
   const software = useForgeStore((s) => s.software);
@@ -158,6 +159,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         .filter(Boolean)
         .join("\n");
       const snap = { ...store.files };
+      const ext = loadExt();
       const shared = {
         voice,
         files: snap,
@@ -166,6 +168,11 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         visitorKey: store.visitorKey || undefined,
         baseUrl: store.baseUrl,
         model: store.model,
+        arcadeKey: ext.arcadeKey || undefined,
+        arcadeUser: ext.arcadeUser || undefined,
+        gcpToken: ext.gcpToken || undefined,
+        gcpProject: ext.gcpProject || undefined,
+        gcpMcp: ext.gcpMcp || undefined,
       };
       const lanes =
         mode === "scout"

@@ -10,6 +10,7 @@ import { GuestPanel } from "@/components/forge/guest-panel";
 import { CREDIT, DISCLAIMER, FREE_API_URL, FREE_LINE, ONE_MAN, SUPPORT_EMAIL } from "@/lib/legal/copy";
 import { installHint } from "@/lib/workspace/host-settings";
 import { osLabel } from "@/lib/workspace/platform";
+import { loadExt, saveExt, type ClientExt } from "@/lib/workspace/extensions-store";
 import { loadSession } from "@/lib/auth/local-account";
 import { requestSupport } from "@/lib/support/session";
 import { sfx } from "@/lib/sfx/hector";
@@ -49,6 +50,7 @@ export function SettingsPanel() {
   const [mdl, setMdl] = useState(model);
   const [pid, setPid] = useState<ChatProviderId>(providerId);
   const [saved, setSaved] = useState(false);
+  const [ext, setExt] = useState<ClientExt>(() => loadExt());
 
   function pick(id: ChatProviderId) {
     const p = CHAT_PROVIDERS.find((x) => x.id === id)!;
@@ -152,6 +154,58 @@ export function SettingsPanel() {
                 </button>
               ))}
             </div>
+            <p className="mt-6 text-xs tracking-[0.14em] text-subtle uppercase">Arcade.dev</p>
+            <p className="mt-1 text-sm text-muted text-pretty">Optional. Gmail, Slack, GitHub. Key from app.arcade.dev.</p>
+            <input
+              type="password"
+              value={ext.arcadeKey}
+              onChange={(e) => setExt({ ...ext, arcadeKey: e.target.value })}
+              placeholder="ARCADE_API_KEY"
+              className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+            />
+            <input
+              value={ext.arcadeUser}
+              onChange={(e) => setExt({ ...ext, arcadeUser: e.target.value })}
+              placeholder="Arcade user id (email)"
+              className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+            />
+            <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">Google Cloud MCP</p>
+            <p className="mt-1 text-sm text-muted text-pretty">OAuth token, cloud-platform scope. Not an API key.</p>
+            <input
+              type="password"
+              value={ext.gcpToken}
+              onChange={(e) => setExt({ ...ext, gcpToken: e.target.value })}
+              placeholder="GCP access token"
+              className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+            />
+            <input
+              value={ext.gcpProject}
+              onChange={(e) => setExt({ ...ext, gcpProject: e.target.value })}
+              placeholder="GCP project id"
+              className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+            />
+            <div className="mt-2 flex flex-wrap gap-2">
+              {["cli", "bigquery", "storage", "compute", "run", "firestore"].map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={"h-9 rounded-md px-3 text-sm " + (ext.gcpMcp === id ? "bg-accent text-accent-fg" : "glass-thin")}
+                  onClick={() => setExt({ ...ext, gcpMcp: id })}
+                >
+                  {id}
+                </button>
+              ))}
+            </div>
+            <Button
+              type="button"
+              className="mt-3 h-11 w-full"
+              onClick={() => {
+                saveExt(ext);
+                setSaved(true);
+              }}
+            >
+              Save extensions
+            </Button>
           </>
         ) : null}
         {tab === "Chatbot" ? (
