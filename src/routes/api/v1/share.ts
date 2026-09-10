@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { jsonApi } from "@/lib/hector-api/complete";
-import { ackNote, joinPeer, leasePath, postNote, pullRoom, shareStatus, syncFile } from "@/lib/share/room";
+import { ackNote, joinPeer, leasePath, listLinks, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
+import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -20,8 +21,42 @@ export const Route = createFileRoute("/api/v1/share")({
         if (op === "ack") return jsonApi({ note: ackNote(String(body?.id ?? ""), String(body?.bot ?? "generic")) });
         if (op === "lease") return jsonApi(leasePath({ bot: String(body?.bot ?? "generic"), path: String(body?.path ?? ""), seconds: body?.seconds ? Number(body.seconds) : undefined }));
         if (op === "sync") return jsonApi(syncFile({ bot: String(body?.bot ?? "generic"), path: String(body?.path ?? ""), content: String(body?.content ?? ""), expect: body?.expect ? String(body.expect) : undefined }));
-        if (op === "pull") return jsonApi(pullRoom());
-        return jsonApi({ error: { message: "op: join | post | ack | lease | sync | pull" } }, 400);
+        if (op === "pull") return jsonApi({ room: pullRoom(), terms: listTerms(), links: listLinks() });
+        if (op === "link") {
+          const link = registerLink({
+            from: String(body?.from ?? "generic"),
+            to: String(body?.to ?? "*"),
+            kind: body?.kind === "putty" || body?.kind === "term" ? body.kind : "ssh",
+            host: String(body?.host ?? ""),
+            port: body?.port ? Number(body.port) : 22,
+            user: String(body?.user ?? "hector"),
+            session: body?.session ? String(body.session) : undefined,
+          });
+          return jsonApi(describeLink(link));
+        }
+        if (op === "term") {
+          if (!body?.session && !body?.command) return jsonApi(openTerm(String(body?.bot ?? "generic")));
+          if (!body?.session && body?.command) {
+            const opened = openTerm(String(body?.bot ?? "generic"));
+            return jsonApi(writeTerm(opened.id, String(body?.bot ?? "generic"), String(body.command), true));
+          }
+          if (body?.session && !body?.command) return jsonApi(readTerm(String(body.session)));
+          return jsonApi(writeTerm(String(body?.session), String(body?.bot ?? "generic"), String(body?.command ?? ""), true));
+        }
+        if (op === "ssh") {
+          return jsonApi(
+            await execSsh({
+              host: String(body?.host ?? ""),
+              username: String(body?.user ?? "hector"),
+              port: body?.port ? Number(body.port) : 22,
+              password: body?.password ? String(body.password) : undefined,
+              command: String(body?.command ?? ""),
+              collab: true,
+              bot: String(body?.bot ?? "generic"),
+            }),
+          );
+        }
+        return jsonApi({ error: { message: "op: join | post | ack | lease | sync | pull | link | term | ssh" } }, 400);
       },
       OPTIONS: () => new Response(null, { status: 204, headers: CORS }),
     },

@@ -1,7 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { detectFolderBots, fnv, kindOf } from "./protocol.ts";
-import { joinPeer, leasePath, postNote, syncFile, materializeShare } from "./room.ts";
+import { joinPeer, leasePath, postNote, registerLink, syncFile, materializeShare } from "./room.ts";
+import { puttyCommand, safeCollabCmd, safeSshHost } from "./wire.ts";
 
 describe("shared workspace", () => {
   it("classifies grok build and other bots", () => {
@@ -39,10 +40,23 @@ describe("shared workspace", () => {
     const files = materializeShare({ "AGENTS.md": "Grok Build" });
     assert.ok(files[".hector/share/README.md"]);
     assert.ok(files[".hector/share/peers.json"]?.includes("hector"));
+    assert.ok(files[".hector/share/links.json"]);
   });
 
   it("hashes are stable", () => {
     assert.equal(fnv("abc"), fnv("abc"));
     assert.notEqual(fnv("abc"), fnv("abd"));
+  });
+
+  it("SSH collab: LAN ok, metadata blocked, pipes blocked", () => {
+    assert.equal(safeSshHost("192.168.1.10", "bot"), "192.168.1.10");
+    assert.equal(safeSshHost("y.doomchat.ca", "bot"), "y.doomchat.ca");
+    assert.equal(safeSshHost("169.254.1.1", "bot"), null);
+    assert.equal(safeSshHost("evil.com", "bot"), null);
+    assert.equal(safeCollabCmd("git status"), "git status");
+    assert.equal(safeCollabCmd("rm -rf /"), null);
+    assert.equal(safeCollabCmd("uname -a; cat /etc/shadow"), null);
+    const link = registerLink({ from: "hector", to: "grok-build", kind: "putty", host: "127.0.0.1", port: 22, user: "dev" });
+    assert.ok(puttyCommand(link).putty.includes("dev@127.0.0.1"));
   });
 });

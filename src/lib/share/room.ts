@@ -12,6 +12,7 @@ import {
   type Peer,
   type PeerKind,
   type Room,
+  type ShareLink,
 } from "./protocol.ts";
 
 const DIR = join(process.cwd(), "data", "share");
@@ -25,6 +26,7 @@ function empty(): Room {
     leases: [],
     inbox: [],
     heads: [],
+    links: [],
   };
 }
 
@@ -43,6 +45,10 @@ export function loadRoom(): Room {
     const room = JSON.parse(readFileSync(FILE, "utf8")) as Room;
     if (room.protocol !== SHARE_PROTOCOL) return empty();
     room.leases = (room.leases ?? []).filter((l) => l.until > Date.now());
+    room.links = room.links ?? [];
+    room.heads = room.heads ?? [];
+    room.inbox = room.inbox ?? [];
+    room.peers = room.peers ?? [];
     return room;
   } catch {
     return empty();
@@ -152,6 +158,29 @@ export function syncFile(input: { bot: string; path: string; content: string; ex
   return { ok: true as const, head };
 }
 
+export function registerLink(input: Omit<ShareLink, "id" | "at"> & { id?: string }) {
+  const room = loadRoom();
+  const link: ShareLink = {
+    id: input.id || fnv(`${input.from}:${input.host}:${input.kind}`).slice(0, 10),
+    from: input.from,
+    to: input.to || "*",
+    kind: input.kind,
+    host: input.host,
+    port: input.port || 22,
+    user: input.user,
+    session: input.session,
+    at: Date.now(),
+  };
+  room.links = room.links.filter((l) => l.id !== link.id);
+  room.links.push(link);
+  save(room);
+  return link;
+}
+
+export function listLinks() {
+  return loadRoom().links;
+}
+
 export function pullRoom() {
   return loadRoom();
 }
@@ -166,6 +195,7 @@ export function materializeShare(files: Record<string, string>): Record<string, 
     [`${SHARE_DIR}/leases.json`]: JSON.stringify(room.leases, null, 2),
     [`${SHARE_DIR}/inbox.jsonl`]: room.inbox.map((n) => JSON.stringify(n)).join("\n"),
     [`${SHARE_DIR}/heads.json`]: JSON.stringify(room.heads, null, 2),
+    [`${SHARE_DIR}/links.json`]: JSON.stringify(room.links, null, 2),
   };
 }
 
@@ -203,5 +233,7 @@ export function shareStatus() {
     peers: room.peers.map((p) => p.id),
     inbox: room.inbox.filter((n) => !n.ack).length,
     leases: room.leases.length,
+    links: room.links.length,
+    terms: true,
   };
 }

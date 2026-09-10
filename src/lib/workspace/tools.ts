@@ -8,7 +8,9 @@ import { normalizePath, pathAllowed } from "./acl";
 import { diagnostics, formatFile, findDefinition, findReferences, renameSymbol } from "@/lib/ide/symbols";
 import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
 import { gate } from "@/lib/horsemen/gateway.ts";
-import { ackNote, ingestInbox, joinPeer, leasePath, materializeShare, postNote, shareStatus, syncFile } from "@/lib/share/room";
+import { ackNote, ingestInbox, joinPeer, leasePath, listLinks, materializeShare, postNote, registerLink, shareStatus, syncFile } from "@/lib/share/room";
+import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
+import { puttyCommand, safeSshHost } from "@/lib/share/wire";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -34,12 +36,12 @@ function refuse(files: Record<string, string>, name: string, detail: string): To
   return { files, trace: { name, ok: false, detail }, payload: { error: detail } };
 }
 
-export function executeTool(
+export async function executeTool(
   name: string,
   args: Record<string, unknown>,
   files: Record<string, string>,
   mode: ForgeMode,
-): ToolResult {
+): Promise<ToolResult> {
   const g = gate(name, args, "death");
   if (!g.ok) return refuse(files, name, g.reason);
   switch (name) {
@@ -198,7 +200,54 @@ export function executeTool(
     }
     case "share_pull": {
       ingestInbox(files);
-      return ok(materializeShare(files), name, shareStatus(), "share room");
+      return ok(materializeShare(files), name, { ...shareStatus(), terms: listTerms(), links: listLinks() }, "share room");
+    }
+    case "share_term": {
+      const session = args.session ? String(args.session) : "";
+      if (!session && (args.command === undefined || args.command === "")) {
+        const opened = openTerm(String(args.bot ?? "hector"));
+        return ok(materializeShare(files), name, opened, `term ${opened.id}`);
+      }
+      if (args.command && !session) {
+        const opened = openTerm(String(args.bot ?? "hector"));
+        const r = writeTerm(opened.id, String(args.bot ?? "hector"), String(args.command), true);
+        return r.ok ? ok(materializeShare(files), name, r, r.out.slice(-400)) : refuse(files, name, r.out);
+      }
+      if (String(args.command ?? "") === "" && session) {
+        const r = readTerm(session);
+        return r.ok ? ok(files, name, r, r.out.slice(-400)) : refuse(files, name, r.out);
+      }
+      const r = writeTerm(session, String(args.bot ?? "hector"), String(args.command ?? ""), true);
+      return r.ok ? ok(files, name, r, r.out.slice(-400)) : refuse(files, name, r.out);
+    }
+    case "share_ssh": {
+      const host = String(args.host ?? "");
+      if (!safeSshHost(host, "bot")) return refuse(files, name, "Host not allowed for bots.");
+      const result = await execSsh({
+        host,
+        port: args.port ? Number(args.port) : 22,
+        username: String(args.user ?? args.username ?? "hector"),
+        password: args.password ? String(args.password) : undefined,
+        privateKey: args.key ? String(args.key) : undefined,
+        command: String(args.command ?? "uname -a"),
+        collab: true,
+        bot: String(args.bot ?? "hector"),
+      });
+      return result.ok ? ok(materializeShare(files), name, { output: result.output }, result.output.slice(0, 400)) : refuse(files, name, result.output);
+    }
+    case "share_link": {
+      const host = String(args.host ?? "127.0.0.1");
+      const kind = args.kind === "putty" || args.kind === "term" ? args.kind : "ssh";
+      const link = registerLink({
+        from: String(args.from ?? "hector"),
+        to: String(args.to ?? "*"),
+        kind,
+        host,
+        port: args.port ? Number(args.port) : 22,
+        user: String(args.user ?? "hector"),
+        session: args.session ? String(args.session) : undefined,
+      });
+      return ok(materializeShare(files), name, { link, ...describeLink(link), putty: puttyCommand(link) }, `${kind} ${link.user}@${link.host}`);
     }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];

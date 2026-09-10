@@ -105,7 +105,7 @@ export async function completeChat(body: ChatBody, key: string) {
   }
 
   if (Object.keys(files).length) {
-    const turn = runLocalTurn({
+    const turn = await runLocalTurn({
       prompt,
       files,
       mode,

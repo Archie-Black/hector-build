@@ -9,7 +9,8 @@ import {
   putObject,
 } from "./hector-cloud";
 import { localChatCompletion } from "./local-turn";
-import { ackNote, joinPeer, leasePath, postNote, pullRoom, shareStatus, syncFile } from "@/lib/share/room";
+import { ackNote, joinPeer, leasePath, listLinks, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
+import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
 
@@ -27,7 +28,10 @@ const TOOLS = [
   { name: "share_post", description: "Post a task/result/note to the shared room.", inputSchema: { type: "object", properties: { from: { type: "string" }, to: { type: "string" }, kind: { type: "string" }, body: { type: "string" } }, required: ["body"] } },
   { name: "share_lease", description: "Lease a path before writing.", inputSchema: { type: "object", properties: { path: { type: "string" }, bot: { type: "string" }, seconds: { type: "number" } }, required: ["path"] } },
   { name: "share_sync", description: "Publish a file into the shared workspace.", inputSchema: { type: "object", properties: { path: { type: "string" }, content: { type: "string" }, bot: { type: "string" }, expect: { type: "string" } }, required: ["path", "content"] } },
-  { name: "share_pull", description: "Pull peers, inbox, leases.", inputSchema: { type: "object", properties: {} } },
+  { name: "share_pull", description: "Pull peers, inbox, leases, SSH links.", inputSchema: { type: "object", properties: {} } },
+  { name: "share_term", description: "Shared backend terminal.", inputSchema: { type: "object", properties: { bot: { type: "string" }, session: { type: "string" }, command: { type: "string" } } } },
+  { name: "share_ssh", description: "Allowlisted SSH command to a linked host.", inputSchema: { type: "object", properties: { host: { type: "string" }, user: { type: "string" }, command: { type: "string" }, port: { type: "number" }, bot: { type: "string" } }, required: ["host", "command"] } },
+  { name: "share_link", description: "Publish SSH/PuTTY/term link. No passwords.", inputSchema: { type: "object", properties: { kind: { type: "string" }, host: { type: "string" }, user: { type: "string" }, port: { type: "number" }, from: { type: "string" }, to: { type: "string" } }, required: ["host"] } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -94,7 +98,38 @@ export async function handleMcp(raw: Rpc) {
     if (name === "share_post") return ok(id, toolText(postNote({ from: String(args.from ?? "generic"), to: args.to ? String(args.to) : "hector", kind: args.kind as "task" | "result" | "note", body: String(args.body ?? "") })));
     if (name === "share_lease") return ok(id, toolText(leasePath({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), seconds: args.seconds ? Number(args.seconds) : undefined })));
     if (name === "share_sync") return ok(id, toolText(syncFile({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), content: String(args.content ?? ""), expect: args.expect ? String(args.expect) : undefined })));
-    if (name === "share_pull") return ok(id, toolText({ ...shareStatus(), ack: args.id ? ackNote(String(args.id), String(args.bot ?? "generic")) : undefined, room: pullRoom() }));
+    if (name === "share_pull") return ok(id, toolText({ ...shareStatus(), ack: args.id ? ackNote(String(args.id), String(args.bot ?? "generic")) : undefined, room: pullRoom(), terms: listTerms(), links: listLinks() }));
+    if (name === "share_term") {
+      if (!args.session && !args.command) return ok(id, toolText(openTerm(String(args.bot ?? "generic"))));
+      if (!args.session && args.command) {
+        const opened = openTerm(String(args.bot ?? "generic"));
+        return ok(id, toolText(writeTerm(opened.id, String(args.bot ?? "generic"), String(args.command), true)));
+      }
+      if (args.session && !args.command) return ok(id, toolText(readTerm(String(args.session))));
+      return ok(id, toolText(writeTerm(String(args.session), String(args.bot ?? "generic"), String(args.command ?? ""), true)));
+    }
+    if (name === "share_ssh") {
+      const result = await execSsh({
+        host: String(args.host ?? ""),
+        username: String(args.user ?? args.username ?? "hector"),
+        port: args.port ? Number(args.port) : 22,
+        command: String(args.command ?? ""),
+        collab: true,
+        bot: String(args.bot ?? "generic"),
+      });
+      return ok(id, toolText(result));
+    }
+    if (name === "share_link") {
+      const link = registerLink({
+        from: String(args.from ?? "generic"),
+        to: String(args.to ?? "*"),
+        kind: args.kind === "putty" || args.kind === "term" ? args.kind : "ssh",
+        host: String(args.host ?? ""),
+        port: args.port ? Number(args.port) : 22,
+        user: String(args.user ?? "hector"),
+      });
+      return ok(id, toolText(describeLink(link)));
+    }
     return fail(id, `unknown tool ${name}`, -32601);
   } catch (err) {
     return fail(id, err instanceof Error ? err.message : String(err));

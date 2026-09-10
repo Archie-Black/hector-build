@@ -8,26 +8,26 @@ import { silentCouple } from "@/lib/chips/silent.ts";
 
 type Msg = { role?: string; content?: unknown; tool_calls?: unknown; name?: string };
 
-export function runLocalTurn(input: {
+export async function runLocalTurn(input: {
   prompt: string;
   files: Record<string, string>;
   mode: ForgeMode;
   history?: { role: string; content: string }[];
-}): AgentResponse {
+}): Promise<AgentResponse> {
   const before = { ...input.files };
   let files = { ...input.files };
   const traces: AgentResponse["traces"] = [];
   const mode = input.mode;
   const prompt = input.prompt.slice(0, 16000);
 
-  const listed = executeTool("list_files", {}, files, mode);
+  const listed = await executeTool("list_files", {}, files, mode);
   traces.push(listed.trace);
 
-  const observed = executeTool("lattice_search", { query: prompt.slice(0, 200) }, files, mode);
+  const observed = await executeTool("lattice_search", { query: prompt.slice(0, 200) }, files, mode);
   traces.push(observed.trace);
   const peak = silentCouple(prompt, files);
   if (peak && files[peak]) {
-    const hit = executeTool("read_file", { path: peak }, files, mode);
+    const hit = await executeTool("read_file", { path: peak }, files, mode);
     traces.push(hit.trace);
   }
 
@@ -67,16 +67,16 @@ export function runLocalTurn(input: {
 
   const generated = synthesizeFiles(prompt, files);
   for (const [path, content] of Object.entries(generated)) {
-    const result = executeTool("write_file", { path, content }, files, mode);
+    const result = await executeTool("write_file", { path, content }, files, mode);
     files = result.files;
     traces.push(result.trace);
   }
 
-  const tests = executeTool("run_tests", {}, files, mode);
+  const tests = await executeTool("run_tests", {}, files, mode);
   files = tests.files;
   traces.push(tests.trace);
 
-  const lints = executeTool("get_diagnostics", {}, files, mode);
+  const lints = await executeTool("get_diagnostics", {}, files, mode);
   traces.push(lints.trace);
 
   const written = Object.keys(generated);

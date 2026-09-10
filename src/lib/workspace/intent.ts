@@ -55,6 +55,12 @@ export function explainTrace(name: string, detail: string, ok: boolean): string 
       return `HX published a shared file (${detail}).` + fail;
     case "share_pull":
       return "HX pulled the shared workspace." + fail;
+    case "share_term":
+      return `HX used a shared terminal (${detail}).` + fail;
+    case "share_ssh":
+      return `HX ran SSH with another bot (${detail}).` + fail;
+    case "share_link":
+      return `HX published an SSH/PuTTY link (${detail}).` + fail;
     case "web_search":
       return `Spectral HX searched the web (${detail}).` + fail;
     case "web_fetch":

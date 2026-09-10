@@ -257,8 +257,57 @@ const TOOLS = [
     type: "function",
     function: {
       name: "share_pull",
-      description: "Pull peers, inbox, and leases. Writes .hector/share into the workspace.",
+      description: "Pull peers, inbox, leases, SSH links, and live terminals.",
       parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_term",
+      description: "Open or write a backend terminal session other bots can share. Commands are allowlisted.",
+      parameters: {
+        type: "object",
+        properties: { bot: { type: "string" }, session: { type: "string" }, command: { type: "string" } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_ssh",
+      description: "Run an allowlisted command on a linked SSH host so another bot can collaborate.",
+      parameters: {
+        type: "object",
+        properties: {
+          host: { type: "string" },
+          user: { type: "string" },
+          port: { type: "number" },
+          command: { type: "string" },
+          bot: { type: "string" },
+        },
+        required: ["host", "command"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_link",
+      description: "Publish an SSH / PuTTY / terminal link for other bots. No passwords stored.",
+      parameters: {
+        type: "object",
+        properties: {
+          kind: { type: "string", description: "ssh | term | putty" },
+          host: { type: "string" },
+          user: { type: "string" },
+          port: { type: "number" },
+          from: { type: "string" },
+          to: { type: "string" },
+          session: { type: "string" },
+        },
+        required: ["host"],
+      },
     },
   },
   {
@@ -637,7 +686,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
               continue;
             }
           }
-          const result = executeTool(name, args, files, mode);
+          const result = await executeTool(name, args, files, mode);
           files = result.files;
           traces.push(result.trace);
           if (result.todos) todos = result.todos;

@@ -3,6 +3,6 @@
   "http": "/api/v1/share",
   "mcp": "/api/v1/mcp",
   "folder": ".hector/share",
-  "ops": ["join", "post", "ack", "lease", "sync", "pull"],
+  "ops": ["join", "post", "ack", "lease", "sync", "pull", "link", "term", "ssh"],
   "kinds": ["hector", "hx", "grok-build", "cursor", "codex", "claude", "openai", "generic"]
 }

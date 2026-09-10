@@ -23,6 +23,17 @@ export type Note = {
   ack?: string;
 };
 export type FileHead = { path: string; hash: string; bot: string; at: number };
+export type ShareLink = {
+  id: string;
+  from: string;
+  to: string;
+  kind: "ssh" | "term" | "putty";
+  host: string;
+  port: number;
+  user: string;
+  session?: string;
+  at: number;
+};
 
 export type Room = {
   protocol: typeof SHARE_PROTOCOL;
@@ -31,6 +42,7 @@ export type Room = {
   leases: Lease[];
   inbox: Note[];
   heads: FileHead[];
+  links: ShareLink[];
 };
 
 export function fnv(text: string) {
@@ -83,7 +95,10 @@ Any build bot can work this folder with Hector.
 3. Talk: { "op":"post", "from":"<id>", "to":"hector", "kind":"task", "body":"..." }
 4. Sync a file: { "op":"sync", "bot":"<id>", "path":"src/app.ts", "content":"..." }
 5. Pull: GET /api/v1/share
+6. Terminal: POST { "op":"term", "bot":"<id>", "command":"git status" }  (allowlisted)
+7. SSH: POST { "op":"ssh", "bot":"<id>", "host":"192.168.1.10", "user":"dev", "command":"uname -a" }
+   PuTTY/plink on Windows: packaging\\\\windows\\\\hector-putty.cmd user@host
 
 Same-folder bots: drop JSON notes into \`.hector/share/inbox.jsonl\` (one object per line).
-MCP: /api/v1/mcp tools share_join, share_post, share_lease, share_pull.
+MCP: /api/v1/mcp tools share_join, share_post, share_lease, share_pull, share_term, share_ssh, share_link.
 `;
