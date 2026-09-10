@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-ROOT="$(cd "$(dirname "$0")" && pwd)"
-export LD_LIBRARY_PATH="$ROOT/usr/lib/x86_64-linux-gnu:$ROOT/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
-exec "$ROOT/usr/bin/qemu-img" "$@"

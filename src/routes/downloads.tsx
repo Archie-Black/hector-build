@@ -13,8 +13,14 @@ function DownloadsPage() {
       <section className="rounded-lg p-5 glass-window">
         <h2 className="text-lg">Hector Build</h2>
         <p className="mt-1 text-sm text-muted">Host window. Talk. Hector delegates to HX.</p>
-        <a href="/downloads/hector-build.zip" className="mt-4 flex h-12 items-center justify-center rounded-md bg-accent text-sm text-accent-fg">
-          Download Hector Build
+        <a
+          href="https://github.com/Archie-Black/hector-build/archive/refs/heads/main.zip"
+          className="mt-4 flex h-12 items-center justify-center rounded-md bg-accent text-sm text-accent-fg"
+        >
+          Download source (GitHub)
+        </a>
+        <a href="https://github.com/Archie-Black/hector-build" className="mt-2 flex h-11 items-center justify-center text-sm">
+          Open repository
         </a>
         <Link to="/" className="mt-2 flex h-11 items-center justify-center text-sm">
           Open live
@@ -23,8 +29,11 @@ function DownloadsPage() {
       <section className="rounded-lg p-5 glass-window">
         <h2 className="text-lg">Spectral HX</h2>
         <p className="mt-1 text-sm text-muted">Coding-floor window. Any chatbot.</p>
-        <a href="/downloads/spectral-hx.zip" className="mt-4 flex h-12 items-center justify-center rounded-md bg-accent text-sm text-accent-fg">
-          Download Spectral HX
+        <a
+          href="https://github.com/Archie-Black/hector-build/archive/refs/heads/main.zip"
+          className="mt-4 flex h-12 items-center justify-center rounded-md bg-accent text-sm text-accent-fg"
+        >
+          Download source (GitHub)
         </a>
         <Link to="/hx" className="mt-2 flex h-11 items-center justify-center text-sm">
           Open live

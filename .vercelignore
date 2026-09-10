@@ -1,0 +1,16 @@
+node_modules
+.venv-superset
+.venv-vector
+runtime
+public/element
+public/downloads
+packaging/guest
+packaging/windows/winamp_latest_full.exe
+attachments
+artifacts
+screenshots
+.output
+dist
+.git
+crates/hx-vector/target
+data
