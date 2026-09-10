@@ -1,0 +1,8 @@
+[Unit]
+Description=Hector automated SSH key revocation
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=__HECTOR_ROOT__
+ExecStart=__HECTOR_ROOT__/packaging/linux/hector-keys-revoke.sh run

@@ -104,7 +104,7 @@ function wslStatus() {
 }
 
 function wslRun(job) {
-  const allowed = new Set(["status", "embed", "packages", "ollama", "models", "onion"]);
+  const allowed = new Set(["status", "embed", "packages", "ollama", "models", "onion", "revoke"]);
   if (!allowed.has(job)) return Promise.resolve({ ok: false, out: "blocked" });
   const guest = `${winToWsl(ROOT)}/packaging/linux/wsl-guest.sh`;
   if (process.platform === "linux") {

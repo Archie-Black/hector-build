@@ -12,7 +12,7 @@ import { ackNote, ingestInbox, joinPeer, leasePath, listLinks, materializeShare,
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { isOnionHost, safeSshHost } from "@/lib/share/wire";
 import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";
-import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
+import { autoRevoke, authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -283,6 +283,7 @@ export async function executeTool(
         const r = await newNym();
         return r.ok ? ok(files, name, r, r.note) : refuse(files, name, r.note);
       }
+      if (action === "auto") return ok(files, name, autoRevoke(), "auto-revoke");
       return ok(files, name, { ...keyStatus(), identities: listIdentities() }, "ssh keys");
     }
     case "todo_write": {

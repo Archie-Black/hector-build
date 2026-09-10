@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { authorizeKey, ensureHostKey, fingerprintOf, generateIdentity, isAuthorizedKey, maybeRotate, revokeKey, rotateIdentity, settleRotations } from "./keys.ts";
+import { autoRevoke, authorizeKey, ensureHostKey, fingerprintOf, generateIdentity, isAuthorizedKey, maybeRotate, revokeKey, rotateIdentity, settleRotations } from "./keys.ts";
 import { isolateTag } from "./onion.ts";
 
 describe("ssh key management", () => {
@@ -37,6 +37,15 @@ describe("ssh key management", () => {
     const id = generateIdentity("young", "y@t");
     const again = maybeRotate("young", Date.now() + 1000);
     assert.equal(again.fingerprint, id.fingerprint);
+  });
+
+  it("autoRevoke settles expired overlap", () => {
+    const first = generateIdentity("auto", "auto@t");
+    const t0 = Date.now();
+    rotateIdentity("auto", t0);
+    const r = autoRevoke(t0 + 25 * 60 * 60 * 1000);
+    assert.ok(r.settled >= 1);
+    assert.equal(isAuthorizedKey(first.public), false);
   });
 
   it("isolates circuits per bot and host", () => {

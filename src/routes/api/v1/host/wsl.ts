@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/v1/host/wsl")({
       POST: async ({ request }: { request: Request }) => {
         const body = (await request.json().catch(() => null)) as { job?: string } | null;
         const job = body?.job || "status";
-        if (!isWslJob(job)) return jsonApi({ error: { message: "status | embed | packages | ollama | models | onion" } }, 400);
+        if (!isWslJob(job)) return jsonApi({ error: { message: "status | embed | packages | ollama | models | onion | revoke" } }, 400);
         const result = await wslRun(job);
         return jsonApi(result, result.ok ? 200 : 400);
       },

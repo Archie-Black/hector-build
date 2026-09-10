@@ -12,7 +12,7 @@ import { localChatCompletion } from "./local-turn";
 import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";
-import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
+import { autoRevoke, authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
 import { isOnionHost } from "@/lib/share/wire";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
@@ -35,7 +35,7 @@ const TOOLS = [
   { name: "share_term", description: "Shared backend terminal.", inputSchema: { type: "object", properties: { bot: { type: "string" }, session: { type: "string" }, command: { type: "string" } } } },
   { name: "share_ssh", description: "Allowlisted SSH command to a linked host.", inputSchema: { type: "object", properties: { host: { type: "string" }, user: { type: "string" }, command: { type: "string" }, port: { type: "number" }, bot: { type: "string" } }, required: ["host", "command"] } },
   { name: "share_link", description: "Publish SSH/PuTTY/term/onion link. Credentials are stored in the backend.", inputSchema: { type: "object", properties: { kind: { type: "string" }, host: { type: "string" }, user: { type: "string" }, port: { type: "number" }, from: { type: "string" }, to: { type: "string" }, password: { type: "string" }, key: { type: "string" } }, required: ["host"] } },
-  { name: "share_keys", description: "SSH keys. action list|generate|authorize|revoke|rotate|settle|rotate-host|newnym.", inputSchema: { type: "object", properties: { action: { type: "string" }, user: { type: "string" }, public: { type: "string" }, fingerprint: { type: "string" }, comment: { type: "string" } } } },
+  { name: "share_keys", description: "SSH keys. action list|generate|authorize|revoke|rotate|settle|rotate-host|newnym|auto.", inputSchema: { type: "object", properties: { action: { type: "string" }, user: { type: "string" }, public: { type: "string" }, fingerprint: { type: "string" }, comment: { type: "string" } } } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -154,6 +154,7 @@ export async function handleMcp(raw: Rpc) {
       if (action === "settle") return ok(id, toolText({ settled: settleRotations() }));
       if (action === "rotate-host") return ok(id, toolText(rotateHostKey()));
       if (action === "newnym") return ok(id, toolText(await newNym()));
+      if (action === "auto") return ok(id, toolText(autoRevoke()));
       return ok(id, toolText({ ...keyStatus(), identities: listIdentities() }));
     }
     return fail(id, `unknown tool ${name}`, -32601);

@@ -3,7 +3,7 @@ import { jsonApi } from "@/lib/hector-api/complete";
 import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";
-import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
+import { autoRevoke, authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
 import { isOnionHost } from "@/lib/share/wire";
 
 const CORS = {
@@ -46,6 +46,7 @@ export const Route = createFileRoute("/api/v1/share")({
             return jsonApi(r);
           }
           if (action === "newnym") return jsonApi(await newNym());
+          if (action === "auto") return jsonApi(autoRevoke());
           return jsonApi({ ...keyStatus(), identities: listIdentities() });
         }
         if (op === "link") {

@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 
-export type WslJob = "status" | "embed" | "packages" | "ollama" | "models" | "onion";
+export type WslJob = "status" | "embed" | "packages" | "ollama" | "models" | "onion" | "revoke";
 
 export type WslStatus = {
   embedded: true;
@@ -13,7 +13,7 @@ export type WslStatus = {
   note: string;
 };
 
-export const JOBS: WslJob[] = ["status", "embed", "packages", "ollama", "models", "onion"];
+export const JOBS: WslJob[] = ["status", "embed", "packages", "ollama", "models", "onion", "revoke"];
 
 export function isWslJob(raw: string): raw is WslJob {
   return JOBS.includes(raw as WslJob);

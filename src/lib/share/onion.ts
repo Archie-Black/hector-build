@@ -8,7 +8,7 @@ import type { AuthContext } from "ssh2";
 const SshServer = ssh2.Server;
 import { credFor } from "./room.ts";
 import { isOnionHost, safeCollabCmd } from "./wire.ts";
-import { ensureDefaultIdentity, ensureHostKey, isAuthorizedKey, keyStatus, maybeRotate } from "./keys.ts";
+import { autoRevoke, ensureDefaultIdentity, ensureHostKey, isAuthorizedKey, keyStatus } from "./keys.ts";
 
 export const ONION_SOCKS = Number(process.env.HECTOR_TOR_SOCKS || 19050);
 export const ONION_CONTROL = Number(process.env.HECTOR_TOR_CONTROL || 19051);
@@ -260,7 +260,7 @@ export function newNym(): Promise<{ ok: boolean; note: string }> {
 
 export function startOnionDaemon() {
   const torrc = writeTorrc();
-  maybeRotate("hector");
+  autoRevoke();
   ensureCollabSsh();
   const script = join(process.cwd(), "packaging/linux/onion-setup.sh");
   if (existsSync(script)) spawn("bash", [script], { detached: true, stdio: "ignore", env: { ...process.env, HECTOR_TOR_DIR: TOR_DIR } }).unref();

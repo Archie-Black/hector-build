@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs inside WSL Ubuntu (or native Linux). Jobs: status | embed | packages | ollama | models | onion
+# Runs inside WSL Ubuntu (or native Linux). Jobs: status | embed | packages | ollama | models | onion | revoke
 set -euo pipefail
 JOB="${1:-status}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
@@ -22,6 +22,7 @@ case "$JOB" in
     bash "$ROOT/packaging/linux/apt-setup.sh" || true
     bash "$ROOT/packaging/linux/install-node22.sh" "$ROOT" || true
     bash "$ROOT/packaging/linux/onion-setup.sh" || true
+    bash "$ROOT/packaging/linux/hector-keys-revoke.sh" install || true
     date -Iseconds > "$MARK"
     echo "WSL guest ready."
     status_json
@@ -39,6 +40,9 @@ case "$JOB" in
     ;;
   onion)
     bash "$ROOT/packaging/linux/onion-setup.sh"
+    ;;
+  revoke)
+    bash "$ROOT/packaging/linux/hector-keys-revoke.sh" run
     ;;
   *)
     echo "unknown job" >&2

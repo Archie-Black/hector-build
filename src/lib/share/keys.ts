@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import ssh2 from "ssh2";
 import type { ParsedKey } from "ssh2";
@@ -26,6 +26,8 @@ export type Identity = {
 
 export const ROTATE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
 export const ROTATE_OVERLAP_MS = 24 * 60 * 60 * 1000;
+export const HARD_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+export const PURGE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
 
 function boot() {
   mkdirSync(DIR, { recursive: true });
@@ -159,6 +161,55 @@ export function maybeRotate(user = "hector", now = Date.now()) {
   if (!current) return generateIdentity(user);
   if (now - current.created >= ROTATE_AFTER_MS) return rotateIdentity(user, now).current;
   return current;
+}
+
+function purgeRevoked(now: number) {
+  let n = 0;
+  const list = loadIndex();
+  for (const row of list) {
+    if (!row.revoked || now - row.revoked < PURGE_AFTER_MS) continue;
+    const hasPrev = list.some((i) => i.user === row.user && i.role === "previous" && !i.revoked);
+    const prev = identityPath(row.user, "previous");
+    if (!hasPrev && existsSync(prev)) {
+      unlinkSync(prev);
+      n += 1;
+    }
+  }
+  if (existsSync(`${HOST_PRIV}.prev`)) {
+    try {
+      const rot = JSON.parse(readFileSync(join(DIR, "host-rotation.json"), "utf8")) as { expires?: number };
+      if ((rot.expires ?? 0) <= now) {
+        unlinkSync(`${HOST_PRIV}.prev`);
+        if (existsSync(`${HOST_PUB}.prev`)) unlinkSync(`${HOST_PUB}.prev`);
+        n += 1;
+      }
+    } catch {
+      /* keep previous host key if the rotation file is missing */
+    }
+  }
+  return n;
+}
+
+/** Daily job: rotate due keys, revoke expired overlap, purge dead private files. */
+export function autoRevoke(now = Date.now()) {
+  boot();
+  let settled = settleRotations(now);
+  const users = [...new Set(loadIndex().filter((i) => !i.revoked && i.role !== "revoked").map((i) => i.user))];
+  if (!users.includes("hector")) users.push("hector");
+  const rotated: string[] = [];
+  for (const user of users) {
+    const before = loadIndex().find((i) => i.user === user && i.role === "current" && !i.revoked);
+    const after = maybeRotate(user, now);
+    if (before && after.fingerprint !== before.fingerprint) rotated.push(user);
+    const current = loadIndex().find((i) => i.user === user && i.role === "current" && !i.revoked);
+    if (current && now - current.created >= HARD_MAX_AGE_MS) {
+      rotateIdentity(user, now);
+      if (!rotated.includes(user)) rotated.push(user);
+    }
+  }
+  settled += settleRotations(now);
+  const purged = purgeRevoked(now);
+  return { settled, rotated, purged, at: now };
 }
 
 export function rotateHostKey(now = Date.now()) {
