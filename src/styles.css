@@ -82,6 +82,7 @@ html[data-theme="light"] {
 }
 
 .gate-scene {
+  --uranium: #e6ff2a;
   background: #000;
 }
 
@@ -90,11 +91,7 @@ html[data-theme="light"] {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background:
-    radial-gradient(120% 70% at 50% 8%, rgb(0 71 171 / 22%), transparent 52%),
-    linear-gradient(180deg, rgb(0 0 0 / 18%) 0%, rgb(4 8 18 / 42%) 46%, rgb(0 0 0 / 88%) 100%),
-    url("/hector/scenery-doom.jpg") center / cover no-repeat;
-  filter: saturate(0.85) contrast(1.08);
+  background: #000;
 }
 
 .gate-bloom {
@@ -106,7 +103,7 @@ html[data-theme="light"] {
   width: 28rem;
   height: 16rem;
   margin-left: -14rem;
-  background: radial-gradient(ellipse at 50% 40%, color-mix(in oklab, var(--color-accent) 38%, transparent), transparent 68%);
+  background: radial-gradient(ellipse at 50% 40%, rgb(0 71 171 / 28%), transparent 68%);
   filter: blur(28px);
 }
 
@@ -115,8 +112,8 @@ html[data-theme="light"] {
   position: absolute;
   inset: auto 0 0;
   z-index: 0;
-  height: 42%;
-  background: linear-gradient(180deg, transparent, rgb(0 0 0 / 72%) 55%, #000 100%);
+  height: 38%;
+  background: linear-gradient(180deg, transparent, rgb(0 0 0 / 80%) 70%, #000 100%);
 }
 
 .gate-scene > :not(.gate-scenery):not(.gate-bloom):not(.gate-mist) {
@@ -126,21 +123,21 @@ html[data-theme="light"] {
 
 .gate-card {
   border-radius: 22px;
-  background: color-mix(in oklab, var(--color-surface) 46%, transparent);
-  backdrop-filter: blur(32px) saturate(1.55);
+  background: color-mix(in oklab, #05070c 55%, transparent);
+  backdrop-filter: blur(32px) saturate(1.4);
   box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-accent) 42%, transparent),
-    inset 0 1px 0 color-mix(in oklab, var(--color-fg) 14%, transparent),
-    inset 0 -18px 40px color-mix(in oklab, #000 28%, transparent),
-    0 32px 80px rgb(0 0 0 / 55%),
-    0 0 90px color-mix(in oklab, var(--color-accent) 16%, transparent);
+    0 0 0 1px #0047ab,
+    0 0 0 2px var(--uranium),
+    inset 0 1px 0 color-mix(in oklab, #fff 10%, transparent),
+    0 32px 80px rgb(0 0 0 / 70%),
+    0 0 70px rgb(0 71 171 / 22%);
 }
 
 .gate-word {
   font-size: 1.85rem;
   font-weight: 560;
   letter-spacing: -0.04em;
-  background: linear-gradient(180deg, #f4f7ff 20%, color-mix(in oklab, var(--color-accent) 55%, #e8eef8));
+  background: linear-gradient(180deg, #f4f7ff 10%, #6ea8ff 78%, var(--uranium));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -149,8 +146,9 @@ html[data-theme="light"] {
 .gate-input {
   height: 3rem;
   border-radius: 12px;
-  border: 1px solid color-mix(in oklab, var(--color-accent) 22%, transparent);
-  background: color-mix(in oklab, var(--color-inset) 78%, transparent);
+  border: 1px solid #0047ab;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--uranium) 35%, transparent);
+  background: rgb(0 0 0 / 55%);
   padding: 0 0.9rem;
   font-size: 0.875rem;
   outline: none;
@@ -158,21 +156,23 @@ html[data-theme="light"] {
 }
 
 .gate-input:focus {
-  border-color: color-mix(in oklab, var(--color-accent) 70%, transparent);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent);
+  border-color: #0047ab;
+  box-shadow:
+    0 0 0 1px var(--uranium),
+    0 0 0 4px rgb(0 71 171 / 28%);
 }
 
 .gate-cta {
   width: 100%;
   height: 3rem;
   border-radius: 12px;
-  background: var(--color-accent);
-  color: var(--color-accent-fg);
+  background: #0047ab;
+  color: #f4f7ff;
   font-size: 0.875rem;
   font-weight: 560;
   box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-fg) 8%, transparent),
-    0 10px 28px color-mix(in oklab, var(--color-accent) 38%, transparent);
+    0 0 0 1px var(--uranium),
+    0 10px 28px rgb(0 71 171 / 40%);
 }
 
 .gate-cta:hover:not(:disabled) {
@@ -292,6 +292,19 @@ html[data-theme="light"] {
   border: 1px solid color-mix(in oklab, var(--color-accent) 32%, transparent);
   border-radius: 50%;
   pointer-events: none;
+}
+
+.gate-scene .atom-ring {
+  border-color: #0047ab;
+  box-shadow:
+    0 0 0 1px #e6ff2a,
+    0 0 16px rgb(0 71 171 / 35%);
+}
+
+.gate-scene .glass-thin {
+  box-shadow:
+    0 0 0 1px #0047ab,
+    0 0 0 2px color-mix(in oklab, #e6ff2a 55%, transparent);
 }
 
 .atom-compact .atom-ring {
