@@ -17,6 +17,7 @@ import { gitNativeStatus } from "@/lib/ide/native-git";
 import { loadExt } from "@/lib/workspace/extensions-store";
 import { loadHome } from "@/lib/ollama/home";
 import { spoolFor } from "@/lib/spool/client";
+import { isPublishJob, slugFromPrompt } from "@/lib/host/names";
 
 export function useAgentSend(voice: "hector" | "hx" = "hx") {
   const software = useForgeStore((s) => s.software);
@@ -105,6 +106,40 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
           traces: [],
         },
       });
+      return;
+    }
+
+    if (isPublishJob(prompt)) {
+      store.setDraft("");
+      store.pushMessage({ id: crypto.randomUUID(), role: "user", content: prompt, mode: "swarm", speaker: "you" });
+      store.setBusy(true);
+      try {
+        const r = await fetch("/api/v1/host/publish", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            slug: slugFromPrompt(prompt),
+            title: prompt.slice(0, 80),
+            files: store.files,
+            access: /private|just me/i.test(prompt) ? "private" : /link only|anyone with the link/i.test(prompt) ? "link" : "public",
+          }),
+        });
+        const site = (await r.json()) as { wildcard?: string; path?: string; slug?: string; error?: { message?: string } };
+        const url = site.wildcard || site.path;
+        store.pushMessage({
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: url
+            ? `Live on doomchat.ca, same job as grok.me.\n${url}\n${site.path && site.path !== url ? site.path : ""}`.trim()
+            : site.error?.message || "Could not publish.",
+          mode: "swarm",
+          speaker: voice,
+        });
+      } catch {
+        setError("Could not publish.");
+      } finally {
+        store.setBusy(false);
+      }
       return;
     }
 
@@ -253,6 +288,12 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
         diffs: useForgeStore.getState().diffs,
       });
       learnFromTurn({ user: prompt, reply, fail: nextFail, critique: cai });
+      void fetch("/api/v1/os", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ op: "improve", agent: voice === "hector" ? "hector" : "hx", prompt, ok: nextFail === 0, note: reply.slice(0, 200) }),
+        keepalive: true,
+      }).catch(() => undefined);
       if (!cai.ok) useForgeStore.getState().remember(cai.violations[0] ?? "Stay inside the constitution.");
       useForgeStore.getState().setStatus(nextFail ? `${nextFail} check(s) still failing.` : "Parallel bots complete.");
       void recordHxJob({

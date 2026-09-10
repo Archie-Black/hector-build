@@ -20,6 +20,7 @@ import { Route as SandboxRouteImport } from './routes/sandbox'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as ApiRtcRouteImport } from './routes/api/rtc'
 import { Route as ApiShareRouteImport } from './routes/api/share'
+import { Route as HSlugRouteImport } from './routes/h.$slug'
 import { Route as HxSessionRouteImport } from './routes/hx.session'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiV1CloudRouteImport } from './routes/api/v1/cloud'
@@ -33,6 +34,7 @@ import { Route as ApiV1OsRouteImport } from './routes/api/v1/os'
 import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
 import { Route as ApiV1SpoolRouteImport } from './routes/api/v1/spool'
 import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
+import { Route as ApiV1HostPublishRouteImport } from './routes/api/v1/host/publish'
 import { Route as ApiV1HostWslRouteImport } from './routes/api/v1/host/wsl'
 
 const IndexRoute = IndexRouteImport.update({
@@ -88,6 +90,11 @@ const ApiRtcRoute = ApiRtcRouteImport.update({
 const ApiShareRoute = ApiShareRouteImport.update({
   id: '/api/share',
   path: '/api/share',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HSlugRoute = HSlugRouteImport.update({
+  id: '/h/$slug',
+  path: '/h/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HxSessionRoute = HxSessionRouteImport.update({
@@ -155,6 +162,11 @@ const ApiV1ChatCompletionsRoute = ApiV1ChatCompletionsRouteImport.update({
   path: '/api/v1/chat/completions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1HostPublishRoute = ApiV1HostPublishRouteImport.update({
+  id: '/api/v1/host/publish',
+  path: '/api/v1/host/publish',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1HostWslRoute = ApiV1HostWslRouteImport.update({
   id: '/api/v1/host/wsl',
   path: '/api/v1/host/wsl',
@@ -173,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/share': typeof ApiShareRoute
+  '/h/$slug': typeof HSlugRoute
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/cloud': typeof ApiV1CloudRoute
@@ -186,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
+  '/api/v1/host/publish': typeof ApiV1HostPublishRoute
   '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
 export interface FileRoutesByTo {
@@ -200,6 +214,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/share': typeof ApiShareRoute
+  '/h/$slug': typeof HSlugRoute
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/cloud': typeof ApiV1CloudRoute
@@ -213,6 +228,7 @@ export interface FileRoutesByTo {
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
+  '/api/v1/host/publish': typeof ApiV1HostPublishRoute
   '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
 export interface FileRoutesById {
@@ -228,6 +244,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/api/rtc': typeof ApiRtcRoute
   '/api/share': typeof ApiShareRoute
+  '/h/$slug': typeof HSlugRoute
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/v1/cloud': typeof ApiV1CloudRoute
@@ -241,6 +258,7 @@ export interface FileRoutesById {
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
+  '/api/v1/host/publish': typeof ApiV1HostPublishRoute
   '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
 export interface FileRouteTypes {
@@ -257,6 +275,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/api/rtc'
     | '/api/share'
+    | '/h/$slug'
     | '/hx/session'
     | '/api/auth/$'
     | '/api/v1/cloud'
@@ -270,6 +289,7 @@ export interface FileRouteTypes {
     | '/api/v1/share'
     | '/api/v1/spool'
     | '/api/v1/chat/completions'
+    | '/api/v1/host/publish'
     | '/api/v1/host/wsl'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -284,6 +304,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/api/rtc'
     | '/api/share'
+    | '/h/$slug'
     | '/hx/session'
     | '/api/auth/$'
     | '/api/v1/cloud'
@@ -297,6 +318,7 @@ export interface FileRouteTypes {
     | '/api/v1/share'
     | '/api/v1/spool'
     | '/api/v1/chat/completions'
+    | '/api/v1/host/publish'
     | '/api/v1/host/wsl'
   id:
     | '__root__'
@@ -311,6 +333,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/api/rtc'
     | '/api/share'
+    | '/h/$slug'
     | '/hx/session'
     | '/api/auth/$'
     | '/api/v1/cloud'
@@ -324,6 +347,7 @@ export interface FileRouteTypes {
     | '/api/v1/share'
     | '/api/v1/spool'
     | '/api/v1/chat/completions'
+    | '/api/v1/host/publish'
     | '/api/v1/host/wsl'
   fileRoutesById: FileRoutesById
 }
@@ -339,6 +363,7 @@ export interface RootRouteChildren {
   VerifyRoute: typeof VerifyRoute
   ApiRtcRoute: typeof ApiRtcRoute
   ApiShareRoute: typeof ApiShareRoute
+  HSlugRoute: typeof HSlugRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiV1CloudRoute: typeof ApiV1CloudRoute
   ApiV1DevicesRoute: typeof ApiV1DevicesRoute
@@ -351,6 +376,7 @@ export interface RootRouteChildren {
   ApiV1ShareRoute: typeof ApiV1ShareRoute
   ApiV1SpoolRoute: typeof ApiV1SpoolRoute
   ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
+  ApiV1HostPublishRoute: typeof ApiV1HostPublishRoute
   ApiV1HostWslRoute: typeof ApiV1HostWslRoute
 }
 
@@ -431,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/api/share'
       fullPath: '/api/share'
       preLoaderRoute: typeof ApiShareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/h/$slug': {
+      id: '/h/$slug'
+      path: '/h/$slug'
+      fullPath: '/h/$slug'
+      preLoaderRoute: typeof HSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hx/session': {
@@ -524,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ChatCompletionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/host/publish': {
+      id: '/api/v1/host/publish'
+      path: '/api/v1/host/publish'
+      fullPath: '/api/v1/host/publish'
+      preLoaderRoute: typeof ApiV1HostPublishRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/host/wsl': {
       id: '/api/v1/host/wsl'
       path: '/api/v1/host/wsl'
@@ -556,6 +596,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyRoute: VerifyRoute,
   ApiRtcRoute: ApiRtcRoute,
   ApiShareRoute: ApiShareRoute,
+  HSlugRoute: HSlugRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiV1CloudRoute: ApiV1CloudRoute,
   ApiV1DevicesRoute: ApiV1DevicesRoute,
@@ -568,6 +609,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1ShareRoute: ApiV1ShareRoute,
   ApiV1SpoolRoute: ApiV1SpoolRoute,
   ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,
+  ApiV1HostPublishRoute: ApiV1HostPublishRoute,
   ApiV1HostWslRoute: ApiV1HostWslRoute,
 }
 export const routeTree = rootRouteImport

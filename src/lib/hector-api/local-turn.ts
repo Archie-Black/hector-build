@@ -5,6 +5,7 @@ import type { AgentResponse, ForgeMode } from "@/lib/workspace/types";
 import { synthesizeFiles } from "./synthesize";
 import { prove, proofLine } from "@/lib/workspace/prove";
 import { silentCouple } from "@/lib/chips/silent.ts";
+import { recordTurn } from "@/lib/os/mm";
 
 type Msg = { role?: string; content?: unknown; tool_calls?: unknown; name?: string };
 
@@ -83,6 +84,7 @@ export async function runLocalTurn(input: {
   const written = Object.keys(generated);
   const p = prove(files);
   traces.push({ name: "prove", ok: p.done, detail: p.note });
+  recordTurn({ agent: "hx", prompt, ok: p.done, note: p.note });
   return {
     ok: true,
     reply: [

@@ -3,6 +3,7 @@
 #
 # DNS A records → this box:
 #   @  www  hx  y  files  updates  chat  matrix
+#   *  (wildcard — user Hector Builds, like grok.me)
 #
 # Local services:
 #   127.0.0.1:8080  Hector Build + Spectral HX
@@ -100,6 +101,14 @@ chat.doomchat.ca {
 matrix.doomchat.ca {
 	encode gzip zstd
 	reverse_proxy 127.0.0.1:6167 {
+		import proxy
+	}
+}
+
+# grok.me job: every user build gets slug.doomchat.ca
+*.doomchat.ca {
+	encode gzip zstd
+	reverse_proxy 127.0.0.1:8080 {
 		import proxy
 	}
 }

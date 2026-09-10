@@ -10,6 +10,7 @@ import { hectorHostPrompt, spectralHxPrompt, compactHxPrompt, compactHectorPromp
 import { ollamaChat } from "@/lib/ollama/client";
 import { formatRecall } from "@/lib/memory/lattice";
 import { recallMemory } from "@/lib/memory/warehouse";
+import { lessonsFor } from "@/lib/os/mm";
 import { rustSearchNative } from "@/lib/geometry/mdv-native";
 import { harmScan } from "@/lib/align/asimov";
 import { runLocalTurn } from "@/lib/hector-api/local-turn";
@@ -545,7 +546,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
 
     const recalled = await recallMemory({ data: data.prompt });
     silentCouple(data.prompt, data.files);
-    const lessons = [...(data.lessons ?? []), ...formatRecall(recalled)];
+    const lessons = [...(data.lessons ?? []), ...formatRecall(recalled), ...lessonsFor("hx", data.prompt).slice(0, 6), ...lessonsFor("hector", data.prompt).slice(0, 4)];
     const mode = data.mode;
     const compact = engine.kind === "ollama" || engine.kind === "lmstudio";
     const system = compact

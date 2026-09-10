@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { busStatus } from "../devices/bus.ts";
 import { drainJobs, listJobs } from "../devices/print.ts";
 import { advertise } from "../devices/sdp.ts";
+import { bootMm, dropWorking, mmStatus, persistMm } from "./mm.ts";
 
 export type ServiceRole = "kernel" | "user";
 export type OsPhase = "down" | "live" | "wiping";
@@ -20,6 +21,7 @@ export const SERVICES: Service[] = [
   { id: "pnp", name: "PnP", role: "kernel", duty: "devices" },
   { id: "spool", name: "Spooler", role: "kernel", duty: "jobs" },
   { id: "sdp", name: "SDP", role: "kernel", duty: "pairing" },
+  { id: "mmu", name: "MMU", role: "kernel", duty: "memory" },
   { id: "hx", name: "Spectral HX", role: "user", duty: "coding" },
 ];
 
@@ -54,6 +56,7 @@ export function boot(now = Date.now()): Session {
   if (live?.phase === "live") return live;
   mkdirSync(RAM, { recursive: true });
   drainJobs();
+  bootMm();
   const s: Session = { id: `hx-${now.toString(36)}`, at: now, phase: "live", persist: false };
   writeSession(s);
   writeFileSync(join(RAM, "motd"), `Hector Transient OS ${s.id}\nSpectral HX is userland.\n`);
@@ -63,6 +66,7 @@ export function boot(now = Date.now()): Session {
 export function shutdown() {
   const s = readSession();
   if (!s) return { phase: "down" as const };
+  persistMm();
   if (!s.persist) wipeRam();
   writeSession({ ...s, phase: "down" });
   return { phase: "down" as const, id: s.id };
@@ -76,6 +80,8 @@ function wipeRam() {
 export function wipe() {
   const s = readSession();
   wipeRam();
+  dropWorking();
+  persistMm();
   for (const job of listJobs()) {
     const p = join(process.cwd(), "data", "devices", "spool", `${job.id}.job.json`);
     if (existsSync(p)) rmSync(p, { force: true });
@@ -100,7 +106,8 @@ export function osStatus() {
     devices: busStatus().started,
     jobs: listJobs().length,
     sdp: advertise().id,
+    mm: mmStatus(),
     ram: RAM,
-    note: "Host is firmware. Hector is the OS. Spectral HX is userland. Vault is the only disk.",
+    note: "Host is firmware. Hector is the OS. Spectral HX is userland. Vault is secrets. Memory image survives wipe.",
   };
 }
