@@ -13,11 +13,11 @@ export type AgentTask = {
 };
 
 export const ROLE_LABEL: Record<AgentRole, string> = {
-  lead: "Spectral HX",
-  scout: "HX Scout",
-  patch: "HX Patch",
-  test: "HX Checks",
-  improve: "HX Improve",
+  lead: "Hector",
+  scout: "Conquest",
+  patch: "War",
+  test: "Famine",
+  improve: "Hector",
 };
 
 export function planJob(prompt: string, mode: ForgeMode): AgentTask[] {

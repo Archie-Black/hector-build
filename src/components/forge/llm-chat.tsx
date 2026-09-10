@@ -60,7 +60,7 @@ export function LlmChat({ onSend, error, onBack }: Props) {
           <span className="size-11" />
         )}
         <SpectreStage busy={busy} ghosts={busy ? 4 : 3} size="compact" />
-        <p className="ml-1 flex-1 text-sm text-muted">Hector</p>
+        <p className="ml-1 flex-1 text-sm text-muted">Hector · leads the four</p>
         <UserButton />
         <SettingsButton />
       </header>

@@ -6,6 +6,7 @@ import { runWorkspaceTests } from "./run-tests";
 import { normalizePath, pathAllowed } from "./acl";
 import { diagnostics, formatFile, findDefinition, findReferences, renameSymbol } from "@/lib/ide/symbols";
 import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
+import { gate } from "@/lib/horsemen/gateway.ts";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -37,6 +38,8 @@ export function executeTool(
   files: Record<string, string>,
   mode: ForgeMode,
 ): ToolResult {
+  const g = gate(name, args, "death");
+  if (!g.ok) return refuse(files, name, g.reason);
   switch (name) {
     case "list_files":
     case "list_dir":

@@ -210,7 +210,7 @@ const welcome: ChatMessage = {
   id: "welcome",
   role: "system",
   content:
-    "I am Hector. I brief Spectral HX. Tell me what to build.",
+    "I am Hector. I lead Conquest, War, and Famine. Tell me what to build.",
 };
 
 function persistUpdates(updates: UpdateSettings) {
