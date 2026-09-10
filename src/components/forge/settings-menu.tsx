@@ -140,7 +140,7 @@ export function SettingsPanel() {
             <p className="mt-2 text-sm text-pretty">
               This app is the cloud. API <span className="font-mono">/api/v1</span>, MCP{" "}
               <span className="font-mono">/api/v1/mcp</span>, functions <span className="font-mono">/api/v1/functions</span>.
-              Arcade and Google Cloud are federations only. ContextForge is on, full time.
+              Arcade and Google Cloud are federations only. ContextForge is on, full time. Shared workspaces: any build bot joins at /api/v1/share.
             </p>
             <div className="mt-4 grid gap-2">
               {(

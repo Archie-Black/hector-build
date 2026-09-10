@@ -45,6 +45,16 @@ export function explainTrace(name: string, detail: string, ok: boolean): string 
       return `HX proved the job (${detail}).` + fail;
     case "close_job":
       return ok ? "HX closed the job. HOLD." : `HX would not close (${detail}).`;
+    case "share_join":
+      return `A build bot joined the shared room (${detail}).` + fail;
+    case "share_post":
+      return `HX handed work to the shared room (${detail}).` + fail;
+    case "share_lease":
+      return `HX leased a path (${detail}).` + fail;
+    case "share_sync":
+      return `HX published a shared file (${detail}).` + fail;
+    case "share_pull":
+      return "HX pulled the shared workspace." + fail;
     case "web_search":
       return `Spectral HX searched the web (${detail}).` + fail;
     case "web_fetch":

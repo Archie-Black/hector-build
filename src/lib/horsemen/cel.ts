@@ -142,5 +142,6 @@ export const DEFAULT_POLICY: ActionPolicy = {
     'tool.name == "web_fetch"',
     'tool.name == "spawn_subagent"',
     'tool.name.startsWith("horsemen_")',
+    'tool.name.startsWith("share_")',
   ],
 };

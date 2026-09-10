@@ -1,4 +1,4 @@
-const DEFAULT_ROOTS = ["demo", "src", "README.md", "package.json", "AGENTS.md", "demo/HECTOR.md"];
+const DEFAULT_ROOTS = ["demo", "src", "README.md", "package.json", "AGENTS.md", "demo/HECTOR.md", ".hector"];
 
 export function normalizePath(path: string) {
   return path.replace(/\\/g, "/").replace(/^\/+/, "").replace(/\/+/g, "/");

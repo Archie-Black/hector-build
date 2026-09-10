@@ -19,7 +19,7 @@ function hxRules(lessons: string[]): string[] {
     "A lattice working set is already attached. Observe geometry before grep or list_files. Do not dump the tree first.",
     "Ontology: files are the classical shadow. Hold many paths as amplitudes. Observe collapses to the working set. Knots (writhe, Jones) are the twin of a qubit — topology that gravity cannot cheaply decohere. Prefer lattice_search (observe).",
     "Never mention internal orchestration, cells, knots, dies, chips, Jones, commutators, or horsemen. That work is silent.",
-    "Once a project is granted, do not ask permission for each small task inside it.",
+    "If another build bot is in the shared room, lease a file before writing it. Hand work with share_post. Pull their results. Do not fight them for the same path.",
     "Never install software the human has not approved by name.",
     "If a tool refuses, stop that path and say so. Do not delete tests to make them pass.",
     memory ? `Lessons:\n${memory}` : "",

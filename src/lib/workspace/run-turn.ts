@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { diffsFrom, executeTool } from "./tools";
 import { runWorkspaceTests } from "./run-tests";
 import { prove } from "./prove";
+import { ingestInbox, materializeShare } from "@/lib/share/room";
 import { isApiKey } from "./keys";
 import { safeChatBase } from "./providers";
 import { resolveEngine } from "./engines";
@@ -197,6 +198,67 @@ const TOOLS = [
       name: "close_job",
       description: "Refuse unless prove is clear. Returns HOLD only when the job actually holds.",
       parameters: { type: "object", properties: {}, additionalProperties: false },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_join",
+      description: "Register a build bot in the shared workspace (Grok Build, Cursor, Codex, Claude, or any OpenAI-compatible agent).",
+      parameters: {
+        type: "object",
+        properties: { name: { type: "string" }, kind: { type: "string" }, id: { type: "string" } },
+        required: ["name"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_post",
+      description: "Send a task, result, or note to another bot in the shared room.",
+      parameters: {
+        type: "object",
+        properties: {
+          from: { type: "string" },
+          to: { type: "string" },
+          kind: { type: "string", description: "task | result | note" },
+          body: { type: "string" },
+        },
+        required: ["body"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_lease",
+      description: "Lease a file path so another bot does not write it at the same time.",
+      parameters: {
+        type: "object",
+        properties: { path: { type: "string" }, bot: { type: "string" }, seconds: { type: "number" } },
+        required: ["path"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_sync",
+      description: "Publish a file into the shared workspace. Pass expect as the last known hash.",
+      parameters: {
+        type: "object",
+        properties: { path: { type: "string" }, content: { type: "string" }, bot: { type: "string" }, expect: { type: "string" } },
+        required: ["path", "content"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_pull",
+      description: "Pull peers, inbox, and leases. Writes .hector/share into the workspace.",
+      parameters: { type: "object", properties: {} },
     },
   },
   {
@@ -430,7 +492,8 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     ];
 
     const before = { ...data.files };
-    let files = { ...data.files };
+    ingestInbox(data.files);
+    let files = materializeShare({ ...data.files });
     const traces: AgentResponse["traces"] = [];
     let todos: AgentTodo[] = [];
     let plan = "";

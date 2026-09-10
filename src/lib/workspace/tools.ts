@@ -8,6 +8,7 @@ import { normalizePath, pathAllowed } from "./acl";
 import { diagnostics, formatFile, findDefinition, findReferences, renameSymbol } from "@/lib/ide/symbols";
 import type { AgentTodo, ForgeMode, ToolTrace } from "./types";
 import { gate } from "@/lib/horsemen/gateway.ts";
+import { ackNote, ingestInbox, joinPeer, leasePath, materializeShare, postNote, shareStatus, syncFile } from "@/lib/share/room";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -165,6 +166,39 @@ export function executeTool(
       const p = prove(files);
       if (!p.done) return refuse(files, name, proofLine(p));
       return ok(files, name, p, "HOLD");
+    }
+    case "share_join": {
+      const peer = joinPeer({ name: String(args.name ?? "bot"), kind: args.kind as never, id: args.id ? String(args.id) : undefined });
+      return ok(materializeShare(files), name, peer.peer, `joined ${peer.peer.id}`);
+    }
+    case "share_post": {
+      ingestInbox(files);
+      const note = postNote({
+        from: String(args.from ?? "hector"),
+        to: args.to ? String(args.to) : "hector",
+        kind: args.kind as "task" | "result" | "note",
+        body: String(args.body ?? args.message ?? ""),
+      });
+      return ok(materializeShare(files), name, note, `posted ${note.id}`);
+    }
+    case "share_lease": {
+      const r = leasePath({ bot: String(args.bot ?? "hector"), path: String(args.path ?? ""), seconds: args.seconds ? Number(args.seconds) : undefined });
+      return r.ok ? ok(materializeShare(files), name, r.lease, `leased ${r.lease.path}`) : refuse(files, name, r.reason);
+    }
+    case "share_sync": {
+      const r = syncFile({
+        bot: String(args.bot ?? "hector"),
+        path: String(args.path ?? ""),
+        content: String(args.content ?? ""),
+        expect: args.expect ? String(args.expect) : undefined,
+      });
+      if (!r.ok) return refuse(files, name, r.reason);
+      const next = { ...files, [String(args.path)]: String(args.content ?? "") };
+      return ok(materializeShare(next), name, r.head, `synced ${r.head.path}`);
+    }
+    case "share_pull": {
+      ingestInbox(files);
+      return ok(materializeShare(files), name, shareStatus(), "share room");
     }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];

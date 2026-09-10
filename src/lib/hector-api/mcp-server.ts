@@ -9,6 +9,7 @@ import {
   putObject,
 } from "./hector-cloud";
 import { localChatCompletion } from "./local-turn";
+import { ackNote, joinPeer, leasePath, postNote, pullRoom, shareStatus, syncFile } from "@/lib/share/room";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
 
@@ -22,6 +23,11 @@ const TOOLS = [
   { name: "cloud_object_put", description: "Put an object in Hector Cloud storage.", inputSchema: { type: "object", properties: { key: { type: "string" }, body: { type: "string" } }, required: ["key", "body"] } },
   { name: "cloud_object_get", description: "Get an object from Hector Cloud storage.", inputSchema: { type: "object", properties: { key: { type: "string" } }, required: ["key"] } },
   { name: "cloud_object_list", description: "List Hector Cloud objects.", inputSchema: { type: "object", properties: {} } },
+  { name: "share_join", description: "Join the shared workspace as a build bot.", inputSchema: { type: "object", properties: { name: { type: "string" }, kind: { type: "string" }, id: { type: "string" } }, required: ["name"] } },
+  { name: "share_post", description: "Post a task/result/note to the shared room.", inputSchema: { type: "object", properties: { from: { type: "string" }, to: { type: "string" }, kind: { type: "string" }, body: { type: "string" } }, required: ["body"] } },
+  { name: "share_lease", description: "Lease a path before writing.", inputSchema: { type: "object", properties: { path: { type: "string" }, bot: { type: "string" }, seconds: { type: "number" } }, required: ["path"] } },
+  { name: "share_sync", description: "Publish a file into the shared workspace.", inputSchema: { type: "object", properties: { path: { type: "string" }, content: { type: "string" }, bot: { type: "string" }, expect: { type: "string" } }, required: ["path", "content"] } },
+  { name: "share_pull", description: "Pull peers, inbox, leases.", inputSchema: { type: "object", properties: {} } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -51,7 +57,7 @@ export async function handleMcp(raw: Rpc) {
   if (method === "resources/list") {
     return ok(id, {
       resources: [
-        { uri: "hector://cloud/status", name: "Hector Cloud status", mimeType: "application/json" },
+        { uri: "hector://share/room", name: "Shared workspace", mimeType: "application/json" },
         ...listFunctions().map((fn) => ({ uri: `hector://functions/${fn.name}`, name: fn.name, mimeType: "application/json" })),
       ],
     });
@@ -59,6 +65,7 @@ export async function handleMcp(raw: Rpc) {
   if (method === "resources/read") {
     const uri = String(p.uri ?? "");
     if (uri === "hector://cloud/status") return ok(id, { contents: [{ uri, text: JSON.stringify(cloudStatus(), null, 2) }] });
+    if (uri === "hector://share/room") return ok(id, { contents: [{ uri, text: JSON.stringify(pullRoom(), null, 2) }] });
     const fnName = uri.replace(/^hector:\/\/functions\//, "");
     const fn = listFunctions().find((f) => f.name === fnName);
     if (!fn) return fail(id, "unknown resource", -32602);
@@ -83,6 +90,11 @@ export async function handleMcp(raw: Rpc) {
     if (name === "cloud_object_put") return ok(id, toolText(putObject(String(args.key), String(args.body ?? ""))));
     if (name === "cloud_object_get") return ok(id, toolText(getObject(String(args.key))));
     if (name === "cloud_object_list") return ok(id, toolText(listObjects()));
+    if (name === "share_join") return ok(id, toolText(joinPeer({ name: String(args.name ?? "bot"), kind: args.kind as never, id: args.id ? String(args.id) : undefined }).peer));
+    if (name === "share_post") return ok(id, toolText(postNote({ from: String(args.from ?? "generic"), to: args.to ? String(args.to) : "hector", kind: args.kind as "task" | "result" | "note", body: String(args.body ?? "") })));
+    if (name === "share_lease") return ok(id, toolText(leasePath({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), seconds: args.seconds ? Number(args.seconds) : undefined })));
+    if (name === "share_sync") return ok(id, toolText(syncFile({ bot: String(args.bot ?? "generic"), path: String(args.path ?? ""), content: String(args.content ?? ""), expect: args.expect ? String(args.expect) : undefined })));
+    if (name === "share_pull") return ok(id, toolText({ ...shareStatus(), ack: args.id ? ackNote(String(args.id), String(args.bot ?? "generic")) : undefined, room: pullRoom() }));
     return fail(id, `unknown tool ${name}`, -32601);
   } catch (err) {
     return fail(id, err instanceof Error ? err.message : String(err));
