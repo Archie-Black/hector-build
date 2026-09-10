@@ -30,6 +30,7 @@ import { Route as ApiV1ExtensionsRouteImport } from './routes/api/v1/extensions'
 import { Route as ApiV1FunctionsRouteImport } from './routes/api/v1/functions'
 import { Route as ApiV1McpRouteImport } from './routes/api/v1/mcp'
 import { Route as ApiV1ModelsRouteImport } from './routes/api/v1/models'
+import { Route as ApiV1NetRouteImport } from './routes/api/v1/net'
 import { Route as ApiV1OsRouteImport } from './routes/api/v1/os'
 import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
 import { Route as ApiV1SpoolRouteImport } from './routes/api/v1/spool'
@@ -143,6 +144,11 @@ const ApiV1ModelsRoute = ApiV1ModelsRouteImport.update({
   path: '/api/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1NetRoute = ApiV1NetRouteImport.update({
+  id: '/api/v1/net',
+  path: '/api/v1/net',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1OsRoute = ApiV1OsRouteImport.update({
   id: '/api/v1/os',
   path: '/api/v1/os',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/net': typeof ApiV1NetRoute
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/net': typeof ApiV1NetRoute
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/net': typeof ApiV1NetRoute
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
@@ -294,6 +303,7 @@ export interface FileRouteTypes {
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/net'
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/net'
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/net'
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
@@ -384,6 +396,7 @@ export interface RootRouteChildren {
   ApiV1FunctionsRoute: typeof ApiV1FunctionsRoute
   ApiV1McpRoute: typeof ApiV1McpRoute
   ApiV1ModelsRoute: typeof ApiV1ModelsRoute
+  ApiV1NetRoute: typeof ApiV1NetRoute
   ApiV1OsRoute: typeof ApiV1OsRoute
   ApiV1ShareRoute: typeof ApiV1ShareRoute
   ApiV1SpoolRoute: typeof ApiV1SpoolRoute
@@ -542,6 +555,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/net': {
+      id: '/api/v1/net'
+      path: '/api/v1/net'
+      fullPath: '/api/v1/net'
+      preLoaderRoute: typeof ApiV1NetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/os': {
       id: '/api/v1/os'
       path: '/api/v1/os'
@@ -625,6 +645,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1FunctionsRoute: ApiV1FunctionsRoute,
   ApiV1McpRoute: ApiV1McpRoute,
   ApiV1ModelsRoute: ApiV1ModelsRoute,
+  ApiV1NetRoute: ApiV1NetRoute,
   ApiV1OsRoute: ApiV1OsRoute,
   ApiV1ShareRoute: ApiV1ShareRoute,
   ApiV1SpoolRoute: ApiV1SpoolRoute,

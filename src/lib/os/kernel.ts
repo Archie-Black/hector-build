@@ -9,6 +9,7 @@ import { busStatus } from "../devices/bus.ts";
 import { drainJobs, listJobs } from "../devices/print.ts";
 import { advertise } from "../devices/sdp.ts";
 import { bootMm, dropWorking, mmStatus, persistMm } from "./mm.ts";
+import { netStatus } from "../net/stack.ts";
 
 export type ServiceRole = "kernel" | "user";
 export type OsPhase = "down" | "live" | "wiping";
@@ -22,6 +23,7 @@ export const SERVICES: Service[] = [
   { id: "spool", name: "Spooler", role: "kernel", duty: "jobs" },
   { id: "sdp", name: "SDP", role: "kernel", duty: "pairing" },
   { id: "mmu", name: "MMU", role: "kernel", duty: "memory" },
+  { id: "netd", name: "Netd", role: "kernel", duty: "network" },
   { id: "hx", name: "Spectral HX", role: "user", duty: "coding" },
 ];
 
@@ -107,6 +109,7 @@ export function osStatus() {
     jobs: listJobs().length,
     sdp: advertise().id,
     mm: mmStatus(),
+    net: netStatus(),
     ram: RAM,
     note: "Host is firmware. Hector is the OS. Spectral HX is userland. Vault is secrets. Memory image survives wipe.",
   };
