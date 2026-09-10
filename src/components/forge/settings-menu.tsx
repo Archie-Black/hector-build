@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OsWindow } from "@/components/forge/os-window";
@@ -53,6 +53,23 @@ export function SettingsPanel() {
   const [saved, setSaved] = useState(false);
   const [ext, setExt] = useState<ClientExt>(() => loadExt());
   const [home, setHome] = useState(() => loadHome().url);
+  const [wslLine, setWslLine] = useState("WSL: checking…");
+
+  useEffect(() => {
+    if (tab !== "System") return;
+    const desk = (window as unknown as { hxDesktop?: { wslStatus?: () => Promise<{ note?: string; via?: string; ready?: boolean }> } }).hxDesktop;
+    const apply = (s: { note?: string; via?: string; ready?: boolean }) => {
+      setWslLine(s.ready === false ? s.note || "WSL: not ready" : `WSL · ${s.via || "on"} · ${s.note || "embedded"}`);
+    };
+    if (desk?.wslStatus) {
+      void desk.wslStatus().then(apply).catch(() => setWslLine("WSL: native Linux"));
+      return;
+    }
+    void fetch("/api/v1/host/wsl")
+      .then((r) => r.json())
+      .then(apply)
+      .catch(() => setWslLine("WSL: native Linux"));
+  }, [tab]);
 
   function pick(id: ChatProviderId) {
     const p = CHAT_PROVIDERS.find((x) => x.id === id)!;
@@ -118,6 +135,7 @@ export function SettingsPanel() {
             <p className="mt-2 text-sm">{osLabel(platform)}</p>
             <p className="mt-1 font-mono text-xs text-muted">{installHint(platform).path}</p>
             <p className="mt-2 text-sm text-muted text-pretty">{installHint(platform).how}</p>
+            <p className="mt-2 text-sm text-pretty">{wslLine}</p>
             <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">Hector Cloud</p>
             <p className="mt-2 text-sm text-pretty">
               This app is the cloud. API <span className="font-mono">/api/v1</span>, MCP{" "}

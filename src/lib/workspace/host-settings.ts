@@ -69,7 +69,7 @@ export function installHint(os: HostOs) {
   if (os === "windows") {
     return {
       path: "%LOCALAPPDATA%\\HectorBuild",
-      how: "Unzip the GitHub source. Run packaging\\windows\\Install.bat. Node 22. SmartScreen: More info → Run anyway. Defender exclusions prompt on install.",
+      how: "Unzip the GitHub source. Run packaging\\windows\\Install.bat. That embeds WSL Ubuntu for Linux tools. Node 22 + Electron stay Windows. SmartScreen: More info → Run anyway.",
     };
   }
   if (os === "linux") {

@@ -39,7 +39,7 @@ func runSetup() {
 	cmd := exec.Command("powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ps1)
 	cmd.Dir = filepath.Dir(exe)
 	if err := cmd.Run(); err != nil {
-		alert("Hector Build", "Install failed.\n\n"+err.Error()+"\n\nNeed Node 22 from https://nodejs.org\nIf Windows SmartScreen blocked the exe: More info → Run anyway.")
+		alert("Hector Build", "Install failed.\n\n"+err.Error()+"\n\nNeed Node 22 from https://nodejs.org\nWSL Ubuntu is enabled on first install (admin).\nIf Windows SmartScreen blocked the exe: More info → Run anyway.")
 		return
 	}
 	copyLaunchers(filepath.Dir(exe))

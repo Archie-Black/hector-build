@@ -2,11 +2,11 @@
 
 Coding floor for Hector Build. Works with any OpenAI-compatible chatbot.
 
-## Windows install (WSL)
+## Windows install (WSL embedded)
 
 Same as Hector: unzip onto NTFS, double-click `packaging\windows\Install.bat`.
 
-Runtime is WSL. Spectral HX opens as a Windows app window. Hector feeds it jobs live.
+The window is Windows. The install layer is WSL Ubuntu. Spectral HX opens as a Windows app. Hector feeds it jobs live.
 
 Uninstall: `packaging\windows\Uninstall.bat`
 

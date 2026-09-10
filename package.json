@@ -19,7 +19,7 @@
     "preview:stop": "node scripts/preview.mjs stop",
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test": "node --experimental-strip-types --test src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts src/lib/horsemen/horsemen.test.ts src/lib/chips/chips.test.ts src/lib/geometry/link.test.ts src/lib/cells/cells.test.ts src/lib/workspace/engines.test.ts src/lib/security/lockbox.test.ts src/lib/ollama/ollama.test.ts src/lib/ibm/ibm.test.ts src/lib/workspace/prove.test.ts",
+    "test": "node --experimental-strip-types --test src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts src/lib/horsemen/horsemen.test.ts src/lib/chips/chips.test.ts src/lib/geometry/link.test.ts src/lib/cells/cells.test.ts src/lib/workspace/engines.test.ts src/lib/security/lockbox.test.ts src/lib/ollama/ollama.test.ts src/lib/ibm/ibm.test.ts src/lib/workspace/prove.test.ts src/lib/host/wsl.test.ts",
     "test:sandbox": "node --test 'scripts/**/*.test.mjs'",
     "lint": "eslint .",
     "format": "prettier --write .",

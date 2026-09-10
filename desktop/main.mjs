@@ -1,8 +1,8 @@
-import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell } from "electron";
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme, shell } from "electron";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -82,6 +82,53 @@ function openHx() {
   return hx;
 }
 
+function wslBin() {
+  if (process.platform !== "win32") return null;
+  const p = join(process.env.SystemRoot || "C:\\Windows", "System32", "wsl.exe");
+  return existsSync(p) ? p : "wsl.exe";
+}
+
+function winToWsl(p) {
+  const m = String(p).replace(/\//g, "\\").match(/^([A-Za-z]):\\(.*)$/);
+  if (!m) return String(p).replace(/\\/g, "/");
+  return `/mnt/${m[1].toLowerCase()}/${m[2].replace(/\\/g, "/")}`;
+}
+
+function wslStatus() {
+  if (process.platform === "linux") {
+    return { embedded: true, ready: true, via: "native-linux", distro: "native", note: "Linux host." };
+  }
+  const bin = wslBin();
+  if (!bin) return { embedded: true, ready: false, via: "wsl", distro: "Ubuntu", note: "Run Install.bat to embed WSL." };
+  return { embedded: true, ready: true, via: "wsl", distro: "Ubuntu", note: "WSL Ubuntu is the install layer." };
+}
+
+function wslRun(job) {
+  const allowed = new Set(["status", "embed", "ollama", "models"]);
+  if (!allowed.has(job)) return Promise.resolve({ ok: false, out: "blocked" });
+  const guest = `${winToWsl(ROOT)}/packaging/linux/wsl-guest.sh`;
+  if (process.platform === "linux") {
+    return new Promise((resolve) => {
+      const child = spawn("bash", [join(ROOT, "packaging/linux/wsl-guest.sh"), job], { cwd: ROOT });
+      let out = "";
+      child.stdout?.on("data", (d) => { out += String(d); });
+      child.stderr?.on("data", (d) => { out += String(d); });
+      child.on("close", (code) => resolve({ ok: code === 0, out: out.slice(-8000) }));
+      child.on("error", (err) => resolve({ ok: false, out: err.message }));
+    });
+  }
+  const bin = wslBin();
+  if (!bin) return Promise.resolve({ ok: false, out: "wsl.exe missing" });
+  return new Promise((resolve) => {
+    const child = spawn(bin, ["-d", "Ubuntu", "--", "bash", guest, job], { windowsHide: true });
+    let out = "";
+    child.stdout?.on("data", (d) => { out += String(d); });
+    child.stderr?.on("data", (d) => { out += String(d); });
+    child.on("close", (code) => resolve({ ok: code === 0, out: out.slice(-8000) }));
+    child.on("error", (err) => resolve({ ok: false, out: err.message }));
+  });
+}
+
 function ping() {
   return fetch(`${ORIGIN}/`).then((r) => r.ok).catch(() => false);
 }
@@ -123,6 +170,8 @@ app.whenReady().then(async () => {
     void w.loadURL(`${ORIGIN}/?house=1`);
     return true;
   });
+  ipcMain.handle("desktop:wsl-status", () => wslStatus());
+  ipcMain.handle("desktop:wsl-run", (_e, job) => wslRun(String(job || "status")));
   Menu.setApplicationMenu(
     Menu.buildFromTemplate([
       { role: "fileMenu" },

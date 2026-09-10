@@ -1,4 +1,4 @@
-# Hector Build — native Windows 11 install. WSL is optional.
+# Hector Build — Windows 11 install. Embeds WSL Ubuntu for Linux tools.
 $ErrorActionPreference = "Stop"
 $Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $StartMenu = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Hector Build"
@@ -35,6 +35,21 @@ function Add-HectorDefenderExclusions {
 }
 
 Add-HectorDefenderExclusions
+
+Write-Host "Embedding WSL Ubuntu (Linux tools: Ollama, models, installs)..."
+try {
+  $wslScript = Join-Path $PSScriptRoot "wsl-embed.ps1"
+  $p = Start-Process -FilePath "powershell.exe" -Verb RunAs -Wait -PassThru -ArgumentList @(
+    "-NoProfile",
+    "-ExecutionPolicy Bypass",
+    "-File `"$wslScript`"",
+    "`"$Root`""
+  )
+  if ($p.ExitCode -eq 0) { Write-Host "WSL embed OK (or already present)." }
+  else { Write-Host "WSL embed skipped (exit $($p.ExitCode)). Hector still launches as a Windows app." }
+} catch {
+  Write-Host "WSL embed skipped. Hector still launches as a Windows app."
+}
 
 function Have-Node {
   try {
@@ -105,7 +120,8 @@ Native Windows 11 install.
 
 Folder: $Root
 Node: $(node -v)
-WSL is not required.
+WSL Ubuntu is embedded for Linux installs (Ollama, models).
+Electron is still a Windows window.
 
 Defender: exclusions are the app folder + node/electron, not Defender off.
 If Windows blocked Setup.exe: More info → Run anyway (unsigned build).
