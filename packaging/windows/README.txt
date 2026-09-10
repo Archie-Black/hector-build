@@ -22,7 +22,7 @@ Install
 What gets installed
 -------------------
 - Hector Build + Spectral HX (Windows Electron windows)
-- WSL2 + Ubuntu (embedded toolchain)
+- WSL2 + Ubuntu (embedded toolchain: apt, nala, pipx)
 - Defender exclusions for this app folder only
 
 WSL is the install layer. You still click a Windows shortcut.

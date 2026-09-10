@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
 
-export type WslJob = "status" | "embed" | "ollama" | "models";
+export type WslJob = "status" | "embed" | "packages" | "ollama" | "models";
 
 export type WslStatus = {
   embedded: true;
@@ -13,7 +13,7 @@ export type WslStatus = {
   note: string;
 };
 
-export const JOBS: WslJob[] = ["status", "embed", "ollama", "models"];
+export const JOBS: WslJob[] = ["status", "embed", "packages", "ollama", "models"];
 
 export function isWslJob(raw: string): raw is WslJob {
   return JOBS.includes(raw as WslJob);
@@ -70,7 +70,7 @@ export function wslStatus(): WslStatus {
     ready: true,
     distro: "Ubuntu",
     via: "wsl",
-    note: "WSL Ubuntu is the install layer. Hector is the window.",
+    note: "WSL Ubuntu is the install layer. apt, nala, pipx are configured.",
   };
 }
 
