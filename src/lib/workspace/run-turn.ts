@@ -19,6 +19,8 @@ import { silentCouple } from "@/lib/chips/silent.ts";
 import { learn, render } from "@/lib/lingo/lingua";
 import { logExec, markAgent, noteCorrection, watchHuman, xpContext } from "@/lib/xp/experience";
 import { ingest, retrieveFor } from "@/lib/tune/tuner";
+import { geoLane, geoUser, pickLaneModel } from "@/lib/geometry/pair";
+import { decide } from "@/lib/cluster/governor";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -661,7 +663,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     const messages: Msg[] = [
       { role: "system", content: system },
       ...data.history.slice(compact ? -8 : -16).map((m) => ({ role: m.role, content: m.content })),
-      { role: "user", content: data.prompt.slice(0, compact ? 8000 : 16000) },
+      { role: "user", content: (compact ? geoUser(data.files, data.prompt) : data.prompt).slice(0, compact ? 8000 : 16000) },
     ];
 
     const before = { ...data.files };
@@ -673,6 +675,14 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     let reply = "";
     const maxRounds = compact ? (mode === "swarm" ? 10 : 6) : mode === "swarm" ? 16 : mode === "patch" ? 8 : mode === "plan" ? 6 : 5;
     let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : engine.kind === "vllm" ? "Qwen/Qwen2.5-Coder-7B-Instruct" : engine.kind === "ollama" ? "qwen2.5-coder:7b" : "llama3.2");
+    const fast = engine.kind === "ollama" || engine.kind === "vllm" ? engine.fast ?? model : model;
+    const best = engine.kind === "ollama" || engine.kind === "vllm" ? engine.best ?? model : model;
+    const house = decide({ prompt: data.prompt, mode, voice: data.voice });
+    if (compact && (engine.kind === "ollama" || engine.kind === "vllm")) {
+      if (house.class === "7") model = fast;
+      else if (house.class === "mix") model = engine.boost && engine.boost !== best ? engine.boost : fast;
+      else model = best;
+    }
     const maxTokens = compact ? (mode === "scout" ? 1200 : 3500) : mode === "scout" ? 1800 : 5000;
     const sample = (mdl: string) =>
       engine.kind === "ollama" && engine.origin
@@ -702,6 +712,11 @@ export const runForgeTurn = createServerFn({ method: "POST" })
           });
 
     for (let round = 0; round < maxRounds; round++) {
+      if (compact) {
+        if (house.class === "7") model = fast;
+        else if (house.class === "mix" && "boost" in engine && engine.boost && engine.boost !== best) model = engine.boost;
+        else model = pickLaneModel(geoLane(data.prompt, mode, traces), fast, best);
+      }
       let res: Response;
       try {
         res = await sample(model);
@@ -840,7 +855,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     const p = prove(files);
     logExec(data.prompt, p, files);
     markAgent(files);
-    ingest({ prompt: data.prompt, proof: p, files });
+    ingest({ prompt: data.prompt, proof: p, files, klass: house.class });
 
     return {
       ok: true,

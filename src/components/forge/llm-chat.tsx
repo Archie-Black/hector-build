@@ -5,6 +5,7 @@ import { UserButton } from "@/lib/auth/gates";
 import { SpectreStage } from "@/components/forge/spectre-stage";
 import { GhostSprite } from "@/components/forge/ghost-sprite";
 import { SpatialField, SpatialFx } from "@/components/forge/spatial-field";
+import { XrPortal } from "@/components/forge/xr-portal";
 import { useForgeStore } from "@/lib/forge-store";
 
 const STARTERS = [
@@ -53,6 +54,7 @@ export function LlmChat({ onSend, error, onBack }: Props) {
   return (
     <SpatialField className="flex h-dvh flex-col bg-bg text-fg spatial-quiet">
       <SpatialFx />
+      <XrPortal />
       <header className="flex h-12 shrink-0 items-center px-2 glass-thin">
         {onBack ? (
           <button type="button" aria-label="Back" className="flex size-11 items-center justify-center rounded-md text-muted" onClick={onBack}>

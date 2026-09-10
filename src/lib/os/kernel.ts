@@ -14,6 +14,8 @@ import { bootZt, ztStatus } from "../zt/zero.ts";
 import { bootLingua, linguaStatus } from "../lingo/lingua.ts";
 import { bootXp, xpStatus } from "../xp/experience.ts";
 import { bootTuner, tunerStatus } from "../tune/tuner.ts";
+import { bootGovernor, governorStatus } from "../cluster/governor.ts";
+import { bootCeiling, ceilingStatus } from "../cluster/ceiling.ts";
 
 export type ServiceRole = "kernel" | "user";
 export type OsPhase = "down" | "live" | "wiping";
@@ -32,6 +34,8 @@ export const SERVICES: Service[] = [
   { id: "lingua", name: "Lingua", role: "kernel", duty: "voice" },
   { id: "xp", name: "Experience", role: "kernel", duty: "lessons" },
   { id: "tuner", name: "Tuner", role: "kernel", duty: "lora" },
+  { id: "governor", name: "Governor", role: "kernel", duty: "dynB" },
+  { id: "ceiling", name: "Ceiling", role: "kernel", duty: "evolve" },
   { id: "kvm", name: "KVM", role: "kernel", duty: "seats" },
   { id: "darwin", name: "Darwin", role: "kernel", duty: "macos-seat" },
   { id: "keystone", name: "Keystone", role: "kernel", duty: "mac-map" },
@@ -74,6 +78,8 @@ export function boot(now = Date.now()): Session {
   bootLingua();
   bootXp();
   bootTuner();
+  bootGovernor();
+  bootCeiling();
   const s: Session = { id: `hx-${now.toString(36)}`, at: now, phase: "live", persist: false };
   writeSession(s);
   writeFileSync(join(RAM, "motd"), `Hector Transient OS ${s.id}\nSpectral HX is userland.\n`);
@@ -129,6 +135,8 @@ export function osStatus() {
     lingua: linguaStatus(),
     xp: xpStatus(),
     tuner: tunerStatus(),
+    governor: governorStatus(),
+    ceiling: ceilingStatus(),
     ram: RAM,
     note: "Host is firmware. Hector is the OS. Spectral HX is userland. Vault is secrets. Memory image survives wipe.",
   };

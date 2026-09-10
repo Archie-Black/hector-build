@@ -81,7 +81,7 @@ export function benchFrame(opts: { shift?: number; loose?: boolean; led?: "green
 }
 
 export function dualFrame(opts?: { loose?: boolean; led?: "green" | "red"; zoom?: number; thermal?: boolean }) {
-  const z = opts?.zoom ?? load().pose.zoom;
+  const z = opts?.zoom ?? 0;
   return {
     left: benchFrame({ ...opts, zoom: z, shift: 0 }),
     right: benchFrame({ ...opts, zoom: z, shift: 3 }),

@@ -62,7 +62,7 @@ export async function ollamaChat(input: {
     messages: ollamaMessages(input.messages),
     tools: ollamaTools(input.tools),
     stream: false,
-    keep_alive: "24h",
+    keep_alive: /coder|gpt-oss|7b|14b/i.test(input.model) ? "-1" : "24h",
     options: {
       temperature: input.temperature ?? 0.1,
       num_ctx: ctxFor(input.model),

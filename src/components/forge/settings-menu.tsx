@@ -15,6 +15,7 @@ import { loadHome, saveHome } from "@/lib/ollama/home";
 import { loadSession } from "@/lib/auth/local-account";
 import { requestSupport } from "@/lib/support/session";
 import { sfx } from "@/lib/sfx/hector";
+import { loadImmersive, saveImmersive, type ImmersivePref } from "@/lib/xr/caps";
 
 const TABS = ["Look", "System", "Chatbot", "Agent", "Updates", "Vault", "Guest", "About"] as const;
 
@@ -54,6 +55,7 @@ export function SettingsPanel() {
   const [ext, setExt] = useState<ClientExt>(() => loadExt());
   const [home, setHome] = useState(() => loadHome().url);
   const [wslLine, setWslLine] = useState("WSL: checking…");
+  const [immersive, setImmersive] = useState<ImmersivePref>(() => (typeof window === "undefined" ? "glass" : loadImmersive()));
 
   useEffect(() => {
     if (tab !== "System") return;
@@ -126,6 +128,25 @@ export function SettingsPanel() {
             </div>
             <p className="mt-3 text-sm text-muted text-pretty">
               Dark is black and cobalt. Frosted glass stays on both themes.
+            </p>
+            <p className="mt-5 text-xs tracking-[0.14em] text-subtle uppercase">Immersive</p>
+            <div className="mt-2 flex gap-2">
+              {(["glass", "room", "headset"] as ImmersivePref[]).map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={"h-11 flex-1 rounded-md text-sm capitalize " + (immersive === id ? "bg-accent text-accent-fg" : "glass-thin")}
+                  onClick={() => {
+                    setImmersive(id);
+                    saveImmersive(id);
+                  }}
+                >
+                  {id}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-sm text-muted text-pretty">
+              Glass is the page. Room is a WebGL space on this screen. Headset is WebXR VR or AR when the device has it. Enter space is a user gesture.
             </p>
           </>
         ) : null}

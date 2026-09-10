@@ -2,9 +2,10 @@ import { isLoopbackChat, safeChatBase, type ChatProviderId } from "./providers.t
 import { ollamaOrigins, vllmOrigins } from "../ollama/home.ts";
 import { ollamaTags, openaiModels } from "../ollama/client.ts";
 import { pickPair } from "../ollama/rank.ts";
+import { decide, pickHouseModel } from "../cluster/governor.ts";
 import type { ForgeMode } from "./types.ts";
 
-export type LocalEngine = { kind: "ollama" | "vllm"; baseUrl: string; model: string; key: string; origin?: string };
+export type LocalEngine = { kind: "ollama" | "vllm"; baseUrl: string; model: string; key: string; origin?: string; fast?: string; best?: string; steady?: string; boost?: string };
 
 export type Engine =
   | { kind: "hector-local"; baseUrl: "/api/v1"; model: "hector-hx"; key: ""; origin?: string }
@@ -33,9 +34,25 @@ export async function probeOllama(homeUrl?: string, mode?: ForgeMode): Promise<L
   const names = [...new Set(hits.flatMap((h) => h.names))];
   const pair = pickPair(names);
   if (!pair) return null;
-  const model = mode === "scout" || mode === "plan" ? pair.fast : pair.best;
+  const house = decide({ mode, names });
+  const model =
+    house.class === "7"
+      ? pair.fast
+      : house.class === "mix"
+        ? pickHouseModel(names, "mix", pair.best, pair.fast)
+        : pair.best;
   const owner = hits.find((h) => h.names.includes(model)) ?? hits.find((h) => h.names.includes(pair.best)) ?? hits[0]!;
-  return { kind: owner.kind, baseUrl: `${owner.origin}/v1`, model, key: "local", origin: owner.origin };
+  return {
+    kind: owner.kind,
+    baseUrl: `${owner.origin}/v1`,
+    model,
+    key: "local",
+    origin: owner.origin,
+    fast: pair.fast,
+    best: pair.best,
+    steady: pair.best,
+    boost: pickHouseModel(names, "mix", pair.best, pair.fast),
+  };
 }
 
 export async function resolveEngine(input: {
