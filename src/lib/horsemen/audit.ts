@@ -1,6 +1,6 @@
 import { mkdirSync, appendFileSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { HorsemanId } from "./roster";
+import type { HorsemanId } from "./roster.ts";
 
 export type AuditRow = {
   at: number;

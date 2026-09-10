@@ -1,5 +1,5 @@
-import { STRANDS, reduceBraid, writhe } from "./braid";
-import { pAdd, pClean, pFormat, pMul, type Poly } from "./poly";
+import { STRANDS, reduceBraid, writhe } from "./braid.ts";
+import { pAdd, pClean, pFormat, pMul, type Poly } from "./poly.ts";
 
 const CAP = 12;
 

@@ -10,6 +10,7 @@ import {
 } from "./hector-cloud";
 import { localChatCompletion } from "./local-turn";
 import { askBot, HECTOR_ID, superBotBrief } from "@/lib/horsemen/index.ts";
+import { orchestrate } from "@/lib/chips/orchestrate.ts";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
 
@@ -25,6 +26,7 @@ const TOOLS = [
   { name: "cloud_object_list", description: "List Hector Cloud objects.", inputSchema: { type: "object", properties: {} } },
   { name: "horsemen_roster", description: "Four horsemen. Hector leads.", inputSchema: { type: "object", properties: {} } },
   { name: "horsemen_ask", description: "Hector delegates one hop.", inputSchema: { type: "object", properties: { target: { type: "string" }, message: { type: "string" } }, required: ["target"] } },
+  { name: "chip_orchestrate", description: "Mint isolated dies and couple by knot commutator.", inputSchema: { type: "object", properties: { prompt: { type: "string" } }, required: ["prompt"] } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -88,6 +90,7 @@ export async function handleMcp(raw: Rpc) {
     if (name === "cloud_object_list") return ok(id, toolText(listObjects()));
     if (name === "horsemen_roster") return ok(id, toolText(superBotBrief()));
     if (name === "horsemen_ask") return ok(id, toolText(askBot(HECTOR_ID, String(args.target ?? "death") as "conquest" | "war" | "famine" | "death", String(args.message ?? ""), 0)));
+    if (name === "chip_orchestrate") return ok(id, toolText(orchestrate(String(args.prompt ?? ""), {})));
     return fail(id, `unknown tool ${name}`, -32601);
   } catch (err) {
     return fail(id, err instanceof Error ? err.message : String(err));
