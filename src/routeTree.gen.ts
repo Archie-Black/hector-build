@@ -28,7 +28,9 @@ import { Route as ApiV1ExtensionsRouteImport } from './routes/api/v1/extensions'
 import { Route as ApiV1FunctionsRouteImport } from './routes/api/v1/functions'
 import { Route as ApiV1McpRouteImport } from './routes/api/v1/mcp'
 import { Route as ApiV1ModelsRouteImport } from './routes/api/v1/models'
+import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
 import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
+import { Route as ApiV1HostWslRouteImport } from './routes/api/v1/host/wsl'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -125,9 +127,19 @@ const ApiV1ModelsRoute = ApiV1ModelsRouteImport.update({
   path: '/api/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1ShareRoute = ApiV1ShareRouteImport.update({
+  id: '/api/v1/share',
+  path: '/api/v1/share',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1ChatCompletionsRoute = ApiV1ChatCompletionsRouteImport.update({
   id: '/api/v1/chat/completions',
   path: '/api/v1/chat/completions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1HostWslRoute = ApiV1HostWslRouteImport.update({
+  id: '/api/v1/host/wsl',
+  path: '/api/v1/host/wsl',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -151,7 +163,9 @@ export interface FileRoutesByFullPath {
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
+  '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -173,7 +187,9 @@ export interface FileRoutesByTo {
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
+  '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -196,7 +212,9 @@ export interface FileRoutesById {
   '/api/v1/functions': typeof ApiV1FunctionsRoute
   '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
+  '/api/v1/host/wsl': typeof ApiV1HostWslRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -220,7 +238,9 @@ export interface FileRouteTypes {
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/share'
     | '/api/v1/chat/completions'
+    | '/api/v1/host/wsl'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -242,7 +262,9 @@ export interface FileRouteTypes {
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/share'
     | '/api/v1/chat/completions'
+    | '/api/v1/host/wsl'
   id:
     | '__root__'
     | '/'
@@ -264,7 +286,9 @@ export interface FileRouteTypes {
     | '/api/v1/functions'
     | '/api/v1/mcp'
     | '/api/v1/models'
+    | '/api/v1/share'
     | '/api/v1/chat/completions'
+    | '/api/v1/host/wsl'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -286,7 +310,9 @@ export interface RootRouteChildren {
   ApiV1FunctionsRoute: typeof ApiV1FunctionsRoute
   ApiV1McpRoute: typeof ApiV1McpRoute
   ApiV1ModelsRoute: typeof ApiV1ModelsRoute
+  ApiV1ShareRoute: typeof ApiV1ShareRoute
   ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
+  ApiV1HostWslRoute: typeof ApiV1HostWslRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -424,11 +450,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/share': {
+      id: '/api/v1/share'
+      path: '/api/v1/share'
+      fullPath: '/api/v1/share'
+      preLoaderRoute: typeof ApiV1ShareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/chat/completions': {
       id: '/api/v1/chat/completions'
       path: '/api/v1/chat/completions'
       fullPath: '/api/v1/chat/completions'
       preLoaderRoute: typeof ApiV1ChatCompletionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/host/wsl': {
+      id: '/api/v1/host/wsl'
+      path: '/api/v1/host/wsl'
+      fullPath: '/api/v1/host/wsl'
+      preLoaderRoute: typeof ApiV1HostWslRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -463,7 +503,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1FunctionsRoute: ApiV1FunctionsRoute,
   ApiV1McpRoute: ApiV1McpRoute,
   ApiV1ModelsRoute: ApiV1ModelsRoute,
+  ApiV1ShareRoute: ApiV1ShareRoute,
   ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,
+  ApiV1HostWslRoute: ApiV1HostWslRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
