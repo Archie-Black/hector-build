@@ -2,7 +2,7 @@ import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Client } from "ssh2";
-import { isOnionHost, socksConnect, startOnionDaemon } from "./onion.ts";
+import { isolateTag, isOnionHost, socksConnect, startOnionDaemon } from "./onion.ts";
 import { fnv } from "./protocol.ts";
 import { credFor, postNote, registerLink } from "./room.ts";
 import { identityPrivate } from "./keys.ts";
@@ -107,7 +107,7 @@ export function execSsh(input: {
     }, onion ? 60000 : 15000);
     let sock;
     try {
-      sock = onion ? await socksConnect(host, port) : undefined;
+      sock = onion ? await socksConnect(host, port, { isolate: isolateTag(input.bot || "hector", host) }) : undefined;
     } catch (err) {
       clearTimeout(timer);
       resolve({ ok: false, output: err instanceof Error ? err.message : "onion socks failed" });

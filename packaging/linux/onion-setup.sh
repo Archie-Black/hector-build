@@ -28,17 +28,26 @@ fi
 
 cat > "$DIR/torrc" <<EOF
 DataDirectory $DIR/data
-SocksPort 127.0.0.1:$SOCKS_PORT IsolateDestAddr IsolateSOCKSAuth IsolateClientProtocol
+SocksPort 127.0.0.1:$SOCKS_PORT IsolateDestAddr IsolateDestPort IsolateSOCKSAuth IsolateClientProtocol IsolateClientAddr KeepAliveIsolateSOCKSAuth
 ControlPort 127.0.0.1:$CONTROL_PORT
 CookieAuthentication 1
 CookieAuthFile $DIR/data/control_auth_cookie
 AvoidDiskWrites 1
 SafeLogging 1
 LongLivedPorts 22
+MaxCircuitDirtiness 600
+NewCircuitPeriod 30
+CircuitBuildTimeout 10
+LearnCircuitBuildTimeout 1
+EnforceDistinctSubnets 1
+UseEntryGuards 1
+NumEntryGuards 2
+KeepalivePeriod 60
 HiddenServiceDir $DIR/hector-ssh
 HiddenServiceVersion 3
 HiddenServicePort 22 127.0.0.1:2222
 HiddenServiceMaxStreams 32
+HiddenServiceMaxStreamsCloseCircuit 1
 HiddenServiceDir $DIR/hector-share
 HiddenServiceVersion 3
 HiddenServicePort 80 127.0.0.1:$SHARE_PORT

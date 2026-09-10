@@ -11,8 +11,8 @@ import { gate } from "@/lib/horsemen/gateway.ts";
 import { ackNote, ingestInbox, joinPeer, leasePath, listLinks, materializeShare, postNote, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { isOnionHost, safeSshHost } from "@/lib/share/wire";
-import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
-import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey } from "@/lib/share/keys";
+import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";
+import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -267,6 +267,21 @@ export async function executeTool(
       if (action === "revoke") {
         const hit = revokeKey(String(args.fingerprint ?? ""));
         return hit ? ok(files, name, { revoked: true }, "revoked") : refuse(files, name, "unknown key");
+      }
+      if (action === "rotate") {
+        const r = rotateIdentity(String(args.user ?? "hector"));
+        void newNym();
+        return ok(files, name, r, r.current.fingerprint);
+      }
+      if (action === "settle") return ok(files, name, { settled: settleRotations() }, "settled");
+      if (action === "rotate-host") {
+        const r = rotateHostKey();
+        void newNym();
+        return ok(files, name, r, r.current);
+      }
+      if (action === "newnym") {
+        const r = await newNym();
+        return r.ok ? ok(files, name, r, r.note) : refuse(files, name, r.note);
       }
       return ok(files, name, { ...keyStatus(), identities: listIdentities() }, "ssh keys");
     }

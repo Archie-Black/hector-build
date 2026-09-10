@@ -19,8 +19,13 @@ export type Identity = {
   fingerprint: string;
   public: string;
   created: number;
+  role: "current" | "previous" | "revoked";
+  expires?: number;
   revoked?: number;
 };
+
+export const ROTATE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+export const ROTATE_OVERLAP_MS = 24 * 60 * 60 * 1000;
 
 function boot() {
   mkdirSync(DIR, { recursive: true });
@@ -66,12 +71,33 @@ export function ensureHostKey() {
     writeMode(HOST_PUB, pair.public, 0o644);
   }
   const pub = readFileSync(HOST_PUB, "utf8").trim();
-  return { private: readFileSync(HOST_PRIV), public: pub, fingerprint: fingerprintOf(pub) };
+  const prev = existsSync(`${HOST_PRIV}.prev`) ? readFileSync(`${HOST_PRIV}.prev`) : null;
+  return {
+    private: readFileSync(HOST_PRIV),
+    previous: prev,
+    public: pub,
+    fingerprint: fingerprintOf(pub),
+  };
 }
 
-function identityPath(user: string) {
+function identityPath(user: string, which: "current" | "previous" = "current") {
   const safe = user.replace(/[^a-z0-9._-]+/gi, "-").slice(0, 40) || "hector";
-  return join(DIR, `id_${safe}_ed25519`);
+  return join(DIR, which === "previous" ? `id_${safe}_ed25519.prev` : `id_${safe}_ed25519`);
+}
+
+function mintRow(user: string, comment: string): Identity {
+  const pair = utils.generateKeyPairSync("ed25519", { comment });
+  const privPath = identityPath(user);
+  writeMode(privPath, pair.private);
+  writeMode(`${privPath}.pub`, pair.public, 0o644);
+  return {
+    user,
+    comment,
+    fingerprint: fingerprintOf(pair.public),
+    public: pair.public.trim(),
+    created: Date.now(),
+    role: "current",
+  };
 }
 
 function writeAuthorized(list: Identity[]) {
@@ -81,27 +107,79 @@ function writeAuthorized(list: Identity[]) {
 
 export function generateIdentity(user: string, comment = `${user}@hector`) {
   boot();
-  const pair = utils.generateKeyPairSync("ed25519", { comment });
-  const privPath = identityPath(user);
-  writeMode(privPath, pair.private);
-  writeMode(`${privPath}.pub`, pair.public, 0o644);
-  const row: Identity = {
-    user,
-    comment,
-    fingerprint: fingerprintOf(pair.public),
-    public: pair.public.trim(),
-    created: Date.now(),
-  };
-  const list = loadIndex().map((i) => (i.user === user && !i.revoked ? { ...i, revoked: Date.now() } : i));
+  const row = mintRow(user, comment);
+  const list = loadIndex().map((i) =>
+    i.user === user && i.role !== "revoked" && !i.revoked ? { ...i, role: "revoked" as const, revoked: Date.now() } : i,
+  );
   list.push(row);
   saveIndex(list);
   writeAuthorized(list);
   return row;
 }
 
+/** Keep the old key live for ROTATE_OVERLAP_MS, then settleRotations revokes it. */
+export function rotateIdentity(user: string, now = Date.now()) {
+  boot();
+  settleRotations(now);
+  const list = loadIndex();
+  const current = list.find((i) => i.user === user && i.role === "current" && !i.revoked);
+  const priv = identityPath(user);
+  if (current && existsSync(priv)) {
+    writeMode(identityPath(user, "previous"), readFileSync(priv, "utf8"));
+    current.role = "previous";
+    current.expires = now + ROTATE_OVERLAP_MS;
+  }
+  const next = mintRow(user, `${user}@hector-rot-${now}`);
+  list.push(next);
+  saveIndex(list);
+  writeAuthorized(list);
+  return { current: next, previous: current ?? null, overlapMs: ROTATE_OVERLAP_MS };
+}
+
+export function settleRotations(now = Date.now()) {
+  const list = loadIndex();
+  let hit = 0;
+  for (const row of list) {
+    if (row.role === "previous" && (row.expires ?? 0) <= now && !row.revoked) {
+      row.role = "revoked";
+      row.revoked = now;
+      hit += 1;
+    }
+  }
+  if (hit) {
+    saveIndex(list);
+    writeAuthorized(list);
+  }
+  return hit;
+}
+
+export function maybeRotate(user = "hector", now = Date.now()) {
+  settleRotations(now);
+  const current = loadIndex().find((i) => i.user === user && i.role === "current" && !i.revoked);
+  if (!current) return generateIdentity(user);
+  if (now - current.created >= ROTATE_AFTER_MS) return rotateIdentity(user, now).current;
+  return current;
+}
+
+export function rotateHostKey(now = Date.now()) {
+  boot();
+  const host = ensureHostKey();
+  const prevPriv = `${HOST_PRIV}.prev`;
+  const prevPub = `${HOST_PUB}.prev`;
+  writeMode(prevPriv, readFileSync(HOST_PRIV, "utf8"));
+  if (existsSync(HOST_PUB)) writeMode(prevPub, readFileSync(HOST_PUB, "utf8"), 0o644);
+  const pair = utils.generateKeyPairSync("ed25519", { comment: `hector-host-${now}` });
+  writeMode(HOST_PRIV, pair.private);
+  writeMode(HOST_PUB, pair.public, 0o644);
+  writeMode(join(DIR, "host-rotation.json"), JSON.stringify({ at: now, previous: host.fingerprint, current: fingerprintOf(pair.public), expires: now + ROTATE_OVERLAP_MS }));
+  return { current: fingerprintOf(pair.public), previous: host.fingerprint, overlapMs: ROTATE_OVERLAP_MS };
+}
+
 export function identityPrivate(user: string) {
   const p = identityPath(user);
-  return existsSync(p) ? readFileSync(p, "utf8") : "";
+  if (existsSync(p)) return readFileSync(p, "utf8");
+  const prev = identityPath(user, "previous");
+  return existsSync(prev) ? readFileSync(prev, "utf8") : "";
 }
 
 export function listIdentities() {
@@ -111,6 +189,8 @@ export function listIdentities() {
     fingerprint: i.fingerprint,
     public: i.public,
     created: i.created,
+    role: i.role ?? (i.revoked ? "revoked" : "current"),
+    expires: i.expires ?? null,
     revoked: i.revoked ?? null,
   }));
 }
@@ -124,6 +204,7 @@ export function authorizeKey(openssh: string, user: string) {
     fingerprint: fingerprintOf(parsed),
     public: openssh.trim(),
     created: Date.now(),
+    role: "current",
   };
   const list = loadIndex();
   if (!list.some((i) => i.fingerprint === row.fingerprint && !i.revoked)) list.push(row);
@@ -138,6 +219,7 @@ export function revokeKey(fingerprint: string) {
   for (const row of list) {
     if (row.fingerprint === fingerprint && !row.revoked) {
       row.revoked = Date.now();
+      row.role = "revoked";
       hit = true;
     }
   }
@@ -167,17 +249,22 @@ export function rememberHost(host: string, pub: string) {
 }
 
 export function keyStatus() {
+  settleRotations();
   const host = ensureHostKey();
   const ids = listIdentities();
+  const current = ids.filter((i) => i.role === "current");
   return {
     hostFingerprint: host.fingerprint,
-    identities: ids.filter((i) => !i.revoked),
-    authorized: ids.filter((i) => !i.revoked).length,
+    identities: current,
+    previous: ids.filter((i) => i.role === "previous"),
+    authorized: ids.filter((i) => i.role !== "revoked").length,
+    rotateAfterMs: ROTATE_AFTER_MS,
+    overlapMs: ROTATE_OVERLAP_MS,
   };
 }
 
 export function ensureDefaultIdentity() {
   ensureHostKey();
-  const live = loadIndex().find((i) => i.user === "hector" && !i.revoked);
+  const live = loadIndex().find((i) => i.user === "hector" && i.role === "current" && !i.revoked);
   return live ?? generateIdentity("hector", "hector@onion");
 }

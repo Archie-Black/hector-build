@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { jsonApi } from "@/lib/hector-api/complete";
 import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registerLink, shareStatus, syncFile } from "@/lib/share/room";
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
-import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
+import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";
+import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
 import { isOnionHost } from "@/lib/share/wire";
-import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey } from "@/lib/share/keys";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -34,6 +34,18 @@ export const Route = createFileRoute("/api/v1/share")({
             return fp ? jsonApi({ fingerprint: fp }) : jsonApi({ error: { message: "bad public key" } }, 400);
           }
           if (action === "revoke") return jsonApi({ revoked: revokeKey(String(body?.fingerprint ?? "")) });
+          if (action === "rotate") {
+            const r = rotateIdentity(String(body?.user ?? "hector"));
+            void newNym();
+            return jsonApi(r);
+          }
+          if (action === "settle") return jsonApi({ settled: settleRotations() });
+          if (action === "rotate-host") {
+            const r = rotateHostKey();
+            void newNym();
+            return jsonApi(r);
+          }
+          if (action === "newnym") return jsonApi(await newNym());
           return jsonApi({ ...keyStatus(), identities: listIdentities() });
         }
         if (op === "link") {

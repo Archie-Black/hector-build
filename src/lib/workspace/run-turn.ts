@@ -318,7 +318,7 @@ const TOOLS = [
     type: "function",
     function: {
       name: "share_keys",
-      description: "SSH key management in the backend. action: list | generate | authorize | revoke. Ed25519. Private keys never leave the backend.",
+      description: "SSH key management. action: list | generate | authorize | revoke | rotate | settle | rotate-host | newnym. Overlap rotation. Private keys stay in the backend.",
       parameters: {
         type: "object",
         properties: {
