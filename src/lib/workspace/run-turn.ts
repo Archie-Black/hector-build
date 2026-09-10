@@ -17,6 +17,7 @@ import { runLocalTurn } from "@/lib/hector-api/local-turn";
 import { executeExtension, EXTENSION_TOOLS, isExtensionTool } from "@/lib/hector-api/extensions";
 import { silentCouple } from "@/lib/chips/silent.ts";
 import { learn, render } from "@/lib/lingo/lingua";
+import { logExec, markAgent, noteCorrection, watchHuman, xpContext } from "@/lib/xp/experience";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -514,6 +515,9 @@ export const runForgeTurn = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AgentResponse> => {
     void import("@/lib/spool/spooler").then((m) => m.spoolFor(data.prompt)).catch(() => undefined);
     learn(data.prompt);
+    watchHuman(data.files);
+    const prevUser = [...(data.history ?? [])].reverse().find((m) => m.role === "user");
+    if (prevUser) noteCorrection(prevUser.content, data.prompt);
     const visitor = isApiKey(data.visitorKey ?? "") ? data.visitorKey!.trim() : "";
     const engine = await resolveEngine({
       providerId: data.providerId,
@@ -548,7 +552,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
 
     const recalled = await recallMemory({ data: data.prompt });
     silentCouple(data.prompt, data.files);
-    const lessons = [...(data.lessons ?? []), ...formatRecall(recalled), ...lessonsFor("hx", data.prompt).slice(0, 6), ...lessonsFor("hector", data.prompt).slice(0, 4)];
+    const lessons = [...(data.lessons ?? []), ...formatRecall(recalled), ...lessonsFor("hx", data.prompt).slice(0, 6), ...lessonsFor("hector", data.prompt).slice(0, 4), ...xpContext(data.prompt).split("\n").filter(Boolean).slice(0, 10)];
     const mode = data.mode;
     const compact = engine.kind === "ollama" || engine.kind === "lmstudio";
     const system = compact
@@ -751,6 +755,9 @@ export const runForgeTurn = createServerFn({ method: "POST" })
       reply = "Used every step available. Send continue to pick up the rest.";
     }
     reply = render(reply, { who: "hector", job: data.prompt, lastHuman: data.prompt, mood: "build" });
+    const p = prove(files);
+    logExec(data.prompt, p, files);
+    markAgent(files);
 
     return {
       ok: true,

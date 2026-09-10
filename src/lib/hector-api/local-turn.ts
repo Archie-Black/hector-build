@@ -7,6 +7,7 @@ import { prove } from "@/lib/workspace/prove";
 import { silentCouple } from "@/lib/chips/silent.ts";
 import { recordTurn } from "@/lib/os/mm";
 import { learn } from "@/lib/lingo/lingua";
+import { logExec, markAgent, noteCorrection, watchHuman } from "@/lib/xp/experience";
 import { healLoop, iacOf, rememberRepo, wantsVisual } from "@/lib/partner/partner";
 import { speakDone, speakPlan, speakScout } from "@/lib/partner/speak";
 
@@ -20,6 +21,9 @@ export async function runLocalTurn(input: {
 }): Promise<AgentResponse> {
   void import("@/lib/spool/spooler").then((m) => m.spoolFor(input.prompt)).catch(() => undefined);
   learn(input.prompt);
+  watchHuman(input.files);
+  const prev = [...(input.history ?? [])].reverse().find((m) => m.role === "user");
+  if (prev) noteCorrection(prev.content, input.prompt);
   const before = { ...input.files };
   let files = { ...input.files };
   const traces: AgentResponse["traces"] = [];
@@ -90,6 +94,8 @@ export async function runLocalTurn(input: {
   }
   traces.push({ name: "prove", ok: p.done, detail: p.note });
   recordTurn({ agent: "hx", prompt, ok: p.done, note: p.note });
+  logExec(prompt, p, files);
+  markAgent(files);
   const diffs = diffsFrom(before, files);
   const written = Object.keys(generated);
   return {
