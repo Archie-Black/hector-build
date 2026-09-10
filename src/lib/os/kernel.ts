@@ -10,6 +10,7 @@ import { drainJobs, listJobs } from "../devices/print.ts";
 import { advertise } from "../devices/sdp.ts";
 import { bootMm, dropWorking, mmStatus, persistMm } from "./mm.ts";
 import { netStatus } from "../net/stack.ts";
+import { bootZt, ztStatus } from "../zt/zero.ts";
 
 export type ServiceRole = "kernel" | "user";
 export type OsPhase = "down" | "live" | "wiping";
@@ -24,6 +25,7 @@ export const SERVICES: Service[] = [
   { id: "sdp", name: "SDP", role: "kernel", duty: "pairing" },
   { id: "mmu", name: "MMU", role: "kernel", duty: "memory" },
   { id: "netd", name: "Netd", role: "kernel", duty: "network" },
+  { id: "zt", name: "Zero Trust", role: "kernel", duty: "verify" },
   { id: "hx", name: "Spectral HX", role: "user", duty: "coding" },
 ];
 
@@ -59,6 +61,7 @@ export function boot(now = Date.now()): Session {
   mkdirSync(RAM, { recursive: true });
   drainJobs();
   bootMm();
+  bootZt();
   const s: Session = { id: `hx-${now.toString(36)}`, at: now, phase: "live", persist: false };
   writeSession(s);
   writeFileSync(join(RAM, "motd"), `Hector Transient OS ${s.id}\nSpectral HX is userland.\n`);
@@ -110,6 +113,7 @@ export function osStatus() {
     sdp: advertise().id,
     mm: mmStatus(),
     net: netStatus(),
+    zt: ztStatus(),
     ram: RAM,
     note: "Host is firmware. Hector is the OS. Spectral HX is userland. Vault is secrets. Memory image survives wipe.",
   };

@@ -6,6 +6,7 @@ import { synthesizeFiles } from "./synthesize";
 import { prove, proofLine } from "@/lib/workspace/prove";
 import { silentCouple } from "@/lib/chips/silent.ts";
 import { recordTurn } from "@/lib/os/mm";
+import { healLoop, iacOf, prSpec, rememberRepo, reviewDiffs, wantsVisual } from "@/lib/partner/partner";
 
 type Msg = { role?: string; content?: unknown; tool_calls?: unknown; name?: string };
 
@@ -32,6 +33,8 @@ export async function runLocalTurn(input: {
     const hit = await executeTool("read_file", { path: peak }, files, mode);
     traces.push(hit.trace);
   }
+  const arch = rememberRepo(files, prompt);
+  if (arch.hits[0]) traces.push({ name: "arch", ok: true, detail: arch.hits.map((h) => h.path).slice(0, 4).join(", ") });
 
   if (mode === "scout") {
     const lint = diagnostics(files).slice(0, 12);
@@ -67,7 +70,10 @@ export async function runLocalTurn(input: {
     };
   }
 
-  const generated = synthesizeFiles(prompt, files);
+  const generated = { ...synthesizeFiles(prompt, files), ...iacOf(prompt) };
+  if (wantsVisual(prompt) && !generated["index.html"] && !Object.keys(generated).some((p) => p.endsWith(".html"))) {
+    Object.assign(generated, synthesizeFiles(`Pixel-accurate UI from this brief. ${prompt}`, files));
+  }
   for (const [path, content] of Object.entries(generated)) {
     const result = await executeTool("write_file", { path, content }, files, mode);
     files = result.files;
@@ -81,23 +87,34 @@ export async function runLocalTurn(input: {
   const lints = await executeTool("get_diagnostics", {}, files, mode);
   traces.push(lints.trace);
 
-  const written = Object.keys(generated);
-  const p = prove(files);
+  let p = prove(files);
+  if (!p.done) {
+    const healed = await healLoop(prompt, files, 3);
+    files = healed.files;
+    traces.push(...healed.traces);
+    p = healed.proof;
+  }
   traces.push({ name: "prove", ok: p.done, detail: p.note });
   recordTurn({ agent: "hx", prompt, ok: p.done, note: p.note });
+  const diffs = diffsFrom(before, files);
+  const review = reviewDiffs(diffs, files);
+  const pr = prSpec(prompt, diffs);
+  const written = Object.keys(generated);
   return {
     ok: true,
     reply: [
       `Hector API applied ${written.length} file(s) on the local engine.`,
       written.map((path) => `• ${path}`).join("\n"),
       proofLine(p),
+      p.done ? `PR ready: ${pr.branch}` : "",
+      review[0] || "",
     ]
       .filter(Boolean)
       .join("\n"),
     files,
     traces,
     tests: p.tests.map((t) => ({ name: t.name, pass: t.pass, detail: "" })),
-    diffs: diffsFrom(before, files),
+    diffs,
   };
 }
 

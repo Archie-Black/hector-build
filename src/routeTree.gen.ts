@@ -34,6 +34,7 @@ import { Route as ApiV1NetRouteImport } from './routes/api/v1/net'
 import { Route as ApiV1OsRouteImport } from './routes/api/v1/os'
 import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
 import { Route as ApiV1SpoolRouteImport } from './routes/api/v1/spool'
+import { Route as ApiV1ZtRouteImport } from './routes/api/v1/zt'
 import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
 import { Route as ApiV1HostAskRouteImport } from './routes/api/v1/host/ask'
 import { Route as ApiV1HostPublishRouteImport } from './routes/api/v1/host/publish'
@@ -164,6 +165,11 @@ const ApiV1SpoolRoute = ApiV1SpoolRouteImport.update({
   path: '/api/v1/spool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1ZtRoute = ApiV1ZtRouteImport.update({
+  id: '/api/v1/zt',
+  path: '/api/v1/zt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1ChatCompletionsRoute = ApiV1ChatCompletionsRouteImport.update({
   id: '/api/v1/chat/completions',
   path: '/api/v1/chat/completions',
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
+  '/api/v1/zt': typeof ApiV1ZtRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/ask': typeof ApiV1HostAskRoute
   '/api/v1/host/publish': typeof ApiV1HostPublishRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
+  '/api/v1/zt': typeof ApiV1ZtRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/ask': typeof ApiV1HostAskRoute
   '/api/v1/host/publish': typeof ApiV1HostPublishRoute
@@ -274,6 +282,7 @@ export interface FileRoutesById {
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
+  '/api/v1/zt': typeof ApiV1ZtRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/ask': typeof ApiV1HostAskRoute
   '/api/v1/host/publish': typeof ApiV1HostPublishRoute
@@ -307,6 +316,7 @@ export interface FileRouteTypes {
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
+    | '/api/v1/zt'
     | '/api/v1/chat/completions'
     | '/api/v1/host/ask'
     | '/api/v1/host/publish'
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
+    | '/api/v1/zt'
     | '/api/v1/chat/completions'
     | '/api/v1/host/ask'
     | '/api/v1/host/publish'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
+    | '/api/v1/zt'
     | '/api/v1/chat/completions'
     | '/api/v1/host/ask'
     | '/api/v1/host/publish'
@@ -400,6 +412,7 @@ export interface RootRouteChildren {
   ApiV1OsRoute: typeof ApiV1OsRoute
   ApiV1ShareRoute: typeof ApiV1ShareRoute
   ApiV1SpoolRoute: typeof ApiV1SpoolRoute
+  ApiV1ZtRoute: typeof ApiV1ZtRoute
   ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
   ApiV1HostAskRoute: typeof ApiV1HostAskRoute
   ApiV1HostPublishRoute: typeof ApiV1HostPublishRoute
@@ -583,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1SpoolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/zt': {
+      id: '/api/v1/zt'
+      path: '/api/v1/zt'
+      fullPath: '/api/v1/zt'
+      preLoaderRoute: typeof ApiV1ZtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/chat/completions': {
       id: '/api/v1/chat/completions'
       path: '/api/v1/chat/completions'
@@ -649,6 +669,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1OsRoute: ApiV1OsRoute,
   ApiV1ShareRoute: ApiV1ShareRoute,
   ApiV1SpoolRoute: ApiV1SpoolRoute,
+  ApiV1ZtRoute: ApiV1ZtRoute,
   ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,
   ApiV1HostAskRoute: ApiV1HostAskRoute,
   ApiV1HostPublishRoute: ApiV1HostPublishRoute,

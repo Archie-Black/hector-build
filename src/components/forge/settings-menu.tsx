@@ -140,7 +140,7 @@ export function SettingsPanel() {
             <p className="mt-2 text-sm text-pretty">
               This app is the cloud. API <span className="font-mono">/api/v1</span>, MCP{" "}
               <span className="font-mono">/api/v1/mcp</span>, functions <span className="font-mono">/api/v1/functions</span>.
-              Hector is a transient OS. Spectral HX is userland. Print-spool jobs wait until the backend is up. Bluetooth-style pairing is how bots join. Ghosts never take keyboard focus. Say “publish this” and the build goes live at name.build.doomchat.ca, isolated from www. Netd keeps the network stack alive and reports to Hector.
+              Hector is a transient OS. Spectral HX is userland. Print-spool jobs wait until the backend is up. Bluetooth-style pairing is how bots join. Ghosts never take keyboard focus. Say “publish this” and the build goes live at name.build.doomchat.ca, isolated from www. Netd keeps the network stack alive and reports to Hector. Zero Trust is on. LAN is not trust. Spectral HX maps the repo, heals until prove passes, and opens a clean PR.
             </p>
             <div className="mt-4 grid gap-2">
               {(

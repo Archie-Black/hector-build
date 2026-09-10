@@ -4,6 +4,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { issueGrant } from "../zt/zero.ts";
 
 export type Service = { uuid: string; name: string; channel: string };
 export type Bond = { id: string; name: string; services: Service[]; pairedAt: number };
@@ -42,6 +43,8 @@ export function pair(id: string, name: string, services: Service[] = HECTOR_SERV
   const bond: Bond = { id, name, services, pairedAt: Date.now() };
   list.push(bond);
   save(list);
+  issueGrant({ principal: id, resource: "*", verb: "join", ttlMs: 24 * 3600 * 1000, by: "hector" });
+  issueGrant({ principal: id, resource: "*", verb: "dial", ttlMs: 24 * 3600 * 1000, by: "hector" });
   return bond;
 }
 

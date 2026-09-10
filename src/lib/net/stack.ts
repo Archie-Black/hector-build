@@ -113,11 +113,14 @@ export function probe(host: string, port: number, ms = 400): Promise<boolean> {
 const STACK_BIN = new Set(["ip", "ss", "ping", "hostname", "getent"]);
 
 /** Raw stack. First argv is the binary. No pipes. */
-export function netctl(argv: string[]): Promise<string> {
+export async function netctl(argv: string[]): Promise<string> {
   const bin = argv[0];
-  if (!bin || !STACK_BIN.has(bin)) return Promise.resolve("STUB: not a stack tool");
-  if (argv.some((a) => /[;&|`$<>]/.test(a))) return Promise.resolve("STUB: refused");
-  if (quietNet()) return Promise.resolve("STUB: net quiet");
+  if (!bin || !STACK_BIN.has(bin)) return "STUB: not a stack tool";
+  if (argv.some((a) => /[;&|`$<>]/.test(a))) return "STUB: refused";
+  const { decide } = await import("../zt/zero.ts");
+  const zt = decide({ who: { id: "netd", kind: "kernel" }, verb: "exec", resource: "stack" });
+  if (!zt.allow) return `STUB: zero trust ${zt.reason}`;
+  if (quietNet()) return "STUB: net quiet";
   return new Promise((resolve) => {
     execFile(bin, argv.slice(1), { timeout: 2500 }, (err, stdout, stderr) => {
       if (err && !stdout && !stderr) {

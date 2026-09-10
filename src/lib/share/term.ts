@@ -7,6 +7,7 @@ import { fnv } from "./protocol.ts";
 import { credFor, postNote, registerLink } from "./room.ts";
 import { identityPrivate } from "./keys.ts";
 import { puttyCommand, safeCollabCmd, safeSshHost, type CollabLink } from "./wire.ts";
+import { decide } from "../zt/zero.ts";
 
 type Live = {
   id: string;
@@ -64,7 +65,7 @@ export function readTerm(id: string) {
   return { ok: true as const, out: s.log, id, kind: s.kind, bot: s.bot };
 }
 
-export function execSsh(input: {
+export async function execSsh(input: {
   host: string;
   port?: number;
   username: string;
@@ -76,6 +77,9 @@ export function execSsh(input: {
 }) {
   const host = safeSshHost(input.host, input.collab ? "bot" : "human");
   if (!host) return Promise.resolve({ ok: false, output: "Host not allowed." });
+  const who = input.collab ? { id: input.bot || "bot", kind: "bot" as const } : { id: "human", kind: "human" as const };
+  const zt = decide({ who, verb: "dial", resource: "ssh", loc: host });
+  if (!zt.allow) return Promise.resolve({ ok: false, output: `Zero Trust: ${zt.reason}` });
   const command = input.collab ? safeCollabCmd(input.command) : input.command.trim().slice(0, 2000);
   if (!command) return Promise.resolve({ ok: false, output: "Command blocked." });
   const username = input.username.trim();
