@@ -64,9 +64,19 @@ export function explainTrace(name: string, detail: string, ok: boolean): string 
     case "share_keys":
       return `HX managed SSH keys (${detail}).` + fail;
     case "web_search":
-      return `Spectral HX searched the web (${detail}).` + fail;
+      return `Hector sent Punisher for the public web (${detail}).` + fail;
     case "web_fetch":
-      return `Spectral HX fetched a page (${detail}).` + fail;
+      return `Hector fetched a page (${detail}).` + fail;
+    case "vision_scan":
+      return `Hector looked at the bench (${detail}).` + fail;
+    case "ptz_goto":
+      return "Hector moved the camera." + fail;
+    case "vision_camera":
+      return `Hector set the camera (${detail}).` + fail;
+    case "inspect_ui":
+      return "Hector inspected the UI." + fail;
+    case "mockup_code":
+      return "Hector filed UI from the mockup." + fail;
     case "todo_write":
       return "Spectral HX updated the task board." + fail;
     case "enter_plan_mode":

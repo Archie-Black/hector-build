@@ -1,4 +1,4 @@
-export const LANES = ["core", "git", "term", "model", "browser", "preview", "build", "ssh", "onion"] as const;
+export const LANES = ["core", "git", "term", "model", "browser", "preview", "build", "ssh", "onion", "vision"] as const;
 export type Lane = (typeof LANES)[number];
 
 const ALWAYS: Lane[] = ["core", "git", "term", "model"];
@@ -8,8 +8,9 @@ const HINTS: { lane: Lane; re: RegExp }[] = [
   { lane: "preview", re: /\b(preview|localhost|live view|hot reload|vite)\b/i },
   { lane: "build", re: /\b(npm |pnpm |yarn |pip |pytest|jest|vitest|cargo |compile|typecheck|webpack|build the)\b/i },
   { lane: "ssh", re: /\b(ssh|putty|scp|remote host|wsl)\b/i },
-  { lane: "onion", re: /\b(onion|\.onion|tor circuit|hidden service)\b/i },
+  { lane: "onion", re: /\b(onion|\.onion|tor circuit|hidden service|dark horse)\b/i },
   { lane: "git", re: /\b(git |commit|pull request|clone|branch|merge|repo)\b/i },
+  { lane: "vision", re: /\b(camera|ptz|workbench|arduino|pcb|screenshot|mockup|figma|inspect ui|thermal|punisher)\b/i },
 ];
 
 export function lookAhead(prompt: string): Lane[] {

@@ -13,6 +13,8 @@ import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from 
 import { isOnionHost, safeSshHost } from "@/lib/share/wire";
 import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";
 import { autoRevoke, authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
+import { rideFetch, rideSearch } from "@/lib/web/ride";
+import { embodiedTick, ptzTo, setCamera, visualFiles, inspectUi, type CamCfg } from "@/lib/vision";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -285,6 +287,41 @@ export async function executeTool(
       }
       if (action === "auto") return ok(files, name, autoRevoke(), "auto-revoke");
       return ok(files, name, { ...keyStatus(), identities: listIdentities() }, "ssh keys");
+    }
+    case "web_search": {
+      const payload = await rideSearch(String(args.query ?? ""), Boolean(args.isolate ?? args.onion));
+      return ok(files, name, payload, `${payload.rider}: ${(payload.hits ?? []).length} hit(s)`);
+    }
+    case "web_fetch": {
+      const payload = await rideFetch(String(args.url ?? ""), Boolean(args.isolate ?? args.onion));
+      return "error" in payload ? refuse(files, name, String((payload as { error?: string }).error ?? "blocked")) : ok(files, name, payload, `${payload.rider} ${"status" in payload ? payload.status : ""}`);
+    }
+    case "vision_scan": {
+      const payload = await embodiedTick(files, {
+        loose: Boolean(args.loose),
+        led: args.led === "red" ? "red" : "green",
+      });
+      return ok(files, name, payload, payload.look.text.slice(0, 120));
+    }
+    case "ptz_goto": {
+      const payload = await ptzTo(Number(args.x ?? 0.5), Number(args.y ?? 0.5), Number(args.zoom ?? 0.4));
+      return ok(files, name, payload, payload.note);
+    }
+    case "vision_camera": {
+      const over: Partial<CamCfg> = {};
+      if (args.host != null) over.host = String(args.host);
+      if (args.user != null) over.user = String(args.user);
+      if (args.pass != null) over.pass = String(args.pass);
+      if (args.focus === "room" || args.focus === "bench") over.focus = args.focus;
+      if (args.thermal != null) over.thermal = Boolean(args.thermal);
+      const payload = setCamera(over);
+      return ok(files, name, { host: payload.host, focus: payload.focus, thermal: payload.thermal, pose: payload.pose }, payload.host || "virtual bench");
+    }
+    case "inspect_ui":
+      return ok(files, name, inspectUi(files), "ui inspected");
+    case "mockup_code": {
+      const made = visualFiles(String(args.brief ?? args.prompt ?? "View"), files);
+      return ok({ ...files, ...made }, name, Object.keys(made), "mockup filed");
     }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];

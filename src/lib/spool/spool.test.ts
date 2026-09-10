@@ -23,4 +23,8 @@ describe("look-ahead spool", () => {
   it("spools ssh when the user mentions a remote host", () => {
     assert.ok(lookAhead("ssh into the other bot and git status").includes("ssh"));
   });
+
+  it("spools vision for a workbench camera", () => {
+    assert.ok(lookAhead("check the arduino LED on the PTZ camera").includes("vision"));
+  });
 });

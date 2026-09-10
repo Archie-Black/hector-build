@@ -34,6 +34,7 @@ import { Route as ApiV1NetRouteImport } from './routes/api/v1/net'
 import { Route as ApiV1OsRouteImport } from './routes/api/v1/os'
 import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
 import { Route as ApiV1SpoolRouteImport } from './routes/api/v1/spool'
+import { Route as ApiV1VisionRouteImport } from './routes/api/v1/vision'
 import { Route as ApiV1ZtRouteImport } from './routes/api/v1/zt'
 import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
 import { Route as ApiV1HostAskRouteImport } from './routes/api/v1/host/ask'
@@ -165,6 +166,11 @@ const ApiV1SpoolRoute = ApiV1SpoolRouteImport.update({
   path: '/api/v1/spool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1VisionRoute = ApiV1VisionRouteImport.update({
+  id: '/api/v1/vision',
+  path: '/api/v1/vision',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1ZtRoute = ApiV1ZtRouteImport.update({
   id: '/api/v1/zt',
   path: '/api/v1/zt',
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
+  '/api/v1/vision': typeof ApiV1VisionRoute
   '/api/v1/zt': typeof ApiV1ZtRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/ask': typeof ApiV1HostAskRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
+  '/api/v1/vision': typeof ApiV1VisionRoute
   '/api/v1/zt': typeof ApiV1ZtRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/ask': typeof ApiV1HostAskRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/api/v1/os': typeof ApiV1OsRoute
   '/api/v1/share': typeof ApiV1ShareRoute
   '/api/v1/spool': typeof ApiV1SpoolRoute
+  '/api/v1/vision': typeof ApiV1VisionRoute
   '/api/v1/zt': typeof ApiV1ZtRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
   '/api/v1/host/ask': typeof ApiV1HostAskRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
+    | '/api/v1/vision'
     | '/api/v1/zt'
     | '/api/v1/chat/completions'
     | '/api/v1/host/ask'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
+    | '/api/v1/vision'
     | '/api/v1/zt'
     | '/api/v1/chat/completions'
     | '/api/v1/host/ask'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/api/v1/os'
     | '/api/v1/share'
     | '/api/v1/spool'
+    | '/api/v1/vision'
     | '/api/v1/zt'
     | '/api/v1/chat/completions'
     | '/api/v1/host/ask'
@@ -412,6 +424,7 @@ export interface RootRouteChildren {
   ApiV1OsRoute: typeof ApiV1OsRoute
   ApiV1ShareRoute: typeof ApiV1ShareRoute
   ApiV1SpoolRoute: typeof ApiV1SpoolRoute
+  ApiV1VisionRoute: typeof ApiV1VisionRoute
   ApiV1ZtRoute: typeof ApiV1ZtRoute
   ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
   ApiV1HostAskRoute: typeof ApiV1HostAskRoute
@@ -596,6 +609,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1SpoolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/vision': {
+      id: '/api/v1/vision'
+      path: '/api/v1/vision'
+      fullPath: '/api/v1/vision'
+      preLoaderRoute: typeof ApiV1VisionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/zt': {
       id: '/api/v1/zt'
       path: '/api/v1/zt'
@@ -669,6 +689,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1OsRoute: ApiV1OsRoute,
   ApiV1ShareRoute: ApiV1ShareRoute,
   ApiV1SpoolRoute: ApiV1SpoolRoute,
+  ApiV1VisionRoute: ApiV1VisionRoute,
   ApiV1ZtRoute: ApiV1ZtRoute,
   ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,
   ApiV1HostAskRoute: ApiV1HostAskRoute,

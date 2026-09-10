@@ -383,10 +383,10 @@ const TOOLS = [
     type: "function",
     function: {
       name: "web_search",
-      description: "Search the public web.",
+      description: "Search the web. Punisher rides the surface. Dark Horse takes .onion and isolated circuits.",
       parameters: {
         type: "object",
-        properties: { query: { type: "string" } },
+        properties: { query: { type: "string" }, isolate: { type: "boolean" } },
         required: ["query"],
       },
     },
@@ -395,11 +395,70 @@ const TOOLS = [
     type: "function",
     function: {
       name: "web_fetch",
-      description: "Fetch a public https page as text.",
+      description: "Fetch a page. https public via Punisher. .onion via Dark Horse.",
       parameters: {
         type: "object",
-        properties: { url: { type: "string" } },
+        properties: { url: { type: "string" }, isolate: { type: "boolean" } },
         required: ["url"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "vision_scan",
+      description: "Dual-lens workbench scan. Optical flow, stereo depth, VLM look, hardware-software loop.",
+      parameters: {
+        type: "object",
+        properties: { loose: { type: "boolean" }, led: { type: "string" } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "ptz_goto",
+      description: "Pan-tilt-zoom to a normalised point. ONVIF if a camera is configured.",
+      parameters: {
+        type: "object",
+        properties: { x: { type: "number" }, y: { type: "number" }, zoom: { type: "number" } },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "vision_camera",
+      description: "Set the dual-lens PTZ host (ONVIF). Empty host keeps the virtual bench.",
+      parameters: {
+        type: "object",
+        properties: {
+          host: { type: "string" },
+          user: { type: "string" },
+          pass: { type: "string" },
+          focus: { type: "string" },
+          thermal: { type: "boolean" },
+        },
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "inspect_ui",
+      description: "Inspect HTML/CSS in the workspace for visual bugs.",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "mockup_code",
+      description: "Turn a UI brief or mockup into index.html and ui.css.",
+      parameters: {
+        type: "object",
+        properties: { brief: { type: "string" } },
+        required: ["brief"],
       },
     },
   },
@@ -478,26 +537,6 @@ type Msg = Record<string, unknown>;
 export const probeOwnerKey = createServerFn({ method: "POST" }).handler(async () => {
   return { ownerReady: true, engine: "hector-api" as const };
 });
-
-async function webSearch(query: string) {
-  const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
-  const res = await fetch(url, { headers: { Accept: "application/json" } });
-  const data = (await res.json()) as { AbstractText?: string; AbstractURL?: string; Heading?: string };
-  return {
-    heading: data.Heading || query,
-    text: data.AbstractText || "No instant answer. Use web_fetch on a known URL.",
-    url: data.AbstractURL || "",
-  };
-}
-
-async function webFetch(raw: string) {
-  if (!/^https:\/\//i.test(raw)) return { error: "Only https URLs." };
-  const host = new URL(raw).hostname;
-  if (/^(localhost|127\.|10\.|192\.168\.|0\.0\.0\.0)/.test(host)) return { error: "Private hosts blocked." };
-  const res = await fetch(raw, { redirect: "follow" });
-  const text = await res.text();
-  return { status: res.status, text: text.replace(/<[^>]+>/g, " ").slice(0, 4000) };
-}
 
 async function complete(baseUrl: string, apiKey: string, model: string, body: object) {
   const root = safeChatBase(baseUrl) || "https://api.x.ai/v1";
@@ -670,28 +709,6 @@ export const runForgeTurn = createServerFn({ method: "POST" })
               tool_call_id: String(call.id ?? "call"),
               name,
               content: JSON.stringify(payload.payload),
-            });
-            continue;
-          }
-          if (name === "web_search") {
-            const payload = await webSearch(String(args.query ?? ""));
-            traces.push({ name, ok: true, detail: String(args.query ?? "") });
-            messages.push({
-              role: "tool",
-              tool_call_id: String(call.id ?? "call"),
-              name,
-              content: JSON.stringify(payload),
-            });
-            continue;
-          }
-          if (name === "web_fetch") {
-            const payload = await webFetch(String(args.url ?? ""));
-            traces.push({ name, ok: !("error" in payload), detail: String(args.url ?? "") });
-            messages.push({
-              role: "tool",
-              tool_call_id: String(call.id ?? "call"),
-              name,
-              content: JSON.stringify(payload),
             });
             continue;
           }

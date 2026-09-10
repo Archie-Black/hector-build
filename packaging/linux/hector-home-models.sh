@@ -14,6 +14,7 @@ fi
 
 ollama pull deepseek-coder-v2:16b-lite-instruct || ollama pull deepseek-coder-v2 || true
 ollama pull granite4.2:8b || true
+ollama pull qwen2.5-vl:7b || ollama pull qwen2.5-vl:3b || true
 
 echo "Ollama tags:"
 ollama list || true

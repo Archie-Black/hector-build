@@ -14,6 +14,8 @@ import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from 
 import { onionStatus, startOnionDaemon, newNym } from "@/lib/share/onion";
 import { autoRevoke, authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey, rotateHostKey, rotateIdentity, settleRotations } from "@/lib/share/keys";
 import { isOnionHost } from "@/lib/share/wire";
+import { rideFetch, rideSearch } from "@/lib/web/ride";
+import { embodiedTick } from "@/lib/vision";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
 
@@ -36,6 +38,9 @@ const TOOLS = [
   { name: "share_ssh", description: "Allowlisted SSH command to a linked host.", inputSchema: { type: "object", properties: { host: { type: "string" }, user: { type: "string" }, command: { type: "string" }, port: { type: "number" }, bot: { type: "string" } }, required: ["host", "command"] } },
   { name: "share_link", description: "Publish SSH/PuTTY/term/onion link. Credentials are stored in the backend.", inputSchema: { type: "object", properties: { kind: { type: "string" }, host: { type: "string" }, user: { type: "string" }, port: { type: "number" }, from: { type: "string" }, to: { type: "string" }, password: { type: "string" }, key: { type: "string" } }, required: ["host"] } },
   { name: "share_keys", description: "SSH keys. action list|generate|authorize|revoke|rotate|settle|rotate-host|newnym|auto.", inputSchema: { type: "object", properties: { action: { type: "string" }, user: { type: "string" }, public: { type: "string" }, fingerprint: { type: "string" }, comment: { type: "string" } } } },
+  { name: "web_search", description: "Punisher on the surface web. Dark Horse if isolate or .onion.", inputSchema: { type: "object", properties: { query: { type: "string" }, isolate: { type: "boolean" } }, required: ["query"] } },
+  { name: "web_fetch", description: "Fetch a page via Punisher or Dark Horse.", inputSchema: { type: "object", properties: { url: { type: "string" }, isolate: { type: "boolean" } }, required: ["url"] } },
+  { name: "vision_scan", description: "Dual-lens workbench scan.", inputSchema: { type: "object", properties: {} } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -90,6 +95,9 @@ export async function handleMcp(raw: Rpc) {
       const text = (out as { choices?: { message?: { content?: string } }[] }).choices?.[0]?.message?.content ?? "";
       return ok(id, toolText(text));
     }
+    if (name === "web_search") return ok(id, toolText(await rideSearch(String(args.query ?? ""), Boolean(args.isolate))));
+    if (name === "web_fetch") return ok(id, toolText(await rideFetch(String(args.url ?? ""), Boolean(args.isolate))));
+    if (name === "vision_scan") return ok(id, toolText(await embodiedTick()));
     if (name === "cloud_status") return ok(id, toolText(cloudStatus()));
     if (name === "cloud_fn_list") return ok(id, toolText(listFunctions().map(({ source: _source, ...rest }) => rest)));
     if (name === "cloud_fn_deploy") return ok(id, toolText(deployFunction({ name: String(args.name), source: args.source ? String(args.source) : undefined, entry: args.entry ? String(args.entry) : undefined })));

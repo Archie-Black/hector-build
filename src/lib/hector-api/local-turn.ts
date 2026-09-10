@@ -11,6 +11,7 @@ import { logExec, markAgent, noteCorrection, watchHuman } from "@/lib/xp/experie
 import { ingest, retrieveFor } from "@/lib/tune/tuner";
 import { healLoop, iacOf, rememberRepo, wantsVisual } from "@/lib/partner/partner";
 import { speakDone, speakPlan, speakScout } from "@/lib/partner/speak";
+import { wantsBody, visualFiles } from "@/lib/vision";
 
 type Msg = { role?: string; content?: unknown; tool_calls?: unknown; name?: string };
 
@@ -46,6 +47,16 @@ export async function runLocalTurn(input: {
   const rag = retrieveFor(prompt, files);
   if (rag[0]) traces.push({ name: "rag", ok: true, detail: rag.map((h) => h.path || h.kind).slice(0, 4).join(", ") });
 
+  if (/\b(search the web|look up|what is the latest|docs for)\b/i.test(prompt)) {
+    const web = await executeTool("web_search", { query: prompt.slice(0, 180) }, files, mode);
+    traces.push(web.trace);
+  }
+  if (wantsBody(prompt)) {
+    const vis = await executeTool("vision_scan", {}, files, mode);
+    traces.push(vis.trace);
+    files = vis.files;
+  }
+
   if (mode === "scout") {
     const lint = diagnostics(files).slice(0, 12);
     return {
@@ -73,7 +84,7 @@ export async function runLocalTurn(input: {
 
   const generated = { ...synthesizeFiles(prompt, files), ...iacOf(prompt) };
   if (wantsVisual(prompt) && !generated["index.html"] && !Object.keys(generated).some((p) => p.endsWith(".html"))) {
-    Object.assign(generated, synthesizeFiles(`Pixel-accurate UI from this brief. ${prompt}`, files));
+    Object.assign(generated, visualFiles(prompt, files));
   }
   for (const [path, content] of Object.entries(generated)) {
     const result = await executeTool("write_file", { path, content }, files, mode);

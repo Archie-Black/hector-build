@@ -1,6 +1,7 @@
 import { HECTOR_ID, HORSEMEN, lead, listRiders, rider, type HorsemanId } from "./roster.ts";
 import { gate } from "./gateway.ts";
 import { writeAudit } from "./audit.ts";
+import { pickRider, WEB_RIDERS } from "../web/ride.ts";
 
 export type AskResult = {
   from: HorsemanId;
@@ -30,7 +31,8 @@ export function superBotBrief() {
     super: "apocalypse",
     lead: h,
     riders: listRiders(),
-    line: `${h.name} leads Conquest, War, and Famine. One voice. Four horses.`,
+    line: `${h.name} leads Conquest, War, and Famine. Punisher rides the surface web. Dark Horse rides the onion. One voice.`,
+    web: WEB_RIDERS,
   };
 }
 
@@ -40,6 +42,10 @@ export function routeTask(prompt: string): HorsemanId {
   if (/(approv|roster|local|chat|deny card|ask_bot)/.test(p)) return "famine";
   if (/(memory|routine|persist|teammate|schedule)/.test(p)) return "conquest";
   return HECTOR_ID;
+}
+
+export function routeWeb(raw: string, isolate = false) {
+  return pickRider(raw, isolate);
 }
 
 export function hectorDelegate(prompt: string) {

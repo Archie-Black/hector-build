@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { decidePolicy, DEFAULT_POLICY, evalCel, type PolicyCtx } from "./cel.ts";
-import { askBot, hectorDelegate, superBotBrief } from "./unify.ts";
+import { askBot, hectorDelegate, routeWeb, superBotBrief } from "./unify.ts";
 import { HECTOR_ID, lead } from "./roster.ts";
 
 const ctx = (over: Partial<PolicyCtx> = {}): PolicyCtx => ({
@@ -48,5 +48,11 @@ describe("horsemen", () => {
     const r = hectorDelegate("write an immutable audit policy");
     assert.equal(r.lead, "death");
     assert.equal(r.from, "war");
+  });
+
+  it("Punisher rides the surface, Dark Horse the onion", () => {
+    assert.equal(routeWeb("https://doomchat.ca"), "punisher");
+    assert.equal(routeWeb("http://abc.onion/"), "darkhorse");
+    assert.ok(superBotBrief().web?.some((w) => w.id === "punisher"));
   });
 });
