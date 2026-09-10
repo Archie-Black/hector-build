@@ -11,6 +11,7 @@ import { CREDIT, DISCLAIMER, FREE_API_URL, FREE_LINE, ONE_MAN, SUPPORT_EMAIL } f
 import { installHint } from "@/lib/workspace/host-settings";
 import { osLabel } from "@/lib/workspace/platform";
 import { loadExt, saveExt, type ClientExt } from "@/lib/workspace/extensions-store";
+import { loadHome, saveHome } from "@/lib/ollama/home";
 import { loadSession } from "@/lib/auth/local-account";
 import { requestSupport } from "@/lib/support/session";
 import { sfx } from "@/lib/sfx/hector";
@@ -51,6 +52,7 @@ export function SettingsPanel() {
   const [pid, setPid] = useState<ChatProviderId>(providerId);
   const [saved, setSaved] = useState(false);
   const [ext, setExt] = useState<ClientExt>(() => loadExt());
+  const [home, setHome] = useState(() => loadHome().url);
 
   function pick(id: ChatProviderId) {
     const p = CHAT_PROVIDERS.find((x) => x.id === id)!;
@@ -67,6 +69,7 @@ export function SettingsPanel() {
       model: mdl,
       key: pid === "ollama" || pid === "lmstudio" ? "local" : isApiKey(key) ? key : current,
     });
+    saveHome({ url: home });
     setSaved(true);
   }
 
@@ -211,7 +214,15 @@ export function SettingsPanel() {
         ) : null}
         {tab === "Chatbot" ? (
           <>
-            <p className="text-xs tracking-[0.14em] text-subtle uppercase">Provider</p>
+            <p className="text-xs tracking-[0.14em] text-subtle uppercase">Home server</p>
+            <p className="mt-1 text-xs text-muted">Ollama on this PC, LAN, or https://ollama.doomchat.ca. Hector picks the strongest coder it finds.</p>
+            <input
+              value={home}
+              onChange={(e) => setHome(e.target.value)}
+              placeholder="http://192.168.1.10:11434"
+              className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
+            />
+            <p className="mt-3 text-xs tracking-[0.14em] text-subtle uppercase">Provider</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {CHAT_PROVIDERS.map((p) => (
                 <button

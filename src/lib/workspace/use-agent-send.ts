@@ -15,6 +15,7 @@ import { mentionedPaths, workspaceRules, attachFiles } from "@/lib/workspace/con
 import { diagnostics } from "@/lib/ide/symbols";
 import { gitNativeStatus } from "@/lib/ide/native-git";
 import { loadExt } from "@/lib/workspace/extensions-store";
+import { loadHome } from "@/lib/ollama/home";
 
 export function useAgentSend(voice: "hector" | "hx" = "hx") {
   const software = useForgeStore((s) => s.software);
@@ -169,6 +170,7 @@ export function useAgentSend(voice: "hector" | "hx" = "hx") {
           ? undefined
           : store.visitorKey || undefined,
         providerId: store.providerId,
+        homeUrl: loadHome().url || undefined,
         baseUrl: store.baseUrl,
         model: store.model,
         arcadeKey: ext.arcadeKey || undefined,

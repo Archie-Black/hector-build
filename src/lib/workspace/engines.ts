@@ -1,33 +1,22 @@
 import { isLoopbackChat, safeChatBase, type ChatProviderId } from "./providers.ts";
+import { ollamaOrigins } from "../ollama/home.ts";
+import { ollamaTags } from "../ollama/client.ts";
+import { pickPair } from "../ollama/rank.ts";
+import type { ForgeMode } from "./types.ts";
 
 export type Engine =
-  | { kind: "hector-local"; baseUrl: "/api/v1"; model: "hector-hx"; key: "" }
-  | { kind: "ollama" | "lmstudio" | "cloud"; baseUrl: string; model: string; key: string };
+  | { kind: "hector-local"; baseUrl: "/api/v1"; model: "hector-hx"; key: ""; origin?: string }
+  | { kind: "ollama" | "lmstudio" | "cloud"; baseUrl: string; model: string; key: string; origin?: string };
 
-const OLLAMA = "http://127.0.0.1:11434";
-const PREFER = [/llama3\.2/, /llama3/, /qwen/, /mistral/, /phi/, /gemma/];
-
-async function getJson(url: string, ms = 400) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), ms);
-  try {
-    const res = await fetch(url, { signal: ctrl.signal, headers: { Accept: "application/json" } });
-    if (!res.ok) return null;
-    return (await res.json()) as Record<string, unknown>;
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(t);
+export async function probeOllama(homeUrl?: string, mode?: ForgeMode): Promise<Engine | null> {
+  for (const origin of ollamaOrigins(homeUrl)) {
+    const names = await ollamaTags(origin);
+    const pair = pickPair(names);
+    if (!pair) continue;
+    const model = mode === "scout" || mode === "plan" ? pair.fast : pair.best;
+    return { kind: "ollama", baseUrl: `${origin}/v1`, model, key: "local", origin };
   }
-}
-
-export async function probeOllama() {
-  const data = await getJson(`${OLLAMA}/api/tags`);
-  const models = Array.isArray(data?.models) ? (data.models as { name?: string }[]) : [];
-  const names = models.map((m) => String(m.name ?? "")).filter(Boolean);
-  if (!names.length) return null;
-  const pick = PREFER.map((re) => names.find((n) => re.test(n))).find(Boolean) ?? names[0];
-  return { kind: "ollama" as const, baseUrl: `${OLLAMA}/v1`, model: pick, key: "local" };
+  return null;
 }
 
 export async function resolveEngine(input: {
@@ -35,6 +24,8 @@ export async function resolveEngine(input: {
   baseUrl?: string;
   model?: string;
   key?: string;
+  homeUrl?: string;
+  mode?: ForgeMode;
 }): Promise<Engine> {
   const id = input.providerId ?? "hector";
   const model = (input.model ?? "").trim();
@@ -50,12 +41,13 @@ export async function resolveEngine(input: {
   if (id === "lmstudio" || (base.includes(":1234") && isLoopbackChat(base))) {
     return { kind: "lmstudio", baseUrl: base || "http://127.0.0.1:1234/v1", model: model || "local-model", key: "local" };
   }
-  if (id === "ollama" || (isLoopbackChat(base) && base.includes("11434"))) {
-    const live = await probeOllama();
-    if (live) return { ...live, model: model || live.model };
-  }
 
-  const live = id === "hector" || !key ? await probeOllama() : null;
-  if (live) return live;
+  const live = await probeOllama(input.homeUrl, input.mode);
+  if (id === "ollama" || id === "hector" || !key) {
+    if (live) {
+      const pick = model && !/hector|spectral|hx-local/.test(model) ? model : live.model;
+      return { kind: "ollama", baseUrl: live.baseUrl, model: pick, key: "local", origin: live.origin };
+    }
+  }
   return { kind: "hector-local", baseUrl: "/api/v1", model: "hector-hx", key: "" };
 }

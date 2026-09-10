@@ -6,4 +6,4 @@ export {
   ASSISTANT_NAME,
   HOST_NAME,
 } from "./identity";
-export { hectorHostPrompt, spectralHxPrompt } from "./prompt";
+export { hectorHostPrompt, spectralHxPrompt, compactHxPrompt, compactHectorPrompt } from "./prompt";

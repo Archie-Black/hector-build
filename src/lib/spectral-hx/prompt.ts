@@ -57,3 +57,24 @@ export function hectorHostPrompt(mode: ForgeMode, lessons: string[]): string {
     modeLine(mode),
   ].join("\n");
 }
+
+export function compactHxPrompt(mode: ForgeMode, lessons: string[]): string {
+  const memory = lessons.slice(-4).map((l) => `- ${l}`).join("\n");
+  return [
+    `You are ${AGENT_NAME} inside ${HOST_NAME}. Coding agent. Short sentences.`,
+    "PLAN internally. Then use tools. Do not lecture. Do not expand scope.",
+    "Read before write. Prefer search_replace. Then get_diagnostics and run_tests.",
+    "Finish the job. No stubs. No TODOs. If tests fail, fix them and continue.",
+    modeLine(mode),
+    memory ? `Lessons:\n${memory}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+export function compactHectorPrompt(mode: ForgeMode, lessons: string[]): string {
+  return [
+    `You are ${HOST_NAME}. Delegate building to tools. Report what is done.`,
+    compactHxPrompt(mode, lessons),
+  ].join("\n");
+}

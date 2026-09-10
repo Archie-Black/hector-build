@@ -2,9 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { diffsFrom, executeTool } from "./tools";
 import { runWorkspaceTests } from "./run-tests";
 import { isApiKey } from "./keys";
-import { isLoopbackChat, safeChatBase } from "./providers";
+import { safeChatBase } from "./providers";
 import { resolveEngine } from "./engines";
-import { hectorHostPrompt, spectralHxPrompt } from "@/lib/spectral-hx";
+import { hectorHostPrompt, spectralHxPrompt, compactHxPrompt, compactHectorPrompt } from "@/lib/spectral-hx";
+import { ollamaChat } from "@/lib/ollama/client";
 import { formatRecall } from "@/lib/memory/lattice";
 import { recallMemory } from "@/lib/memory/warehouse";
 import { rustSearchNative } from "@/lib/geometry/mdv-native";
@@ -280,6 +281,21 @@ const TOOLS = [
   ...EXTENSION_TOOLS,
 ];
 
+const CORE_TOOL_NAMES = new Set([
+  "list_files",
+  "glob_files",
+  "grep_files",
+  "lattice_search",
+  "read_file",
+  "write_file",
+  "search_replace",
+  "get_diagnostics",
+  "run_tests",
+  "todo_write",
+]);
+
+const CORE_TOOLS = TOOLS.filter((t) => CORE_TOOL_NAMES.has(t.function.name));
+
 type HistoryItem = { role: "user" | "assistant"; content: string };
 
 type TurnInput = {
@@ -290,6 +306,7 @@ type TurnInput = {
   lessons: string[];
   visitorKey?: string;
   providerId?: import("./providers").ChatProviderId;
+  homeUrl?: string;
   baseUrl?: string;
   model?: string;
   voice?: "hector" | "hx";
@@ -347,6 +364,8 @@ export const runForgeTurn = createServerFn({ method: "POST" })
       baseUrl: data.baseUrl,
       model: data.model,
       key: visitor,
+      homeUrl: data.homeUrl,
+      mode: data.mode,
     });
     const harm = harmScan(data.prompt);
     if (harm.harm) {
@@ -375,12 +394,19 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     silentCouple(data.prompt, data.files);
     const lessons = [...(data.lessons ?? []), ...formatRecall(recalled)];
     const mode = data.mode;
-    const system =
-      data.voice === "hector" ? hectorHostPrompt(mode, lessons) : spectralHxPrompt(mode, lessons);
+    const compact = engine.kind === "ollama" || engine.kind === "lmstudio";
+    const system = compact
+      ? data.voice === "hector"
+        ? compactHectorPrompt(mode, lessons)
+        : compactHxPrompt(mode, lessons)
+      : data.voice === "hector"
+        ? hectorHostPrompt(mode, lessons)
+        : spectralHxPrompt(mode, lessons);
+    const toolset = compact ? CORE_TOOLS : TOOLS;
     const messages: Msg[] = [
       { role: "system", content: system },
-      ...data.history.slice(-16).map((m) => ({ role: m.role, content: m.content })),
-      { role: "user", content: data.prompt.slice(0, 16000) },
+      ...data.history.slice(compact ? -8 : -16).map((m) => ({ role: m.role, content: m.content })),
+      { role: "user", content: data.prompt.slice(0, compact ? 8000 : 16000) },
     ];
 
     const before = { ...data.files };
@@ -389,31 +415,37 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     let todos: AgentTodo[] = [];
     let plan = "";
     let reply = "";
-    const maxRounds = mode === "swarm" ? 16 : mode === "patch" ? 8 : mode === "plan" ? 6 : 5;
-    let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : isLoopbackChat(baseUrl) ? "llama3.2" : "gpt-4.1");
+    const maxRounds = compact ? (mode === "swarm" ? 10 : 6) : mode === "swarm" ? 16 : mode === "patch" ? 8 : mode === "plan" ? 6 : 5;
+    let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : "llama3.2");
+    const maxTokens = compact ? (mode === "scout" ? 1200 : 3500) : mode === "scout" ? 1800 : 5000;
+    const sample = (mdl: string) =>
+      engine.kind === "ollama" && engine.origin
+        ? ollamaChat({
+            origin: engine.origin,
+            model: mdl,
+            messages,
+            tools: toolset,
+            temperature: 0.1,
+            maxTokens,
+          })
+        : complete(baseUrl, apiKey, mdl, {
+            temperature: compact ? 0.1 : 0.15,
+            max_tokens: maxTokens,
+            tools: toolset,
+            tool_choice: "auto",
+            messages,
+          });
 
     for (let round = 0; round < maxRounds; round++) {
       let res: Response;
       try {
-        res = await complete(baseUrl, apiKey, model, {
-          temperature: 0.15,
-          max_tokens: mode === "scout" ? 1800 : 5000,
-          tools: TOOLS,
-          tool_choice: "auto",
-          messages,
-        });
+        res = await sample(model);
       } catch {
         return local();
       }
       if (!res.ok && baseUrl.includes("x.ai") && (res.status === 400 || res.status === 404) && model === "grok-4.5") {
         model = "grok-4";
-        res = await complete(baseUrl, apiKey, model, {
-          temperature: 0.15,
-          max_tokens: mode === "scout" ? 1800 : 5000,
-          tools: TOOLS,
-          tool_choice: "auto",
-          messages,
-        });
+        res = await sample(model);
       }
 
       if (!res.ok) {
@@ -443,7 +475,10 @@ export const runForgeTurn = createServerFn({ method: "POST" })
           const name = String(fn.name ?? "");
           let args: Record<string, unknown> = {};
           try {
-            args = JSON.parse(String(fn.arguments ?? "{}")) as Record<string, unknown>;
+            args =
+              fn.arguments && typeof fn.arguments === "object"
+                ? (fn.arguments as Record<string, unknown>)
+                : (JSON.parse(String(fn.arguments ?? "{}")) as Record<string, unknown>);
           } catch {
             args = {};
           }
