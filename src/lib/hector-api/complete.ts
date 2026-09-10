@@ -149,6 +149,7 @@ export const LOCAL_MODELS = [
   { id: "spectral-hx", owned_by: "hector-build", object: "model" as const },
   { id: "hx-local", owned_by: "hector-build", object: "model" as const },
   { id: "hector-mdv", owned_by: "hector-build", object: "model" as const },
+  { id: "hector-cloud", owned_by: "hector-build", object: "model" as const },
   { id: "hector-hx-cloud", owned_by: "hector-build", object: "model" as const },
 ];
 

@@ -22,8 +22,11 @@ import { Route as ApiRtcRouteImport } from './routes/api/rtc'
 import { Route as ApiShareRouteImport } from './routes/api/share'
 import { Route as HxSessionRouteImport } from './routes/hx.session'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiV1CloudRouteImport } from './routes/api/v1/cloud'
 import { Route as ApiV1EmbeddingsRouteImport } from './routes/api/v1/embeddings'
 import { Route as ApiV1ExtensionsRouteImport } from './routes/api/v1/extensions'
+import { Route as ApiV1FunctionsRouteImport } from './routes/api/v1/functions'
+import { Route as ApiV1McpRouteImport } from './routes/api/v1/mcp'
 import { Route as ApiV1ModelsRouteImport } from './routes/api/v1/models'
 import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
 
@@ -92,6 +95,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1CloudRoute = ApiV1CloudRouteImport.update({
+  id: '/api/v1/cloud',
+  path: '/api/v1/cloud',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1EmbeddingsRoute = ApiV1EmbeddingsRouteImport.update({
   id: '/api/v1/embeddings',
   path: '/api/v1/embeddings',
@@ -100,6 +108,16 @@ const ApiV1EmbeddingsRoute = ApiV1EmbeddingsRouteImport.update({
 const ApiV1ExtensionsRoute = ApiV1ExtensionsRouteImport.update({
   id: '/api/v1/extensions',
   path: '/api/v1/extensions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1FunctionsRoute = ApiV1FunctionsRouteImport.update({
+  id: '/api/v1/functions',
+  path: '/api/v1/functions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1McpRoute = ApiV1McpRouteImport.update({
+  id: '/api/v1/mcp',
+  path: '/api/v1/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1ModelsRoute = ApiV1ModelsRouteImport.update({
@@ -127,8 +145,11 @@ export interface FileRoutesByFullPath {
   '/api/share': typeof ApiShareRoute
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/v1/cloud': typeof ApiV1CloudRoute
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
+  '/api/v1/functions': typeof ApiV1FunctionsRoute
+  '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
 }
@@ -146,8 +167,11 @@ export interface FileRoutesByTo {
   '/api/share': typeof ApiShareRoute
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/v1/cloud': typeof ApiV1CloudRoute
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
+  '/api/v1/functions': typeof ApiV1FunctionsRoute
+  '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
 }
@@ -166,8 +190,11 @@ export interface FileRoutesById {
   '/api/share': typeof ApiShareRoute
   '/hx/session': typeof HxSessionRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/v1/cloud': typeof ApiV1CloudRoute
   '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
   '/api/v1/extensions': typeof ApiV1ExtensionsRoute
+  '/api/v1/functions': typeof ApiV1FunctionsRoute
+  '/api/v1/mcp': typeof ApiV1McpRoute
   '/api/v1/models': typeof ApiV1ModelsRoute
   '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
 }
@@ -187,8 +214,11 @@ export interface FileRouteTypes {
     | '/api/share'
     | '/hx/session'
     | '/api/auth/$'
+    | '/api/v1/cloud'
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
+    | '/api/v1/functions'
+    | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/chat/completions'
   fileRoutesByTo: FileRoutesByTo
@@ -206,8 +236,11 @@ export interface FileRouteTypes {
     | '/api/share'
     | '/hx/session'
     | '/api/auth/$'
+    | '/api/v1/cloud'
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
+    | '/api/v1/functions'
+    | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/chat/completions'
   id:
@@ -225,8 +258,11 @@ export interface FileRouteTypes {
     | '/api/share'
     | '/hx/session'
     | '/api/auth/$'
+    | '/api/v1/cloud'
     | '/api/v1/embeddings'
     | '/api/v1/extensions'
+    | '/api/v1/functions'
+    | '/api/v1/mcp'
     | '/api/v1/models'
     | '/api/v1/chat/completions'
   fileRoutesById: FileRoutesById
@@ -244,8 +280,11 @@ export interface RootRouteChildren {
   ApiRtcRoute: typeof ApiRtcRoute
   ApiShareRoute: typeof ApiShareRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiV1CloudRoute: typeof ApiV1CloudRoute
   ApiV1EmbeddingsRoute: typeof ApiV1EmbeddingsRoute
   ApiV1ExtensionsRoute: typeof ApiV1ExtensionsRoute
+  ApiV1FunctionsRoute: typeof ApiV1FunctionsRoute
+  ApiV1McpRoute: typeof ApiV1McpRoute
   ApiV1ModelsRoute: typeof ApiV1ModelsRoute
   ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
 }
@@ -343,6 +382,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/cloud': {
+      id: '/api/v1/cloud'
+      path: '/api/v1/cloud'
+      fullPath: '/api/v1/cloud'
+      preLoaderRoute: typeof ApiV1CloudRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/embeddings': {
       id: '/api/v1/embeddings'
       path: '/api/v1/embeddings'
@@ -355,6 +401,20 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/extensions'
       fullPath: '/api/v1/extensions'
       preLoaderRoute: typeof ApiV1ExtensionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/functions': {
+      id: '/api/v1/functions'
+      path: '/api/v1/functions'
+      fullPath: '/api/v1/functions'
+      preLoaderRoute: typeof ApiV1FunctionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/mcp': {
+      id: '/api/v1/mcp'
+      path: '/api/v1/mcp'
+      fullPath: '/api/v1/mcp'
+      preLoaderRoute: typeof ApiV1McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/models': {
@@ -397,8 +457,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiRtcRoute: ApiRtcRoute,
   ApiShareRoute: ApiShareRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiV1CloudRoute: ApiV1CloudRoute,
   ApiV1EmbeddingsRoute: ApiV1EmbeddingsRoute,
   ApiV1ExtensionsRoute: ApiV1ExtensionsRoute,
+  ApiV1FunctionsRoute: ApiV1FunctionsRoute,
+  ApiV1McpRoute: ApiV1McpRoute,
   ApiV1ModelsRoute: ApiV1ModelsRoute,
   ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,
 }

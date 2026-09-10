@@ -1,5 +1,15 @@
 import { arcadeAuthorize, arcadeCtx, arcadeExecute, arcadeList } from "./arcade";
 import { gcpCall, gcpCtx, gcpList, GCP_MCP_SERVERS } from "./gcp-mcp";
+import {
+  cloudStatus,
+  deleteFunction,
+  deployFunction,
+  getObject,
+  invokeFunction,
+  listFunctions,
+  listObjects,
+  putObject,
+} from "./hector-cloud";
 
 export type ExtInput = {
   arcadeKey?: string;
@@ -64,10 +74,67 @@ export const EXTENSION_TOOLS = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "cloud_fn_list",
+      description: "List functions on Hector Cloud (this app is the cloud).",
+      parameters: { type: "object", properties: {} },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "cloud_fn_deploy",
+      description: "Deploy JS to Hector Cloud. Source must define handler(event).",
+      parameters: {
+        type: "object",
+        properties: { name: { type: "string" }, source: { type: "string" }, entry: { type: "string" } },
+        required: ["name"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "cloud_fn_invoke",
+      description: "Invoke a Hector Cloud function.",
+      parameters: {
+        type: "object",
+        properties: { name: { type: "string" }, event: { type: "object" } },
+        required: ["name"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "cloud_object_put",
+      description: "Store an object on Hector Cloud.",
+      parameters: {
+        type: "object",
+        properties: { key: { type: "string" }, body: { type: "string" } },
+        required: ["key", "body"],
+      },
+    },
+  },
 ];
 
 export function isExtensionTool(name: string) {
-  return name === "arcade_list" || name === "arcade_execute" || name === "gcp_mcp_list" || name === "gcp_mcp_call";
+  return (
+    name === "arcade_list" ||
+    name === "arcade_execute" ||
+    name === "gcp_mcp_list" ||
+    name === "gcp_mcp_call" ||
+    name === "cloud_fn_list" ||
+    name === "cloud_fn_deploy" ||
+    name === "cloud_fn_invoke" ||
+    name === "cloud_fn_delete" ||
+    name === "cloud_object_put" ||
+    name === "cloud_object_get" ||
+    name === "cloud_object_list" ||
+    name === "cloud_status"
+  );
 }
 
 export async function executeExtension(name: string, args: Record<string, unknown>, ext: ExtInput) {
@@ -107,6 +174,20 @@ export async function executeExtension(name: string, args: Record<string, unknow
       const payload = await gcpCall(ctx, String(args.tool ?? args.name ?? ""), (args.arguments as Record<string, unknown>) ?? {});
       return { ok: true, detail: String(args.tool ?? ""), payload };
     }
+    if (name === "cloud_status") return { ok: true, detail: "hector-cloud", payload: cloudStatus() };
+    if (name === "cloud_fn_list") return { ok: true, detail: "functions", payload: listFunctions().map(({ source: _s, ...r }) => r) };
+    if (name === "cloud_fn_deploy") {
+      const fn = deployFunction({ name: String(args.name), source: args.source ? String(args.source) : undefined, entry: args.entry ? String(args.entry) : undefined });
+      return { ok: true, detail: fn.name, payload: fn };
+    }
+    if (name === "cloud_fn_invoke") {
+      const payload = await invokeFunction(String(args.name), args.event ?? {});
+      return { ok: true, detail: String(args.name), payload };
+    }
+    if (name === "cloud_fn_delete") return { ok: true, detail: "delete", payload: { deleted: deleteFunction(String(args.name)) } };
+    if (name === "cloud_object_put") return { ok: true, detail: String(args.key), payload: putObject(String(args.key), String(args.body ?? "")) };
+    if (name === "cloud_object_get") return { ok: true, detail: String(args.key), payload: getObject(String(args.key)) };
+    if (name === "cloud_object_list") return { ok: true, detail: "objects", payload: listObjects() };
     return { ok: false, detail: `Unknown extension ${name}`, payload: { error: name } };
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
@@ -116,8 +197,11 @@ export async function executeExtension(name: string, args: Record<string, unknow
 
 export function extensionStatus(ext: ExtInput) {
   return {
+    hectorCloud: true,
     arcade: Boolean(arcadeCtx({ apiKey: ext.arcadeKey, userId: ext.arcadeUser })),
     gcp: Boolean(gcpCtx({ token: ext.gcpToken, project: ext.gcpProject, server: ext.gcpMcp })),
     gcpServers: Object.keys(GCP_MCP_SERVERS),
+    mcp: "/api/v1/mcp",
+    functions: "/api/v1/functions",
   };
 }

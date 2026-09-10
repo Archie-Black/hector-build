@@ -115,10 +115,11 @@ export function SettingsPanel() {
             <p className="mt-2 text-sm">{osLabel(platform)}</p>
             <p className="mt-1 font-mono text-xs text-muted">{installHint(platform).path}</p>
             <p className="mt-2 text-sm text-muted text-pretty">{installHint(platform).how}</p>
-            <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">Local API</p>
+            <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">Hector Cloud</p>
             <p className="mt-2 text-sm text-pretty">
-              Always on at <span className="font-mono">/api/v1</span>. Model <span className="font-mono">hector-hx</span>.
-              Cloud is optional: paste a key and pick Grok / OpenAI / Groq.
+              This app is the cloud. API <span className="font-mono">/api/v1</span>, MCP{" "}
+              <span className="font-mono">/api/v1/mcp</span>, functions <span className="font-mono">/api/v1/functions</span>.
+              Arcade and Google Cloud are federations only.
             </p>
             <div className="mt-4 grid gap-2">
               {(
@@ -185,7 +186,7 @@ export function SettingsPanel() {
               className="mt-2 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
             />
             <div className="mt-2 flex flex-wrap gap-2">
-              {["cli", "bigquery", "storage", "compute", "run", "firestore"].map((id) => (
+              {["cli", "bigquery", "storage", "compute", "run", "functions", "firestore"].map((id) => (
                 <button
                   key={id}
                   type="button"

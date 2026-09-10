@@ -6,6 +6,7 @@ export const GCP_MCP_SERVERS: Record<string, string> = {
   storage: "https://storage.googleapis.com/mcp",
   compute: "https://compute.googleapis.com/mcp",
   run: "https://run.googleapis.com/mcp",
+  functions: "https://cloudfunctions.googleapis.com/mcp",
   firestore: "https://firestore.googleapis.com/mcp",
   resource: "https://cloudresourcemanager.googleapis.com/mcp",
 };
@@ -34,6 +35,7 @@ async function mcp(ctx: GcpCtx, method: string, params?: Record<string, unknown>
       Authorization: `Bearer ${ctx.token}`,
       "Content-Type": "application/json",
       Accept: "application/json, text/event-stream",
+      ...(ctx.project ? { "x-goog-user-project": ctx.project } : {}),
     },
     body: JSON.stringify({
       jsonrpc: "2.0",
