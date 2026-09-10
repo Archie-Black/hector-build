@@ -98,6 +98,7 @@ Any build bot can work this folder with Hector.
 6. Terminal: POST { "op":"term", "bot":"<id>", "command":"git status" }  (allowlisted)
 7. SSH: POST { "op":"ssh", "bot":"<id>", "host":"192.168.1.10", "user":"dev", "password":"...", "command":"uname -a" }
    Onion (bot-to-bot when not on LAN): { "op":"onion" } then ssh to the .onion hostname through SOCKS 127.0.0.1:19050.
+   Two hidden services: SSH (22→2222) and share (80→app). Keys: { "op":"keys", "action":"generate|list|authorize|revoke" } Ed25519 in data/share/keys.
    Credentials stay in the backend (data/share/creds.json) and are reused. Not written into the project tree.
    PuTTY/plink on Windows: packaging\\\\windows\\\\hector-putty.cmd user@host
 

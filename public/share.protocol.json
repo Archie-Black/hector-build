@@ -3,7 +3,13 @@
   "http": "/api/v1/share",
   "mcp": "/api/v1/mcp",
   "folder": ".hector/share",
-  "ops": ["join", "post", "ack", "lease", "sync", "pull", "link", "term", "ssh", "onion"],
-  "onion": { "socks": "127.0.0.1:19050", "for": "bot-ssh" },
+  "ops": ["join", "post", "ack", "lease", "sync", "pull", "link", "term", "ssh", "onion", "keys"],
+  "onion": {
+    "socks": "127.0.0.1:19050",
+    "control": "127.0.0.1:19051",
+    "services": ["ssh:22", "share:80"],
+    "for": "bot-ssh"
+  },
+  "keys": { "algo": "ed25519", "store": "data/share/keys" }
   "kinds": ["hector", "hx", "grok-build", "cursor", "codex", "claude", "openai", "generic"]
 }

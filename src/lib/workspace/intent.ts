@@ -61,6 +61,8 @@ export function explainTrace(name: string, detail: string, ok: boolean): string 
       return `HX ran SSH with another bot (${detail}).` + fail;
     case "share_link":
       return `HX published an SSH/PuTTY link (${detail}).` + fail;
+    case "share_keys":
+      return `HX managed SSH keys (${detail}).` + fail;
     case "web_search":
       return `Spectral HX searched the web (${detail}).` + fail;
     case "web_fetch":

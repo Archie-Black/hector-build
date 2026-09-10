@@ -2,17 +2,22 @@ import { createConnection, type Socket } from "node:net";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawn } from "node:child_process";
-import { generateKeyPairSync } from "node:crypto";
-import { Server as SshServer } from "ssh2";
+import ssh2 from "ssh2";
+import type { AuthContext } from "ssh2";
+
+const SshServer = ssh2.Server;
 import { credFor } from "./room.ts";
 import { isOnionHost, safeCollabCmd } from "./wire.ts";
+import { ensureDefaultIdentity, ensureHostKey, isAuthorizedKey, keyStatus } from "./keys.ts";
 
 export const ONION_SOCKS = Number(process.env.HECTOR_TOR_SOCKS || 19050);
+export const ONION_CONTROL = Number(process.env.HECTOR_TOR_CONTROL || 19051);
 export const ONION_SSH_PORT = 2222;
+export const ONION_SHARE_PORT = Number(process.env.PORT || 8080);
 
 const TOR_DIR = join(process.cwd(), "data", "tor");
-const HS_DIR = join(TOR_DIR, "hector-ssh");
-const HOST_KEY = join(TOR_DIR, "ssh-host.pem");
+const SSH_HS = join(TOR_DIR, "hector-ssh");
+const SHARE_HS = join(TOR_DIR, "hector-share");
 
 export { isOnionHost };
 
@@ -60,31 +65,64 @@ export function socksConnect(destHost: string, destPort: number, socksPort = ONI
   });
 }
 
-function hostKey() {
-  mkdirSync(TOR_DIR, { recursive: true });
-  if (!existsSync(HOST_KEY)) {
-    const pair = generateKeyPairSync("rsa", {
-      modulusLength: 2048,
-      privateKeyEncoding: { type: "pkcs1", format: "pem" },
-      publicKeyEncoding: { type: "pkcs1", format: "pem" },
-    });
-    writeFileSync(HOST_KEY, pair.privateKey, { mode: 0o600 });
-  }
-  return readFileSync(HOST_KEY);
+export function writeTorrc() {
+  mkdirSync(SSH_HS, { recursive: true, mode: 0o700 });
+  mkdirSync(SHARE_HS, { recursive: true, mode: 0o700 });
+  mkdirSync(join(TOR_DIR, "data"), { recursive: true, mode: 0o700 });
+  const body = `DataDirectory ${join(TOR_DIR, "data")}
+SocksPort 127.0.0.1:${ONION_SOCKS} IsolateDestAddr IsolateSOCKSAuth IsolateClientProtocol
+ControlPort 127.0.0.1:${ONION_CONTROL}
+CookieAuthentication 1
+CookieAuthFile ${join(TOR_DIR, "data", "control_auth_cookie")}
+AvoidDiskWrites 1
+SafeLogging 1
+LongLivedPorts 22
+HiddenServiceDir ${SSH_HS}
+HiddenServiceVersion 3
+HiddenServicePort 22 127.0.0.1:${ONION_SSH_PORT}
+HiddenServiceMaxStreams 32
+HiddenServiceDir ${SHARE_HS}
+HiddenServiceVersion 3
+HiddenServicePort 80 127.0.0.1:${ONION_SHARE_PORT}
+Log notice file ${join(TOR_DIR, "tor.log")}
+`;
+  writeFileSync(join(TOR_DIR, "torrc"), body, { mode: 0o600 });
+  return join(TOR_DIR, "torrc");
+}
+
+function hsName(dir: string) {
+  const p = join(dir, "hostname");
+  return existsSync(p) ? readFileSync(p, "utf8").trim() : "";
 }
 
 let serverOn = false;
 
+function authClient(ctx: AuthContext) {
+  if (ctx.method === "publickey") {
+    const pub = ctx as AuthContext & { key: Parameters<typeof isAuthorizedKey>[0]; signature?: Buffer; blob?: Buffer };
+    if (!isAuthorizedKey(pub.key)) return ctx.reject(["publickey", "password"]);
+    const parsed = pub.key;
+    if (parsed && typeof parsed === "object" && "verify" in parsed && pub.signature && pub.blob) {
+      const verify = (parsed as { verify: (data: Buffer, sig: Buffer) => boolean }).verify;
+      if (!verify(pub.blob, pub.signature)) return ctx.reject(["publickey", "password"]);
+    }
+    return ctx.accept();
+  }
+  if (ctx.method === "password") {
+    const cred = credFor("onion", ctx.username) || credFor("127.0.0.1", ctx.username);
+    if (cred?.password && "password" in ctx && ctx.password === cred.password) return ctx.accept();
+    return ctx.reject(["publickey", "password"]);
+  }
+  ctx.reject(["publickey", "password"]);
+}
+
 export function ensureCollabSsh() {
   if (serverOn) return;
   serverOn = true;
-  const server = new SshServer({ hostKeys: [hostKey()] }, (client) => {
-    client.on("authentication", (ctx) => {
-      if (ctx.method !== "password") return ctx.reject(["password"]);
-      const cred = credFor("onion", ctx.username) || credFor("127.0.0.1", ctx.username);
-      if (cred?.password && ctx.password === cred.password) return ctx.accept();
-      ctx.reject(["password"]);
-    });
+  ensureDefaultIdentity();
+  const host = ensureHostKey();
+  const server = new SshServer({ hostKeys: [host.private], algorithms: { serverHostKey: ["ssh-ed25519"] } }, (client) => {
+    client.on("authentication", (ctx) => authClient(ctx));
     client.on("ready", () => {
       client.on("session", (accept) => {
         const session = accept();
@@ -110,25 +148,32 @@ export function ensureCollabSsh() {
 }
 
 export function onionHostname() {
-  const p = join(HS_DIR, "hostname");
-  if (!existsSync(p)) return "";
-  return readFileSync(p, "utf8").trim();
+  return hsName(SSH_HS);
 }
 
 export function onionStatus() {
   return {
     socks: ONION_SOCKS,
+    control: ONION_CONTROL,
     localSsh: ONION_SSH_PORT,
-    hostname: onionHostname() || null,
     for: "bot-ssh",
+    services: [
+      { name: "ssh", port: 22, target: `127.0.0.1:${ONION_SSH_PORT}`, hostname: hsName(SSH_HS) || null },
+      { name: "share", port: 80, target: `127.0.0.1:${ONION_SHARE_PORT}`, hostname: hsName(SHARE_HS) || null },
+    ],
+    keys: keyStatus(),
   };
 }
 
 export function startOnionDaemon() {
-  mkdirSync(HS_DIR, { recursive: true });
-  const script = join(process.cwd(), "packaging/linux/onion-setup.sh");
-  if (!existsSync(script)) return onionStatus();
-  spawn("bash", [script], { detached: true, stdio: "ignore" }).unref();
+  const torrc = writeTorrc();
   ensureCollabSsh();
+  const script = join(process.cwd(), "packaging/linux/onion-setup.sh");
+  if (existsSync(script)) spawn("bash", [script], { detached: true, stdio: "ignore", env: { ...process.env, HECTOR_TOR_DIR: TOR_DIR } }).unref();
+  else if (!existsSync(join(TOR_DIR, "tor.pid"))) {
+    const tor = spawn("tor", ["-f", torrc], { detached: true, stdio: "ignore" });
+    tor.unref();
+    writeFileSync(join(TOR_DIR, "tor.pid"), String(tor.pid || ""));
+  }
   return onionStatus();
 }

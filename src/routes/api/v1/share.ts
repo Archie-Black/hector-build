@@ -4,6 +4,7 @@ import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registe
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
 import { isOnionHost } from "@/lib/share/wire";
+import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey } from "@/lib/share/keys";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -25,6 +26,16 @@ export const Route = createFileRoute("/api/v1/share")({
         if (op === "sync") return jsonApi(syncFile({ bot: String(body?.bot ?? "generic"), path: String(body?.path ?? ""), content: String(body?.content ?? ""), expect: body?.expect ? String(body.expect) : undefined }));
         if (op === "pull") return jsonApi({ room: pullRoom(), terms: listTerms(), links: backendLinks(), onion: onionStatus() });
         if (op === "onion") return jsonApi(startOnionDaemon());
+        if (op === "keys") {
+          const action = String(body?.action ?? "list");
+          if (action === "generate") return jsonApi(generateIdentity(String(body?.user ?? "hector"), body?.comment ? String(body.comment) : undefined));
+          if (action === "authorize") {
+            const fp = authorizeKey(String(body?.public ?? ""), String(body?.user ?? "hector"));
+            return fp ? jsonApi({ fingerprint: fp }) : jsonApi({ error: { message: "bad public key" } }, 400);
+          }
+          if (action === "revoke") return jsonApi({ revoked: revokeKey(String(body?.fingerprint ?? "")) });
+          return jsonApi({ ...keyStatus(), identities: listIdentities() });
+        }
         if (op === "link") {
           const host = String(body?.host ?? "");
           const kind = isOnionHost(host) || body?.kind === "onion" ? "onion" : body?.kind === "putty" || body?.kind === "term" ? body.kind : "ssh";
@@ -64,7 +75,7 @@ export const Route = createFileRoute("/api/v1/share")({
             }),
           );
         }
-        return jsonApi({ error: { message: "op: join | post | ack | lease | sync | pull | link | term | ssh | onion" } }, 400);
+        return jsonApi({ error: { message: "op: join | post | ack | lease | sync | pull | link | term | ssh | onion | keys" } }, 400);
       },
       OPTIONS: () => new Response(null, { status: 204, headers: CORS }),
     },

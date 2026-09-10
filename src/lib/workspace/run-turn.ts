@@ -296,7 +296,7 @@ const TOOLS = [
     type: "function",
     function: {
       name: "share_link",
-      description: "Publish an SSH / PuTTY / terminal link. Passwords and keys are stored in the backend and reused.",
+      description: "Publish an SSH / PuTTY / terminal / onion link. Passwords and keys are stored in the backend and reused.",
       parameters: {
         type: "object",
         properties: {
@@ -311,6 +311,23 @@ const TOOLS = [
           key: { type: "string" },
         },
         required: ["host"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "share_keys",
+      description: "SSH key management in the backend. action: list | generate | authorize | revoke. Ed25519. Private keys never leave the backend.",
+      parameters: {
+        type: "object",
+        properties: {
+          action: { type: "string" },
+          user: { type: "string" },
+          comment: { type: "string" },
+          public: { type: "string" },
+          fingerprint: { type: "string" },
+        },
       },
     },
   },

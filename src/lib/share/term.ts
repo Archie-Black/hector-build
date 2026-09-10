@@ -5,6 +5,7 @@ import { Client } from "ssh2";
 import { isOnionHost, socksConnect, startOnionDaemon } from "./onion.ts";
 import { fnv } from "./protocol.ts";
 import { credFor, postNote, registerLink } from "./room.ts";
+import { identityPrivate } from "./keys.ts";
 import { puttyCommand, safeCollabCmd, safeSshHost, type CollabLink } from "./wire.ts";
 
 type Live = {
@@ -82,7 +83,7 @@ export function execSsh(input: {
   if (!username) return Promise.resolve({ ok: false, output: "User required." });
   const saved = credFor(host, username);
   const password = input.password || saved?.password;
-  const privateKey = input.privateKey || saved?.privateKey;
+  const privateKey = input.privateKey || saved?.privateKey || identityPrivate(username) || identityPrivate("hector");
   if (input.password || input.privateKey) {
     registerLink({
       from: input.bot || "hector",

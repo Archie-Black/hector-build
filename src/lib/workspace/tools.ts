@@ -12,6 +12,7 @@ import { ackNote, ingestInbox, joinPeer, leasePath, listLinks, materializeShare,
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { isOnionHost, safeSshHost } from "@/lib/share/wire";
 import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
+import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey } from "@/lib/share/keys";
 
 const WRITE_MODES: ForgeMode[] = ["patch", "swarm"];
 
@@ -252,6 +253,22 @@ export async function executeTool(
         privateKey: args.key || args.privateKey ? String(args.key ?? args.privateKey) : undefined,
       });
       return ok(materializeShare(files), name, describeLink(link), `${kind} ${link.user}@${link.host}`);
+    }
+    case "share_keys": {
+      const action = String(args.action ?? "list");
+      if (action === "generate") {
+        const id = generateIdentity(String(args.user ?? "hector"), args.comment ? String(args.comment) : undefined);
+        return ok(files, name, id, id.fingerprint);
+      }
+      if (action === "authorize") {
+        const fp = authorizeKey(String(args.public ?? ""), String(args.user ?? "hector"));
+        return fp ? ok(files, name, { fingerprint: fp }, fp) : refuse(files, name, "bad public key");
+      }
+      if (action === "revoke") {
+        const hit = revokeKey(String(args.fingerprint ?? ""));
+        return hit ? ok(files, name, { revoked: true }, "revoked") : refuse(files, name, "unknown key");
+      }
+      return ok(files, name, { ...keyStatus(), identities: listIdentities() }, "ssh keys");
     }
     case "todo_write": {
       const raw = Array.isArray(args.todos) ? args.todos : [];

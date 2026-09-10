@@ -13,6 +13,7 @@ import { ackNote, backendLinks, joinPeer, leasePath, postNote, pullRoom, registe
 import { describeLink, execSsh, listTerms, openTerm, readTerm, writeTerm } from "@/lib/share/term";
 import { onionStatus, startOnionDaemon } from "@/lib/share/onion";
 import { isOnionHost } from "@/lib/share/wire";
+import { authorizeKey, generateIdentity, keyStatus, listIdentities, revokeKey } from "@/lib/share/keys";
 
 type Rpc = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
 
@@ -33,7 +34,8 @@ const TOOLS = [
   { name: "share_pull", description: "Pull peers, inbox, leases, SSH links.", inputSchema: { type: "object", properties: {} } },
   { name: "share_term", description: "Shared backend terminal.", inputSchema: { type: "object", properties: { bot: { type: "string" }, session: { type: "string" }, command: { type: "string" } } } },
   { name: "share_ssh", description: "Allowlisted SSH command to a linked host.", inputSchema: { type: "object", properties: { host: { type: "string" }, user: { type: "string" }, command: { type: "string" }, port: { type: "number" }, bot: { type: "string" } }, required: ["host", "command"] } },
-  { name: "share_link", description: "Publish SSH/PuTTY/term link. Credentials are stored in the backend.", inputSchema: { type: "object", properties: { kind: { type: "string" }, host: { type: "string" }, user: { type: "string" }, port: { type: "number" }, from: { type: "string" }, to: { type: "string" }, password: { type: "string" }, key: { type: "string" } }, required: ["host"] } },
+  { name: "share_link", description: "Publish SSH/PuTTY/term/onion link. Credentials are stored in the backend.", inputSchema: { type: "object", properties: { kind: { type: "string" }, host: { type: "string" }, user: { type: "string" }, port: { type: "number" }, from: { type: "string" }, to: { type: "string" }, password: { type: "string" }, key: { type: "string" } }, required: ["host"] } },
+  { name: "share_keys", description: "SSH key management. action list|generate|authorize|revoke.", inputSchema: { type: "object", properties: { action: { type: "string" }, user: { type: "string" }, public: { type: "string" }, fingerprint: { type: "string" }, comment: { type: "string" } } } },
 ];
 
 function ok(id: Rpc["id"], result: unknown) {
@@ -138,6 +140,13 @@ export async function handleMcp(raw: Rpc) {
         privateKey: args.key || args.privateKey ? String(args.key ?? args.privateKey) : undefined,
       });
       return ok(id, toolText(describeLink(link)));
+    }
+    if (name === "share_keys") {
+      const action = String(args.action ?? "list");
+      if (action === "generate") return ok(id, toolText(generateIdentity(String(args.user ?? "hector"), args.comment ? String(args.comment) : undefined)));
+      if (action === "authorize") return ok(id, toolText({ fingerprint: authorizeKey(String(args.public ?? ""), String(args.user ?? "hector")) }));
+      if (action === "revoke") return ok(id, toolText({ revoked: revokeKey(String(args.fingerprint ?? "")) }));
+      return ok(id, toolText({ ...keyStatus(), identities: listIdentities() }));
     }
     return fail(id, `unknown tool ${name}`, -32601);
   } catch (err) {
