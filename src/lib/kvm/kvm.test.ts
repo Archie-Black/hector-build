@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { cssAspect, retinaOf } from "./retina.ts";
 import { isSwitchChord, mapKey } from "./keymap.ts";
-import { machAlloc, machRecv, machSend } from "./mach.ts";
+import { machAlloc, machBoot, machMakeSendOnce, machPass, machPortSet, machRecv, machRecvSet, machSend, machSendName, machSpaces, machVmAllocate, taskForPid } from "./mach.ts";
 import { launchctlLoad, listJobs } from "./launchd.ts";
 import { kvmBoot, kvmGrab, kvmKey, kvmSwitch } from "./seats.ts";
 import { darwinBoot, sysctl, wantsDarwin } from "./darwin.ts";
@@ -41,6 +41,37 @@ describe("hector kvm + darwin", () => {
     assert.equal("error" in ok, false);
     const msg = machRecv("com.test.port", "hx");
     assert.equal("error" in msg, false);
+  });
+
+  it("ipc_space is local, send-once dies, receive moves, host-priv gates task_for_pid", () => {
+    machBoot();
+    machAlloc("com.test.once", "hx");
+    machMakeSendOnce("com.test.once", "hx");
+    const so = machSpaces().find((s) => s.task === "hx")?.rights.find((r) => r.kind === "send-once");
+    assert.ok(so);
+    assert.equal("error" in machSendName("hx", so.name, "one"), false);
+    assert.equal("error" in machSendName("hx", so.name, "two"), true);
+
+    machAlloc("com.test.move", "hx");
+    const passed = machPass("hx", "com.spectralhx.seat", "com.test.move", "move-receive", "take it");
+    assert.equal("error" in passed, false);
+    assert.equal("error" in machRecv("com.test.move", "hx"), true);
+    assert.equal("error" in machRecv("com.spectralhx.seat", "hx"), false);
+
+    assert.equal("error" in taskForPid("hx", "hector"), true);
+    const tfp = taskForPid("hector", "hx");
+    assert.equal("error" in tfp, false);
+
+    const set = machPortSet("hector", ["com.hector.host", "com.hector.host-priv"]);
+    assert.ok(set.members && set.members.length >= 1);
+    machSend("com.hector.host", "hector", "ping");
+    const fromSet = machRecvSet("hector", set.name);
+    assert.equal("error" in fromSet, false);
+
+    const mem = machVmAllocate("hx", 8192);
+    assert.equal("error" in mem, false);
+    const spaces = machSpaces();
+    assert.ok(spaces.some((s) => s.task === "hx" && s.special.taskSelf > 0));
   });
 
   it("launchd boots webconnect and kvm", () => {
