@@ -1,6 +1,6 @@
 import { arcadeAuthorize, arcadeCtx, arcadeExecute, arcadeList } from "./arcade";
 import { gcpCall, gcpCtx, gcpList, GCP_MCP_SERVERS } from "./gcp-mcp";
-import { forgeCall, forgeCtx, forgeHealth, forgeListTools } from "../ibm/contextforge";
+import { forgeCall, forgeHealth, forgeListTools, liveForge } from "../ibm/contextforge";
 import {
   cloudStatus,
   deleteFunction,
@@ -209,20 +209,17 @@ export async function executeExtension(name: string, args: Record<string, unknow
       return { ok: true, detail: String(args.tool ?? ""), payload };
     }
     if (name === "ibm_forge_health") {
-      const ctx = forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken });
-      if (!ctx) return { ok: false, detail: "Set IBM ContextForge URL (http://127.0.0.1:4444).", payload: { need: "ibm" } };
+      const ctx = await liveForge({ url: ext.ibmForge, token: ext.ibmForgeToken });
       const payload = await forgeHealth(ctx);
-      return { ok: true, detail: ctx.origin, payload };
+      return { ok: true, detail: `${ctx.via} always-on`, payload };
     }
     if (name === "ibm_forge_list") {
-      const ctx = forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken });
-      if (!ctx) return { ok: false, detail: "Set IBM ContextForge URL.", payload: { need: "ibm" } };
+      const ctx = await liveForge({ url: ext.ibmForge, token: ext.ibmForgeToken });
       const payload = await forgeListTools(ctx);
-      return { ok: true, detail: "contextforge tools", payload };
+      return { ok: true, detail: `${ctx.via} tools`, payload };
     }
     if (name === "ibm_forge_call") {
-      const ctx = forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken });
-      if (!ctx) return { ok: false, detail: "Set IBM ContextForge URL.", payload: { need: "ibm" } };
+      const ctx = await liveForge({ url: ext.ibmForge, token: ext.ibmForgeToken });
       const payload = await forgeCall(ctx, String(args.tool ?? args.name ?? ""), (args.arguments as Record<string, unknown>) ?? {});
       return { ok: true, detail: String(args.tool ?? ""), payload };
     }
@@ -252,7 +249,7 @@ export function extensionStatus(ext: ExtInput) {
     hectorCloud: true,
     arcade: Boolean(arcadeCtx({ apiKey: ext.arcadeKey, userId: ext.arcadeUser })),
     gcp: Boolean(gcpCtx({ token: ext.gcpToken, project: ext.gcpProject, server: ext.gcpMcp })),
-    ibmForge: Boolean(forgeCtx({ url: ext.ibmForge, token: ext.ibmForgeToken })),
+    ibmForge: true,
     gcpServers: Object.keys(GCP_MCP_SERVERS),
     mcp: "/api/v1/mcp",
     functions: "/api/v1/functions",

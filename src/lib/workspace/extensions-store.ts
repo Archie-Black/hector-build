@@ -11,7 +11,7 @@ export type ClientExt = {
 };
 
 export function defaultExt(): ClientExt {
-  return { arcadeKey: "", arcadeUser: "", gcpToken: "", gcpProject: "", gcpMcp: "cli", ibmForge: "", ibmForgeToken: "" };
+  return { arcadeKey: "", arcadeUser: "", gcpToken: "", gcpProject: "", gcpMcp: "cli", ibmForge: "http://127.0.0.1:4444", ibmForgeToken: "" };
 }
 
 export function loadExt(): ClientExt {

@@ -122,7 +122,7 @@ export function SettingsPanel() {
             <p className="mt-2 text-sm text-pretty">
               This app is the cloud. API <span className="font-mono">/api/v1</span>, MCP{" "}
               <span className="font-mono">/api/v1/mcp</span>, functions <span className="font-mono">/api/v1/functions</span>.
-              Arcade and Google Cloud are federations only.
+              Arcade and Google Cloud are federations only. ContextForge is on, full time.
             </p>
             <div className="mt-4 grid gap-2">
               {(
@@ -201,7 +201,7 @@ export function SettingsPanel() {
               ))}
             </div>
             <p className="mt-4 text-xs tracking-[0.14em] text-subtle uppercase">IBM ContextForge</p>
-            <p className="mt-1 text-sm text-muted text-pretty">Optional MCP gateway. Apache 2.0. Self-host on :4444 or https://mcp.doomchat.ca.</p>
+            <p className="mt-1 text-sm text-muted text-pretty">On. Always. IBM on :4444 if it is running, Hector otherwise. No switch.</p>
             <input
               value={ext.ibmForge}
               onChange={(e) => setExt({ ...ext, ibmForge: e.target.value })}

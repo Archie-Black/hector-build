@@ -14,10 +14,11 @@ export const Route = createFileRoute("/api/v1/mcp")({
     handlers: {
       GET: () =>
         jsonApi({
-          name: "hector-cloud",
+          name: "hector-contextforge",
           protocol: "mcp",
           transport: "streamable-http",
           endpoint: "/api/v1/mcp",
+          alwaysOn: true,
         }),
       POST: async ({ request }: { request: Request }) => {
         const raw = (await request.json().catch(() => null)) as { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> } | null;

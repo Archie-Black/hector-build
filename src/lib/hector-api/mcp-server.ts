@@ -43,7 +43,7 @@ export async function handleMcp(raw: Rpc) {
     return ok(id, {
       protocolVersion: "2025-11-25",
       capabilities: { tools: {}, resources: {} },
-      serverInfo: { name: "hector-cloud", version: "1.0.0" },
+      serverInfo: { name: "hector-contextforge", version: "1.0.0", alwaysOn: true },
     });
   }
   if (method === "notifications/initialized" || method === "ping") return ok(id, {});
