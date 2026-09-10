@@ -36,7 +36,7 @@ export function SpectreStage({ busy, ghosts, size = "hero" }: Props) {
               "--tilt": ring.tilt,
               "--yaw": ring.yaw,
               "--dur": ring.dur,
-              "--r": compact ? "2.15rem" : ring.r,
+              "--r": compact ? "2.15rem" : page ? `calc(${ring.r} * 0.5)` : ring.r,
               "--delay": `${i * -1.1}s`,
             } as CSSProperties
           }

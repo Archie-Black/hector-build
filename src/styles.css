@@ -368,8 +368,8 @@ html[data-theme="light"] {
   position: relative;
   margin: 0 auto;
   overflow: visible;
-  perspective: 1180px;
-  perspective-origin: 50% 46%;
+  perspective: 760px;
+  perspective-origin: 50% 42%;
   transform-style: preserve-3d;
 }
 
@@ -379,8 +379,8 @@ html[data-theme="light"] {
 }
 
 .atom-page {
-  width: min(24rem, 92vw);
-  height: 17rem;
+  width: min(16rem, 78vw);
+  height: 10.5rem;
 }
 
 .atom-compact {
@@ -475,42 +475,74 @@ html[data-theme="light"] {
 }
 
 .atom-ace {
-  width: 1.55rem;
-  height: 2.2rem;
-  margin: -1.1rem 0 0 -0.78rem;
-  filter: drop-shadow(0 8px 12px rgb(0 0 0 / 70%)) drop-shadow(0 0 8px color-mix(in oklab, #e6ff2a 35%, transparent));
+  width: 0.78rem;
+  height: 1.1rem;
+  margin: -0.55rem 0 0 -0.39rem;
+  transform-style: preserve-3d;
+  animation-name: ace-tumble;
+  filter:
+    drop-shadow(0 10px 14px rgb(0 0 0 / 75%))
+    drop-shadow(0 0 10px color-mix(in oklab, #e6ff2a 40%, transparent));
 }
 
 .atom-page .atom-ace {
-  width: 1.85rem;
-  height: 2.6rem;
-  margin: -1.3rem 0 0 -0.92rem;
+  width: 0.92rem;
+  height: 1.3rem;
+  margin: -0.65rem 0 0 -0.46rem;
+}
+
+.atom-ace .ghost-photo {
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 0.5px #0047ab,
+    0 0 0 1px color-mix(in oklab, #e6ff2a 55%, transparent),
+    inset 0 0 8px rgb(0 71 171 / 25%);
 }
 
 .atom-nucleus-hold {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%) translateZ(4px);
+  transform: translate(-50%, -50%) translateZ(18px);
+  transform-style: preserve-3d;
+}
+
+.atom-nucleus-hold::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: -12%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(0 0 0 / 80%), transparent 70%);
+  transform: rotateX(78deg) translateZ(-28px);
+  filter: blur(5px);
+  pointer-events: none;
 }
 
 .atom-nucleus {
   display: block;
   width: 9.4rem;
   height: 9.4rem;
+  transform-style: preserve-3d;
   animation: skull-idle 7.2s ease-in-out infinite;
   filter: drop-shadow(0 18px 28px rgb(0 0 0 / 70%)) drop-shadow(0 0 22px color-mix(in oklab, var(--color-accent) 42%, transparent));
 }
 
 .atom-page .atom-nucleus {
-  width: 12.4rem;
-  height: 12.4rem;
+  width: 6.2rem;
+  height: 6.2rem;
+  filter:
+    drop-shadow(0 14px 22px rgb(0 0 0 / 80%))
+    drop-shadow(0 0 16px color-mix(in oklab, var(--color-accent) 50%, transparent))
+    drop-shadow(0 0 2px #e6ff2a);
 }
 
 .atom-page .atom-halo {
-  width: 16rem;
-  height: 16rem;
-  margin: -8rem 0 0 -8rem;
+  width: 8.2rem;
+  height: 8.2rem;
+  margin: -4.1rem 0 0 -4.1rem;
 }
 
 .atom-compact .atom-nucleus {
@@ -553,6 +585,24 @@ html[data-theme="light"] {
   }
 }
 
+@keyframes ace-tumble {
+  from {
+    transform: rotateX(calc(-1 * var(--tilt))) rotateY(0deg) rotateZ(0deg) scale3d(1.05, 1.05, 1);
+  }
+  25% {
+    transform: rotateX(calc(-1 * var(--tilt))) rotateY(90deg) rotateZ(-90deg) scale3d(0.72, 0.72, 1);
+  }
+  50% {
+    transform: rotateX(calc(-1 * var(--tilt))) rotateY(180deg) rotateZ(-180deg) scale3d(0.82, 0.82, 1);
+  }
+  75% {
+    transform: rotateX(calc(-1 * var(--tilt))) rotateY(270deg) rotateZ(-270deg) scale3d(1.18, 1.18, 1);
+  }
+  to {
+    transform: rotateX(calc(-1 * var(--tilt))) rotateY(-360deg) rotateZ(-360deg) scale3d(1.05, 1.05, 1);
+  }
+}
+
 @keyframes atom-pass {
   0%,
   100% {
@@ -575,10 +625,10 @@ html[data-theme="light"] {
 @keyframes skull-idle {
   0%,
   100% {
-    transform: rotateY(-16deg) rotateX(4deg) translateY(0);
+    transform: rotateY(-28deg) rotateX(10deg) translateZ(6px) translateY(0);
   }
   50% {
-    transform: rotateY(18deg) rotateX(-3deg) translateY(-7px);
+    transform: rotateY(32deg) rotateX(-8deg) translateZ(22px) translateY(-5px);
   }
 }
 
