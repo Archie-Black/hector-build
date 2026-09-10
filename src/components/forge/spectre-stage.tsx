@@ -8,8 +8,8 @@ type Props = {
 
 const RINGS = [
   { tilt: "0deg", duration: "0.55s" },
-  { tilt: "60deg", duration: "0.7s" },
-  { tilt: "-55deg", duration: "0.42s" },
+  { tilt: "62deg", duration: "0.72s" },
+  { tilt: "-58deg", duration: "0.4s" },
 ];
 
 export function SpectreStage({ busy, ghosts, size = "hero" }: Props) {
@@ -25,6 +25,7 @@ export function SpectreStage({ busy, ghosts, size = "hero" }: Props) {
       }
       aria-hidden={compact}
     >
+      <span className="atom-halo" />
       {RINGS.slice(0, rings).map((ring, i) => (
         <div
           key={ring.tilt}

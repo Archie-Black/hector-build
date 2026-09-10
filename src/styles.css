@@ -91,13 +91,120 @@ html[data-theme="light"] {
   inset: 0;
   z-index: 0;
   background:
-    linear-gradient(180deg, rgb(0 0 0 / 12%) 0%, rgb(8 2 2 / 28%) 48%, rgb(0 0 0 / 82%) 100%),
+    radial-gradient(120% 70% at 50% 8%, rgb(0 71 171 / 22%), transparent 52%),
+    linear-gradient(180deg, rgb(0 0 0 / 18%) 0%, rgb(4 8 18 / 42%) 46%, rgb(0 0 0 / 88%) 100%),
     url("/hector/scenery-doom.jpg") center / cover no-repeat;
+  filter: saturate(0.85) contrast(1.08);
 }
 
-.gate-scene > :not(.gate-scenery) {
+.gate-bloom {
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 4.5rem;
+  z-index: 0;
+  width: 28rem;
+  height: 16rem;
+  margin-left: -14rem;
+  background: radial-gradient(ellipse at 50% 40%, color-mix(in oklab, var(--color-accent) 38%, transparent), transparent 68%);
+  filter: blur(28px);
+}
+
+.gate-mist {
+  pointer-events: none;
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 0;
+  height: 42%;
+  background: linear-gradient(180deg, transparent, rgb(0 0 0 / 72%) 55%, #000 100%);
+}
+
+.gate-scene > :not(.gate-scenery):not(.gate-bloom):not(.gate-mist) {
   position: relative;
   z-index: 1;
+}
+
+.gate-card {
+  border-radius: 22px;
+  background: color-mix(in oklab, var(--color-surface) 46%, transparent);
+  backdrop-filter: blur(32px) saturate(1.55);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-accent) 42%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--color-fg) 14%, transparent),
+    inset 0 -18px 40px color-mix(in oklab, #000 28%, transparent),
+    0 32px 80px rgb(0 0 0 / 55%),
+    0 0 90px color-mix(in oklab, var(--color-accent) 16%, transparent);
+}
+
+.gate-word {
+  font-size: 1.85rem;
+  font-weight: 560;
+  letter-spacing: -0.04em;
+  background: linear-gradient(180deg, #f4f7ff 20%, color-mix(in oklab, var(--color-accent) 55%, #e8eef8));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gate-input {
+  height: 3rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--color-accent) 22%, transparent);
+  background: color-mix(in oklab, var(--color-inset) 78%, transparent);
+  padding: 0 0.9rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gate-input:focus {
+  border-color: color-mix(in oklab, var(--color-accent) 70%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent);
+}
+
+.gate-cta {
+  width: 100%;
+  height: 3rem;
+  border-radius: 12px;
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  font-size: 0.875rem;
+  font-weight: 560;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-fg) 8%, transparent),
+    0 10px 28px color-mix(in oklab, var(--color-accent) 38%, transparent);
+}
+
+.gate-cta:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.gate-cta:disabled {
+  opacity: 0.45;
+}
+
+.atom-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 13rem;
+  height: 13rem;
+  margin: -6.5rem 0 0 -6.5rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in oklab, var(--color-accent) 55%, transparent) 0%, transparent 70%);
+  filter: blur(18px);
+  opacity: 0.55;
+  animation: hector-bob 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.atom-compact .atom-halo {
+  width: 2.6rem;
+  height: 2.6rem;
+  margin: -1.3rem 0 0 -1.3rem;
+  opacity: 0.4;
+  filter: blur(8px);
 }
 
 .app-shell {
@@ -124,21 +231,30 @@ html[data-theme="light"] {
 }
 
 .atom-page .atom-nucleus {
-  width: 11rem;
-  height: 11rem;
-  margin: -5.5rem 0 0 -5.5rem;
-  filter: drop-shadow(0 8px 16px color-mix(in oklab, var(--color-accent) 28%, transparent));
+  width: 12rem;
+  height: 12rem;
+  margin: -6rem 0 0 -6rem;
+  filter: drop-shadow(0 10px 22px color-mix(in oklab, var(--color-accent) 42%, transparent));
+}
+
+.atom-page .atom-halo {
+  width: 16rem;
+  height: 16rem;
+  margin: -8rem 0 0 -8rem;
 }
 
 .atom-page .atom-ring {
-  width: 16.5rem;
-  height: 5.6rem;
+  width: 17.5rem;
+  height: 6rem;
+  box-shadow:
+    0 0 18px color-mix(in oklab, var(--color-accent) 22%, transparent),
+    inset 0 0 14px color-mix(in oklab, var(--color-accent) 12%, transparent);
 }
 
 .atom-page .atom-electron {
-  width: 2rem;
-  height: 2rem;
-  offset-path: ellipse(8.25rem 2.8rem at 50% 50%);
+  width: 2.05rem;
+  height: 2.05rem;
+  offset-path: ellipse(8.7rem 3rem at 50% 50%);
 }
 
 .atom-compact {
@@ -196,12 +312,13 @@ html[data-theme="light"] {
 .atom-electron {
   position: absolute;
   display: block;
+  z-index: 3;
   width: 2.1rem;
   height: 2.1rem;
   offset-path: ellipse(9rem 3.2rem at 50% 50%);
   offset-rotate: 0deg;
   animation: atom-orbit 0.55s linear infinite;
-  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--color-accent) 35%, transparent));
+  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--color-accent) 55%, transparent));
 }
 
 .atom-compact .atom-electron {
@@ -602,6 +719,7 @@ html[data-theme="light"] {
   .jersey-sprite,
   .smoke-puff,
   .chat-dot,
+  .atom-halo,
   .atom-nucleus,
   .atom-electron {
     animation: none;
