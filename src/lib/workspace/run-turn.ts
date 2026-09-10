@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { diffsFrom, executeTool } from "./tools";
 import { runWorkspaceTests } from "./run-tests";
 import { isApiKey } from "./keys";
-import { safeChatBase } from "./providers";
+import { isLoopbackChat, safeChatBase } from "./providers";
 import { hectorHostPrompt, spectralHxPrompt } from "@/lib/spectral-hx";
 import { formatRecall } from "@/lib/memory/lattice";
 import { recallMemory } from "@/lib/memory/warehouse";
@@ -305,10 +305,12 @@ export const probeOwnerKey = createServerFn({ method: "POST" }).handler(async ()
 });
 
 function useLocalEngine(baseUrl: string, model: string, apiKey: string) {
-  if (!apiKey) return true;
+  if (isLoopbackChat(baseUrl)) return false;
   if (/hector-hx|spectral-hx|hx-local/.test(model)) return true;
   const root = safeChatBase(baseUrl) || "";
-  return root === "/api/v1" || root.endsWith("/api/v1");
+  if (root === "/api/v1" || root.endsWith("/api/v1")) return true;
+  if (!apiKey) return true;
+  return false;
 }
 
 async function webSearch(query: string) {
@@ -347,7 +349,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
   .validator((input: TurnInput) => input)
   .handler(async ({ data }): Promise<AgentResponse> => {
     const visitor = isApiKey(data.visitorKey ?? "") ? data.visitorKey!.trim() : "";
-    const apiKey = visitor || process.env.XAI_API_KEY || "";
+    const apiKey = visitor || process.env.XAI_API_KEY || (isLoopbackChat(data.baseUrl || "") ? "local" : "");
     const harm = harmScan(data.prompt);
     if (harm.harm) {
       return {
@@ -388,7 +390,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     let plan = "";
     let reply = "";
     const maxRounds = mode === "swarm" ? 16 : mode === "patch" ? 8 : mode === "plan" ? 6 : 5;
-    let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : "gpt-4.1");
+    let model = requested || (baseUrl.includes("x.ai") ? "grok-4.5" : isLoopbackChat(baseUrl) ? "llama3.2" : "gpt-4.1");
 
     for (let round = 0; round < maxRounds; round++) {
       let res = await complete(baseUrl, apiKey, model, {

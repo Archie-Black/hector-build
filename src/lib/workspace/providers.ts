@@ -1,4 +1,12 @@
-export type ChatProviderId = "hector" | "xai" | "openai" | "groq" | "openrouter" | "custom";
+export type ChatProviderId =
+  | "hector"
+  | "xai"
+  | "openai"
+  | "groq"
+  | "openrouter"
+  | "ollama"
+  | "lmstudio"
+  | "custom";
 
 export type ChatProvider = {
   id: ChatProviderId;
@@ -51,12 +59,28 @@ export const CHAT_PROVIDERS: ChatProvider[] = [
     hint: "One key, many models. Paste the sk-or- key and set the model id.",
   },
   {
+    id: "ollama",
+    name: "Ollama",
+    baseUrl: "http://127.0.0.1:11434/v1",
+    model: "llama3.2",
+    keysUrl: "https://ollama.com/download",
+    hint: "Local. No key. Run Ollama, then ollama pull llama3.2. Works on the desktop/WSL install — not the hosted preview.",
+  },
+  {
+    id: "lmstudio",
+    name: "LM Studio",
+    baseUrl: "http://127.0.0.1:1234/v1",
+    model: "local-model",
+    keysUrl: "https://lmstudio.ai",
+    hint: "Local OpenAI-compatible server. Start the server in LM Studio. No key.",
+  },
+  {
     id: "custom",
     name: "Custom (OpenAI-compatible)",
     baseUrl: "https://api.example.com/v1",
     model: "your-model",
     keysUrl: "",
-    hint: "Any OpenAI-compatible chatbot: Ollama, LM Studio, Together, Azure, a proxy. Loopback http://127.0.0.1:11434/v1 is allowed.",
+    hint: "Any OpenAI-compatible chatbot: llama.cpp, Together, Azure, a proxy.",
   },
 ];
 
@@ -96,6 +120,7 @@ export function saveProvider(next: { id: ChatProviderId; baseUrl: string; model:
     JSON.stringify({ id: next.id, baseUrl: next.baseUrl.trim(), model: next.model.trim() }),
   );
   if (isApiKey(next.key)) window.localStorage.setItem(KEY_STORE, next.key.trim());
+  else if (next.id === "ollama" || next.id === "lmstudio") window.localStorage.setItem(KEY_STORE, "local");
   else window.localStorage.removeItem(KEY_STORE);
 }
 
@@ -117,4 +142,20 @@ export function safeChatBase(raw: string): string | null {
   } catch {
     return null;
   }
+}
+
+export function isLoopbackChat(raw: string) {
+  const root = safeChatBase(raw);
+  if (!root || root === "/api/v1") return false;
+  try {
+    const host = new URL(root).hostname.toLowerCase();
+    return host === "localhost" || host === "127.0.0.1" || host === "[::1]";
+  } catch {
+    return false;
+  }
+}
+
+export function engineKey(id: ChatProviderId, key: string) {
+  if (id === "ollama" || id === "lmstudio") return key.trim() || "local";
+  return key;
 }

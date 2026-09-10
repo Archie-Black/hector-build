@@ -65,7 +65,7 @@ export function SettingsPanel() {
       id: pid,
       baseUrl: url,
       model: mdl,
-      key: isApiKey(key) ? key : current,
+      key: pid === "ollama" || pid === "lmstudio" ? "local" : isApiKey(key) ? key : current,
     });
     setSaved(true);
   }
@@ -224,7 +224,7 @@ export function SettingsPanel() {
                 </button>
               ))}
             </div>
-            {pid === "custom" ? (
+            {pid === "custom" || pid === "ollama" || pid === "lmstudio" ? (
               <input
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
@@ -238,6 +238,9 @@ export function SettingsPanel() {
               placeholder="model id"
               className="mt-3 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
             />
+            {pid === "ollama" || pid === "lmstudio" ? (
+              <p className="mt-2 text-xs text-muted">No API key. Local engine.</p>
+            ) : (
             <input
               type="password"
               value={key}
@@ -245,6 +248,7 @@ export function SettingsPanel() {
               placeholder="API key (leave blank to keep current)"
               className="mt-3 h-11 w-full rounded-md bg-inset px-3 text-sm outline-none"
             />
+            )}
             <Button type="button" className="mt-3 h-11 w-full" onClick={saveChat}>
               Save chatbot
             </Button>
