@@ -1,0 +1,33 @@
+; doomchat.ca — full wildcard + isolation zone
+; Replace 0.0.0.0 with the VPS A record (HECTOR_HOST_IP).
+; Apply: packaging/host/dns/apply.sh
+$ORIGIN doomchat.ca.
+$TTL 300
+
+@       IN  A       0.0.0.0
+www     IN  A       0.0.0.0
+hx      IN  A       0.0.0.0
+y       IN  A       0.0.0.0
+files   IN  A       0.0.0.0
+updates IN  A       0.0.0.0
+chat    IN  A       0.0.0.0
+matrix  IN  A       0.0.0.0
+ollama  IN  A       0.0.0.0
+mcp     IN  A       0.0.0.0
+api     IN  A       0.0.0.0
+build   IN  A       0.0.0.0
+
+; Catch-all first-level (Caddy returns 421 unless a named service)
+*       IN  A       0.0.0.0
+
+; User isolation zone (slug.build.doomchat.ca)
+*.build IN  A       0.0.0.0
+
+; Mail closed until you add MX
+@       IN  TXT     "v=spf1 -all"
+_dmarc  IN  TXT     "v=DMARC1; p=reject; rua=mailto:Deltakingzero@doomchat.ca"
+
+; ACME
+@       IN  CAA     0 issue "letsencrypt.org"
+@       IN  CAA     0 issuewild "letsencrypt.org"
+@       IN  CAA     0 iodef "mailto:Deltakingzero@doomchat.ca"

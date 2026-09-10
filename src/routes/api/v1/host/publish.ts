@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { jsonApi } from "@/lib/hector-api/complete";
 import { canView, fileOf, listSites, loadSite, publish, unpublish } from "@/lib/host/site";
+import { classifyHost, withIsolation } from "@/lib/host/isolate";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -21,8 +22,16 @@ export const Route = createFileRoute("/api/v1/host/publish")({
         if (path) {
           const file = fileOf(slug, path);
           if (!file || !canView(file.meta, k)) return jsonApi({ error: { message: "not found" } }, 404);
-          const type = path.endsWith(".css") ? "text/css" : path.endsWith(".js") ? "text/javascript" : path.endsWith(".html") || path.endsWith(".htm") ? "text/html" : "text/plain";
-          return new Response(file.body, { headers: { "content-type": `${type}; charset=utf-8`, ...CORS } });
+          const type = path.endsWith(".css")
+            ? "text/css"
+            : path.endsWith(".js")
+              ? "text/javascript"
+              : path.endsWith(".html") || path.endsWith(".htm")
+                ? "text/html"
+                : "text/plain";
+          const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "";
+          const kind = classifyHost(host).kind === "user" ? "user" : "apex";
+          return withIsolation(new Response(file.body, { headers: { "content-type": `${type}; charset=utf-8` } }), kind);
         }
         const site = loadSite(slug);
         if (!site || !canView(site.meta, k)) return jsonApi({ error: { message: "not found" } }, 404);

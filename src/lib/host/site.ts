@@ -4,7 +4,7 @@
  */
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { RESERVED, slugify, urls } from "./names.ts";
+import { RESERVED, isSafeSlug, slugify, urls } from "./names.ts";
 
 export type Access = "private" | "link" | "public";
 export type SiteMeta = {
@@ -16,7 +16,7 @@ export type SiteMeta = {
   at: number;
   files: number;
 };
-export { RESERVED, slugify, urls, slugFromHost, isPublishJob, slugFromPrompt } from "./names.ts";
+export { RESERVED, slugify, urls, slugFromHost, isPublishJob, slugFromPrompt, isSafeSlug } from "./names.ts";
 
 const DIR = join(process.cwd(), "data", "host");
 
@@ -96,8 +96,8 @@ export function publish(input: {
   boot();
   const title = (input.title || "Hector Build").replace(/[<>]/g, "").slice(0, 80);
   let slug = slugify(input.slug || title);
-  if (!slug || RESERVED.has(slug)) slug = `hx-${Date.now().toString(36).slice(-6)}`;
-  if (RESERVED.has(slug)) throw new Error("reserved name");
+  if (!isSafeSlug(slug)) slug = `hx-${Date.now().toString(36).slice(-6)}`;
+  if (!isSafeSlug(slug)) throw new Error("reserved name");
   const token = hashToken(`${slug}:${Date.now()}:${Math.random()}`);
   const files = { ...input.files };
   if (!files["index.html"] && !files["index.htm"]) files["index.html"] = landing(title, files);

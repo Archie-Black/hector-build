@@ -1,9 +1,8 @@
 # Hector Build · doomchat.ca
 # One VPS. Caddy terminates TLS.
 #
-# DNS A records → this box:
-#   @  www  hx  y  files  updates  chat  matrix
-#   *  (wildcard — user Hector Builds, like grok.me)
+# DNS: packaging/host/dns/doomchat.ca.zone  +  dns/apply.sh
+# Wildcard A * and *.build → this box. User sites: slug.build.doomchat.ca
 #
 # Local services:
 #   127.0.0.1:8080  Hector Build + Spectral HX
@@ -13,6 +12,11 @@
 
 {
 	email admin@doomchat.ca
+	on_demand_tls {
+		ask http://127.0.0.1:8080/api/v1/host/ask
+		interval 2m
+		burst 10
+	}
 }
 
 (proxy) {
@@ -30,12 +34,28 @@
 	}
 }
 
+(isolate) {
+	header -Set-Cookie
+	header Cross-Origin-Opener-Policy same-origin
+	header Cross-Origin-Embedder-Policy credentialless
+	header Cross-Origin-Resource-Policy same-origin
+	header Origin-Agent-Cluster "?1"
+	header X-Content-Type-Options nosniff
+	header X-Frame-Options DENY
+	header Referrer-Policy no-referrer
+	header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+	header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'"
+	header Cache-Control no-store
+}
+
 doomchat.ca {
 	redir https://www.doomchat.ca{uri} permanent
+	header Strict-Transport-Security "max-age=15552000; includeSubDomains"
 }
 
 www.doomchat.ca {
 	encode gzip zstd
+	header Strict-Transport-Security "max-age=15552000; includeSubDomains"
 	reverse_proxy 127.0.0.1:8080 {
 		import proxy
 	}
@@ -105,10 +125,26 @@ matrix.doomchat.ca {
 	}
 }
 
-# grok.me job: every user build gets slug.doomchat.ca
-*.doomchat.ca {
+# Isolation zone. Cookie jar cannot reach www / hx / y.
+*.build.doomchat.ca {
 	encode gzip zstd
-	reverse_proxy 127.0.0.1:8080 {
-		import proxy
+	tls {
+		on_demand
 	}
+	import isolate
+	handle {
+		rewrite * /api/v1/host/publish?slug={labels.3}&path={path}&k={query.k}
+		reverse_proxy 127.0.0.1:8080 {
+			import proxy
+		}
+	}
+}
+
+build.doomchat.ca {
+	redir https://www.doomchat.ca{uri} permanent
+}
+
+# First-level names that are not services do not host user builds.
+*.doomchat.ca {
+	respond "Not a Hector host" 421
 }

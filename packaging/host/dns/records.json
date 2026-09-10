@@ -1,0 +1,25 @@
+{
+  "zone": "doomchat.ca",
+  "ttl": 300,
+  "note": "Set ip from HECTOR_HOST_IP. User builds: *.build.doomchat.ca",
+  "records": [
+    { "type": "A", "name": "@", "proxy": true },
+    { "type": "A", "name": "www", "proxy": true },
+    { "type": "A", "name": "hx", "proxy": true },
+    { "type": "A", "name": "y", "proxy": true },
+    { "type": "A", "name": "files", "proxy": true },
+    { "type": "A", "name": "updates", "proxy": true },
+    { "type": "A", "name": "chat", "proxy": true },
+    { "type": "A", "name": "matrix", "proxy": false },
+    { "type": "A", "name": "ollama", "proxy": true },
+    { "type": "A", "name": "mcp", "proxy": true },
+    { "type": "A", "name": "api", "proxy": true },
+    { "type": "A", "name": "build", "proxy": true },
+    { "type": "A", "name": "*", "proxy": true },
+    { "type": "A", "name": "*.build", "proxy": true },
+    { "type": "TXT", "name": "@", "content": "v=spf1 -all" },
+    { "type": "TXT", "name": "_dmarc", "content": "v=DMARC1; p=reject; rua=mailto:Deltakingzero@doomchat.ca" },
+    { "type": "CAA", "name": "@", "content": "0 issue \"letsencrypt.org\"" },
+    { "type": "CAA", "name": "@", "content": "0 issuewild \"letsencrypt.org\"" }
+  ]
+}
