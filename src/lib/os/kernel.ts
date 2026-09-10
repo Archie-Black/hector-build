@@ -11,6 +11,7 @@ import { advertise } from "../devices/sdp.ts";
 import { bootMm, dropWorking, mmStatus, persistMm } from "./mm.ts";
 import { netStatus } from "../net/stack.ts";
 import { bootZt, ztStatus } from "../zt/zero.ts";
+import { bootLingua, linguaStatus } from "../lingo/lingua.ts";
 
 export type ServiceRole = "kernel" | "user";
 export type OsPhase = "down" | "live" | "wiping";
@@ -26,6 +27,7 @@ export const SERVICES: Service[] = [
   { id: "mmu", name: "MMU", role: "kernel", duty: "memory" },
   { id: "netd", name: "Netd", role: "kernel", duty: "network" },
   { id: "zt", name: "Zero Trust", role: "kernel", duty: "verify" },
+  { id: "lingua", name: "Lingua", role: "kernel", duty: "voice" },
   { id: "hx", name: "Spectral HX", role: "user", duty: "coding" },
 ];
 
@@ -62,6 +64,7 @@ export function boot(now = Date.now()): Session {
   drainJobs();
   bootMm();
   bootZt();
+  bootLingua();
   const s: Session = { id: `hx-${now.toString(36)}`, at: now, phase: "live", persist: false };
   writeSession(s);
   writeFileSync(join(RAM, "motd"), `Hector Transient OS ${s.id}\nSpectral HX is userland.\n`);
@@ -114,6 +117,7 @@ export function osStatus() {
     mm: mmStatus(),
     net: netStatus(),
     zt: ztStatus(),
+    lingua: linguaStatus(),
     ram: RAM,
     note: "Host is firmware. Hector is the OS. Spectral HX is userland. Vault is secrets. Memory image survives wipe.",
   };

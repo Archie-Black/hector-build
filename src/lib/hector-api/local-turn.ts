@@ -3,10 +3,12 @@ import { runWorkspaceTests } from "@/lib/workspace/run-tests";
 import { diagnostics } from "@/lib/ide/symbols";
 import type { AgentResponse, ForgeMode } from "@/lib/workspace/types";
 import { synthesizeFiles } from "./synthesize";
-import { prove, proofLine } from "@/lib/workspace/prove";
+import { prove } from "@/lib/workspace/prove";
 import { silentCouple } from "@/lib/chips/silent.ts";
 import { recordTurn } from "@/lib/os/mm";
-import { healLoop, iacOf, prSpec, rememberRepo, reviewDiffs, wantsVisual } from "@/lib/partner/partner";
+import { learn } from "@/lib/lingo/lingua";
+import { healLoop, iacOf, rememberRepo, wantsVisual } from "@/lib/partner/partner";
+import { speakDone, speakPlan, speakScout } from "@/lib/partner/speak";
 
 type Msg = { role?: string; content?: unknown; tool_calls?: unknown; name?: string };
 
@@ -17,6 +19,7 @@ export async function runLocalTurn(input: {
   history?: { role: string; content: string }[];
 }): Promise<AgentResponse> {
   void import("@/lib/spool/spooler").then((m) => m.spoolFor(input.prompt)).catch(() => undefined);
+  learn(input.prompt);
   const before = { ...input.files };
   let files = { ...input.files };
   const traces: AgentResponse["traces"] = [];
@@ -40,12 +43,7 @@ export async function runLocalTurn(input: {
     const lint = diagnostics(files).slice(0, 12);
     return {
       ok: true,
-      reply: [
-        "Hector API (local) scout.",
-        `Workspace: ${Object.keys(files).length} files.`,
-        lint.length ? `Lints: ${lint.map((l) => `${l.path}:${l.line} ${l.message}`).join("; ")}` : "No lints.",
-        "Ready to implement. No writes in scout.",
-      ].join("\n"),
+      reply: speakScout(Object.keys(files).length, lint.length),
       files,
       traces,
       tests: runWorkspaceTests(files),
@@ -57,11 +55,7 @@ export async function runLocalTurn(input: {
     const planned = synthesizeFiles(prompt, files);
     return {
       ok: true,
-      reply: [
-        "Hector API plan (local engine).",
-        ...Object.keys(planned).map((p, i) => `${i + 1}. ${p}`),
-        "Say go and Spectral HX will apply this.",
-      ].join("\n"),
+      reply: speakPlan(Object.keys(planned)),
       files,
       traces,
       tests: runWorkspaceTests(files),
@@ -97,20 +91,10 @@ export async function runLocalTurn(input: {
   traces.push({ name: "prove", ok: p.done, detail: p.note });
   recordTurn({ agent: "hx", prompt, ok: p.done, note: p.note });
   const diffs = diffsFrom(before, files);
-  const review = reviewDiffs(diffs, files);
-  const pr = prSpec(prompt, diffs);
   const written = Object.keys(generated);
   return {
     ok: true,
-    reply: [
-      `Hector API applied ${written.length} file(s) on the local engine.`,
-      written.map((path) => `• ${path}`).join("\n"),
-      proofLine(p),
-      p.done ? `PR ready: ${pr.branch}` : "",
-      review[0] || "",
-    ]
-      .filter(Boolean)
-      .join("\n"),
+    reply: speakDone({ written, proof: p }),
     files,
     traces,
     tests: p.tests.map((t) => ({ name: t.name, pass: t.pass, detail: "" })),
@@ -132,8 +116,8 @@ export function localChatCompletion(body: {
     .join("\n\n");
   const text =
     Object.keys(generated).length === 0
-      ? "Hector API is live. Ask me to build, and I will write the files."
-      : `Hector API (local).\n\n${files}`;
+      ? "Hey. Tell me what to build."
+      : `Done.\n\n${files}`;
 
   if (Array.isArray(body.tools) && body.tools.length && Object.keys(generated).length) {
     const calls = Object.entries(generated)

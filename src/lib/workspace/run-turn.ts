@@ -16,6 +16,7 @@ import { harmScan } from "@/lib/align/asimov";
 import { runLocalTurn } from "@/lib/hector-api/local-turn";
 import { executeExtension, EXTENSION_TOOLS, isExtensionTool } from "@/lib/hector-api/extensions";
 import { silentCouple } from "@/lib/chips/silent.ts";
+import { learn, render } from "@/lib/lingo/lingua";
 import type { AgentResponse, AgentTodo, ForgeMode } from "./types";
 
 const TOOLS = [
@@ -512,6 +513,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
   .validator((input: TurnInput) => input)
   .handler(async ({ data }): Promise<AgentResponse> => {
     void import("@/lib/spool/spooler").then((m) => m.spoolFor(data.prompt)).catch(() => undefined);
+    learn(data.prompt);
     const visitor = isApiKey(data.visitorKey ?? "") ? data.visitorKey!.trim() : "";
     const engine = await resolveEngine({
       providerId: data.providerId,
@@ -525,7 +527,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     if (harm.harm) {
       return {
         ok: true,
-        reply: harm.note,
+        reply: render(harm.note, { who: "hector", mood: "chat", job: data.prompt }),
         files: data.files,
         traces: [{ name: "asimov", ok: true, detail: harm.law }],
         tests: runWorkspaceTests(data.files),
@@ -748,6 +750,7 @@ export const runForgeTurn = createServerFn({ method: "POST" })
     if (!reply) {
       reply = "Used every step available. Send continue to pick up the rest.";
     }
+    reply = render(reply, { who: "hector", job: data.prompt, lastHuman: data.prompt, mood: "build" });
 
     return {
       ok: true,
