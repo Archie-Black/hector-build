@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 type Props = {
-  kind: "hector" | "agent";
+  kind: "hector" | "agent" | "ace";
   className?: string;
   n?: number;
   style?: CSSProperties;
@@ -10,6 +10,7 @@ type Props = {
 const SRC = {
   hector: "/hector/skull-cut.png",
   agent: "/hector/agent-cut.png",
+  ace: "/hector/ace-cut.png",
 };
 
 /** Photoreal Unreal-style sheets. Black plate matches the void. */

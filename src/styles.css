@@ -474,6 +474,19 @@ html[data-theme="light"] {
   margin: -0.39rem 0 0 -0.39rem;
 }
 
+.atom-ace {
+  width: 1.55rem;
+  height: 2.2rem;
+  margin: -1.1rem 0 0 -0.78rem;
+  filter: drop-shadow(0 8px 12px rgb(0 0 0 / 70%)) drop-shadow(0 0 8px color-mix(in oklab, #e6ff2a 35%, transparent));
+}
+
+.atom-page .atom-ace {
+  width: 1.85rem;
+  height: 2.6rem;
+  margin: -1.3rem 0 0 -0.92rem;
+}
+
 .atom-nucleus-hold {
   position: absolute;
   left: 50%;
@@ -972,4 +985,59 @@ html[data-motion="reduce"] * {
 html[data-os="android"] .glass-window,
 html[data-os="ios"] .glass-window {
   backdrop-filter: blur(14px);
+}
+
+.xr-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.xr-canvas-off {
+  display: none;
+}
+
+.xr-enter {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 50%;
+  z-index: 5;
+  height: 2.5rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-fg);
+  background: rgb(0 0 0 / 45%);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 0 0 1px #0047ab,
+    0 0 0 2px #e6ff2a;
+}
+
+.xr-live {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.9rem;
+  z-index: 5;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e6ff2a;
+}
+
+.spatial-field.xr-live .spatial-stage {
+  opacity: 0;
+}
+
+.spatial-field.xr-live .spatial-floor,
+.spatial-field.xr-live .spatial-volume,
+.spatial-field.xr-live .spatial-motes {
+  opacity: 0;
 }

@@ -45,7 +45,7 @@ export function SpectreStage({ busy, ghosts, size = "hero" }: Props) {
             <span className="atom-ring-line" />
             <div className="atom-orbit-spin">
               <div className="atom-electron-hold">
-                <GhostSprite kind="agent" className="atom-electron" />
+                <GhostSprite kind={page ? "ace" : "agent"} className={"atom-electron" + (page ? " atom-ace" : "")} />
               </div>
             </div>
           </div>
