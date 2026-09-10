@@ -20,7 +20,7 @@ public/downloads/
 public/element/
 packaging/guest/*.iso
 packaging/windows/winamp_latest_full.exe
-attachments/winamp_latest_full.exe
+attachments/Pasted Text-*.txt
 .grok/
 .env
 .env.*

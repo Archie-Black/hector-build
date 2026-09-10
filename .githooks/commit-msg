@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${HECTOR_HOOKS:-1}" == "0" ]]; then
+  exit 0
+fi
+msg=$(head -n1 "$1" | tr -d '\r')
+if [[ ${#msg} -lt 8 ]]; then
+  echo "commit-msg: subject must be at least 8 characters" >&2
+  exit 1
+fi
+if grep -qiE '^(fix|update|wip|tmp)$' <<<"$msg"; then
+  echo "commit-msg: say what changed" >&2
+  exit 1
+fi
