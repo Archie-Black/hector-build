@@ -80,11 +80,147 @@ html[data-theme="light"] {
     inset 0 1px 0 color-mix(in oklab, var(--color-fg) 8%, transparent);
 }
 
+.gate-scene {
+  background: #000;
+}
+
+.gate-scenery {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 12%) 0%, rgb(8 2 2 / 28%) 48%, rgb(0 0 0 / 82%) 100%),
+    url("/hector/scenery-doom.jpg") center / cover no-repeat;
+}
+
+.gate-scene > :not(.gate-scenery) {
+  position: relative;
+  z-index: 1;
+}
+
 .app-shell {
   background:
     radial-gradient(900px 420px at 88% -8%, color-mix(in oklab, var(--color-accent) 24%, transparent), transparent 58%),
     radial-gradient(700px 360px at 8% 108%, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent 55%),
     var(--color-bg);
+}
+
+.atom-stage {
+  position: relative;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.atom-hero {
+  width: 22rem;
+  height: 14rem;
+}
+
+.atom-page {
+  width: min(22rem, 90vw);
+  height: 15rem;
+}
+
+.atom-page .atom-nucleus {
+  width: 11rem;
+  height: 11rem;
+  margin: -5.5rem 0 0 -5.5rem;
+  filter: drop-shadow(0 8px 16px color-mix(in oklab, var(--color-accent) 28%, transparent));
+}
+
+.atom-page .atom-ring {
+  width: 16.5rem;
+  height: 5.6rem;
+}
+
+.atom-page .atom-electron {
+  width: 2rem;
+  height: 2rem;
+  offset-path: ellipse(8.25rem 2.8rem at 50% 50%);
+}
+
+.atom-compact {
+  width: 5.5rem;
+  height: 3.2rem;
+}
+
+.atom-nucleus {
+  position: absolute;
+  display: block;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 8.5rem;
+  height: 8.5rem;
+  margin: -4.25rem 0 0 -4.25rem;
+  filter: drop-shadow(0 0 22px color-mix(in oklab, var(--color-accent) 50%, transparent));
+  animation: hector-bob 4.8s ease-in-out infinite;
+}
+
+.atom-compact .atom-nucleus {
+  width: 1.9rem;
+  height: 1.9rem;
+  margin: -0.95rem 0 0 -0.95rem;
+  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--color-accent) 40%, transparent));
+}
+
+.atom-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18rem;
+  height: 6.4rem;
+  margin: 0;
+  border: 1px solid color-mix(in oklab, var(--color-accent) 32%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.atom-compact .atom-ring {
+  width: 4.6rem;
+  height: 1.7rem;
+  border-color: color-mix(in oklab, var(--color-accent) 22%, transparent);
+}
+
+.ghost-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  background: transparent;
+}
+
+.atom-electron {
+  position: absolute;
+  display: block;
+  width: 2.1rem;
+  height: 2.1rem;
+  offset-path: ellipse(9rem 3.2rem at 50% 50%);
+  offset-rotate: 0deg;
+  animation: atom-orbit 0.55s linear infinite;
+  filter: drop-shadow(0 0 10px color-mix(in oklab, var(--color-accent) 35%, transparent));
+}
+
+.atom-compact .atom-electron {
+  width: 0.72rem;
+  height: 0.72rem;
+  offset-path: ellipse(2.3rem 0.85rem at 50% 50%);
+}
+
+.hector-busy .atom-nucleus {
+  animation-duration: 2.8s;
+}
+
+.hector-busy .atom-electron {
+  animation-duration: 0.28s;
+}
+
+@keyframes atom-orbit {
+  to {
+    offset-distance: 100%;
+  }
 }
 
 .hector-hero {
@@ -94,7 +230,6 @@ html[data-theme="light"] {
   width: 7.5rem;
   height: 7.5rem;
   margin: 0.5rem auto 0;
-  object-fit: contain;
   filter: drop-shadow(0 0 18px color-mix(in oklab, var(--color-accent) 45%, transparent));
   animation: hector-bob 3.6s ease-in-out infinite;
 }
@@ -123,18 +258,6 @@ html[data-theme="light"] {
   margin: -0.48rem;
   animation-name: ghost-orbit-sm;
   animation-duration: 6s;
-}
-
-.hector-busy .hector-hero {
-  animation-duration: 1.2s;
-}
-
-.hector-busy .ghost-orbit-img {
-  animation-duration: 3.2s;
-}
-
-.hector-busy .ghost-orbit-sm {
-  animation-duration: 2.4s;
 }
 
 .smoke-puff {
@@ -205,32 +328,13 @@ html[data-theme="light"] {
   }
 }
 
-.hector-hero-page {
-  width: 11rem;
-  height: 11rem;
-  margin: 0 auto;
-  filter: drop-shadow(0 0 36px color-mix(in oklab, var(--color-accent) 55%, transparent));
-}
-
-.ghost-orbit-page {
-  width: 3.15rem;
-  height: 3.15rem;
-  margin: -1.57rem;
-  animation-name: ghost-orbit-page;
-  animation-duration: 14s;
-}
-
-.ghost-orbit-page:nth-child(odd) {
-  animation-duration: 18s;
-  animation-direction: reverse;
-}
-
-@keyframes ghost-orbit-page {
-  from {
-    transform: rotate(0deg) translateX(12rem) rotate(0deg);
+@keyframes hector-bob {
+  0%,
+  100% {
+    transform: translateY(0);
   }
-  to {
-    transform: rotate(360deg) translateX(12rem) rotate(-360deg);
+  50% {
+    transform: translateY(-5px);
   }
 }
 
@@ -496,7 +600,9 @@ html[data-theme="light"] {
   .ghost-orbit-img,
   .jersey-sprite,
   .smoke-puff,
-  .chat-dot {
+  .chat-dot,
+  .atom-nucleus,
+  .atom-electron {
     animation: none;
   }
 }

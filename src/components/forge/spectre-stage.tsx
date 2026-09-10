@@ -1,4 +1,3 @@
-import { SmokeLayer } from "@/components/forge/smoke-layer";
 import { GhostSprite } from "@/components/forge/ghost-sprite";
 
 type Props = {
@@ -7,32 +6,39 @@ type Props = {
   size?: "hero" | "compact" | "page";
 };
 
+const RINGS = [
+  { tilt: "0deg", duration: "0.55s" },
+  { tilt: "60deg", duration: "0.7s" },
+  { tilt: "-55deg", duration: "0.42s" },
+];
+
 export function SpectreStage({ busy, ghosts, size = "hero" }: Props) {
-  const n = Math.max(2, Math.min(ghosts, size === "page" ? 9 : 5));
   const compact = size === "compact";
   const page = size === "page";
+  const rings = compact ? 1 : Math.min(3, Math.max(1, Math.round(ghosts / 2)));
   return (
     <div
       className={
-        "relative mx-auto " +
-        (compact ? "h-11 w-20" : page ? "h-[min(72vh,32rem)] w-full max-w-3xl" : "h-44 w-full max-w-sm") +
+        "atom-stage" +
+        (compact ? " atom-compact" : page ? " atom-page" : " atom-hero") +
         (busy ? " hector-busy" : "")
       }
       aria-hidden={compact}
     >
-      {compact ? null : <SmokeLayer busy={busy || page} />}
-      {Array.from({ length: n }, (_, i) => (
-        <GhostSprite
-          key={i}
-          kind="agent"
-          className={"ghost-orbit-img" + (compact ? " ghost-orbit-sm" : page ? " ghost-orbit-page" : "")}
-          style={{ animationDelay: `${i * -1.1}s` }}
-        />
+      {RINGS.slice(0, rings).map((ring, i) => (
+        <div
+          key={ring.tilt}
+          className="atom-ring"
+          style={{ transform: `translate(-50%, -50%) rotate(${ring.tilt})` }}
+        >
+          <GhostSprite
+            kind="agent"
+            className="atom-electron"
+            style={{ animationDuration: ring.duration, animationDelay: `${i * -0.18}s` }}
+          />
+        </div>
       ))}
-      <GhostSprite
-        kind="hector"
-        className={"hector-hero" + (compact ? " hector-hero-sm" : page ? " hector-hero-page" : "")}
-      />
+      <GhostSprite kind="hector" className="atom-nucleus" />
     </div>
   );
 }

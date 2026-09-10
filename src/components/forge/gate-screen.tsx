@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { GhostVis } from "@/components/forge/ghost-vis";
 import { SpectreStage } from "@/components/forge/spectre-stage";
 import { useForgeStore } from "@/lib/forge-store";
 import {
@@ -64,12 +63,12 @@ export function GateScreen() {
   }, [step]);
 
   return (
-    <div className="relative flex h-dvh flex-col items-center justify-end overflow-hidden px-4 pb-6">
-      <GhostVis on beat={0.2} layer="back" />
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <SpectreStage busy ghosts={8} size="page" />
+    <div className="gate-scene relative flex h-dvh flex-col items-center overflow-hidden px-4 pb-6 pt-5">
+      <div className="gate-scenery" aria-hidden />
+      <div className="pointer-events-none flex w-full shrink-0 justify-center">
+        <SpectreStage busy={false} ghosts={3} size="page" />
       </div>
-      <div className="relative z-10 w-full max-w-md rounded-lg px-8 py-7 text-center glass-window">
+      <div className="relative z-10 mt-auto w-full max-w-md rounded-lg px-8 py-7 text-center glass-window">
         <h1 className="text-3xl font-medium tracking-tight text-balance">DooMChaT</h1>
         <p className="mt-1 text-sm text-muted">Hector Build · Spectral HX</p>
         <p className="mt-1 text-xs tracking-[0.14em] text-subtle uppercase">{CREDIT}</p>
