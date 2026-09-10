@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { SpectreStage } from "@/components/forge/spectre-stage";
 import { SmokeLayer } from "@/components/forge/smoke-layer";
 import { SpatialField, SpatialFx } from "@/components/forge/spatial-field";
+import { XrPortal } from "@/components/forge/xr-portal";
+import { OAuthButtons } from "@/components/forge/oauth-buttons";
 import { useForgeStore } from "@/lib/forge-store";
 import {
   confirmCode,
@@ -17,7 +19,6 @@ import { scanEnvironment, scanLines, type EnvScan } from "@/lib/hw/env-scan";
 import { lockPlatform } from "@/lib/workspace/platform";
 import { createVault, vaultExists } from "@/lib/security/vault";
 import { CREDIT } from "@/lib/legal/copy";
-import { GROK_PROVIDERS, authEnabled, signIn as signInOAuth } from "@/lib/auth/client";
 import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import QRCode from "qrcode";
 
@@ -41,7 +42,7 @@ export function GateScreen() {
   const [otpSvg, setOtpSvg] = useState("");
   const [recSvg, setRecSvg] = useState("");
   const [codes, setCodes] = useState<string[]>([]);
-  const { user, isPending } = useCurrentUserState();
+  const { user } = useCurrentUserState();
 
   useEffect(() => {
     if (user && !user.isDevFallback) {
@@ -70,11 +71,12 @@ export function GateScreen() {
       <div className="gate-bloom" aria-hidden />
       <div className="gate-mist" aria-hidden />
       <SpatialFx />
+      <XrPortal />
       <SmokeLayer busy={false} />
       <div className="spatial-stage pointer-events-none flex w-full shrink-0 justify-center pt-2">
         <SpectreStage busy={false} ghosts={3} size="page" />
       </div>
-      <div className="gate-card spatial-glass relative z-10 mt-auto w-full max-w-md px-8 py-8 text-center glass-window">
+      <div id="hector-xr-overlay" className="gate-card spatial-glass relative z-10 mt-auto w-full max-w-md px-8 py-8 text-center glass-window">
         <span className="spatial-sheen" aria-hidden />
         <h1 className="gate-word text-balance">DooMChaT</h1>
         <p className="mt-1 text-sm text-muted">Hector Build · Spectral HX</p>
@@ -82,19 +84,8 @@ export function GateScreen() {
 
         {step === "login" ? (
           <div className="mt-8 flex flex-col gap-2 text-left">
-            {isPending ? <div className="h-12 rounded-md glass-thin" /> : null}
-            {!isPending && authEnabled
-              ? GROK_PROVIDERS.map((p) => (
-                  <button
-                    key={p.providerId}
-                    type="button"
-                    className="h-12 rounded-xl text-sm font-medium glass-thin"
-                    onClick={() => void signInOAuth(p.providerId, { callbackURL: "/" })}
-                  >
-                    Continue with {p.label}
-                  </button>
-                ))
-              : null}
+            <OAuthButtons verb="Continue" />
+            <p className="py-1 text-center text-xs tracking-[0.16em] text-subtle uppercase">or email</p>
             <form
               className="flex flex-col gap-2"
               onSubmit={(e) => {
@@ -137,15 +128,18 @@ export function GateScreen() {
             >
               Create account
             </button>
-            <p className="text-center text-xs text-subtle">OAuth, or a verified email.</p>
+            <p className="text-center text-xs text-subtle">Google, X, or a verified email.</p>
             </form>
           </div>
         ) : null}
 
         {step === "signup" ? (
-          <form
-            className="mt-8 flex flex-col gap-2 text-left"
-            onSubmit={(e) => {
+          <div className="mt-8 flex flex-col gap-2 text-left">
+            <OAuthButtons verb="Sign up" />
+            <p className="py-1 text-center text-xs tracking-[0.16em] text-subtle uppercase">or email</p>
+            <form
+              className="flex flex-col gap-2"
+              onSubmit={(e) => {
               e.preventDefault();
               setError(null);
               void createAccount(email, password, confirm)
@@ -192,6 +186,7 @@ export function GateScreen() {
               Back to login
             </button>
           </form>
+          </div>
         ) : null}
 
         {step === "verify" ? (
