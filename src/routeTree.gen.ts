@@ -10,146 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as BiRouteImport } from './routes/bi'
-import { Route as ChatRouteImport } from './routes/chat'
-import { Route as DownloadsRouteImport } from './routes/downloads'
-import { Route as HxRouteImport } from './routes/hx'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as SandboxRouteImport } from './routes/sandbox'
-import { Route as VerifyRouteImport } from './routes/verify'
-import { Route as ApiRtcRouteImport } from './routes/api/rtc'
-import { Route as ApiShareRouteImport } from './routes/api/share'
-import { Route as HSlugRouteImport } from './routes/h.$slug'
-import { Route as HxSessionRouteImport } from './routes/hx.session'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiV1CloudRouteImport } from './routes/api/v1/cloud'
-import { Route as ApiV1DevicesRouteImport } from './routes/api/v1/devices'
-import { Route as ApiV1EmbeddingsRouteImport } from './routes/api/v1/embeddings'
-import { Route as ApiV1ExtensionsRouteImport } from './routes/api/v1/extensions'
-import { Route as ApiV1FunctionsRouteImport } from './routes/api/v1/functions'
-import { Route as ApiV1KvmRouteImport } from './routes/api/v1/kvm'
-import { Route as ApiV1McpRouteImport } from './routes/api/v1/mcp'
-import { Route as ApiV1ModelsRouteImport } from './routes/api/v1/models'
+import { Route as ApiV1ChimeraRouteImport } from './routes/api/v1/chimera'
+import { Route as ApiV1GhostwalkRouteImport } from './routes/api/v1/ghostwalk'
 import { Route as ApiV1NetRouteImport } from './routes/api/v1/net'
-import { Route as ApiV1OsRouteImport } from './routes/api/v1/os'
-import { Route as ApiV1ShareRouteImport } from './routes/api/v1/share'
-import { Route as ApiV1SpoolRouteImport } from './routes/api/v1/spool'
-import { Route as ApiV1VisionRouteImport } from './routes/api/v1/vision'
-import { Route as ApiV1ZtRouteImport } from './routes/api/v1/zt'
-import { Route as ApiV1ChatCompletionsRouteImport } from './routes/api/v1/chat/completions'
-import { Route as ApiV1HostAskRouteImport } from './routes/api/v1/host/ask'
-import { Route as ApiV1HostPublishRouteImport } from './routes/api/v1/host/publish'
-import { Route as ApiV1HostWslRouteImport } from './routes/api/v1/host/wsl'
+import { Route as ApiV1TimeRouteImport } from './routes/api/v1/time'
+import { Route as ApiV1HxAuthorRouteImport } from './routes/api/v1/hx/author'
+import { Route as ApiV1HxGodotRouteImport } from './routes/api/v1/hx/godot'
+import { Route as ApiV1HxHorizonRouteImport } from './routes/api/v1/hx/horizon'
+import { Route as ApiV1HxLtvRouteImport } from './routes/api/v1/hx/ltv'
+import { Route as ApiV1HxMarketRouteImport } from './routes/api/v1/hx/market'
+import { Route as ApiV1HxRetainRouteImport } from './routes/api/v1/hx/retain'
+import { Route as ApiV1HxUeRouteImport } from './routes/api/v1/hx/ue'
+import { Route as ApiV1V01dFsRouteImport } from './routes/api/v1/v01d/fs'
+import { Route as ApiV1V01dRunRouteImport } from './routes/api/v1/v01d/run'
+import { Route as ApiV1V01dShareRouteImport } from './routes/api/v1/v01d/share'
+import { Route as ApiV1V01dSpeakRouteImport } from './routes/api/v1/v01d/speak'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const ApiV1ChimeraRoute = ApiV1ChimeraRouteImport.update({
+  id: '/api/v1/chimera',
+  path: '/api/v1/chimera',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BiRoute = BiRouteImport.update({
-  id: '/bi',
-  path: '/bi',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatRoute = ChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DownloadsRoute = DownloadsRouteImport.update({
-  id: '/downloads',
-  path: '/downloads',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HxRoute = HxRouteImport.update({
-  id: '/hx',
-  path: '/hx',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SandboxRoute = SandboxRouteImport.update({
-  id: '/sandbox',
-  path: '/sandbox',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VerifyRoute = VerifyRouteImport.update({
-  id: '/verify',
-  path: '/verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiRtcRoute = ApiRtcRouteImport.update({
-  id: '/api/rtc',
-  path: '/api/rtc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShareRoute = ApiShareRouteImport.update({
-  id: '/api/share',
-  path: '/api/share',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HSlugRoute = HSlugRouteImport.update({
-  id: '/h/$slug',
-  path: '/h/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HxSessionRoute = HxSessionRouteImport.update({
-  id: '/session',
-  path: '/session',
-  getParentRoute: () => HxRoute,
-} as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1CloudRoute = ApiV1CloudRouteImport.update({
-  id: '/api/v1/cloud',
-  path: '/api/v1/cloud',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1DevicesRoute = ApiV1DevicesRouteImport.update({
-  id: '/api/v1/devices',
-  path: '/api/v1/devices',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1EmbeddingsRoute = ApiV1EmbeddingsRouteImport.update({
-  id: '/api/v1/embeddings',
-  path: '/api/v1/embeddings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1ExtensionsRoute = ApiV1ExtensionsRouteImport.update({
-  id: '/api/v1/extensions',
-  path: '/api/v1/extensions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1FunctionsRoute = ApiV1FunctionsRouteImport.update({
-  id: '/api/v1/functions',
-  path: '/api/v1/functions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1KvmRoute = ApiV1KvmRouteImport.update({
-  id: '/api/v1/kvm',
-  path: '/api/v1/kvm',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1McpRoute = ApiV1McpRouteImport.update({
-  id: '/api/v1/mcp',
-  path: '/api/v1/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiV1ModelsRoute = ApiV1ModelsRouteImport.update({
-  id: '/api/v1/models',
-  path: '/api/v1/models',
+const ApiV1GhostwalkRoute = ApiV1GhostwalkRouteImport.update({
+  id: '/api/v1/ghostwalk',
+  path: '/api/v1/ghostwalk',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1NetRoute = ApiV1NetRouteImport.update({
@@ -157,292 +46,196 @@ const ApiV1NetRoute = ApiV1NetRouteImport.update({
   path: '/api/v1/net',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1OsRoute = ApiV1OsRouteImport.update({
-  id: '/api/v1/os',
-  path: '/api/v1/os',
+const ApiV1TimeRoute = ApiV1TimeRouteImport.update({
+  id: '/api/v1/time',
+  path: '/api/v1/time',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1ShareRoute = ApiV1ShareRouteImport.update({
-  id: '/api/v1/share',
-  path: '/api/v1/share',
+const ApiV1HxAuthorRoute = ApiV1HxAuthorRouteImport.update({
+  id: '/api/v1/hx/author',
+  path: '/api/v1/hx/author',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1SpoolRoute = ApiV1SpoolRouteImport.update({
-  id: '/api/v1/spool',
-  path: '/api/v1/spool',
+const ApiV1HxGodotRoute = ApiV1HxGodotRouteImport.update({
+  id: '/api/v1/hx/godot',
+  path: '/api/v1/hx/godot',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1VisionRoute = ApiV1VisionRouteImport.update({
-  id: '/api/v1/vision',
-  path: '/api/v1/vision',
+const ApiV1HxHorizonRoute = ApiV1HxHorizonRouteImport.update({
+  id: '/api/v1/hx/horizon',
+  path: '/api/v1/hx/horizon',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1ZtRoute = ApiV1ZtRouteImport.update({
-  id: '/api/v1/zt',
-  path: '/api/v1/zt',
+const ApiV1HxLtvRoute = ApiV1HxLtvRouteImport.update({
+  id: '/api/v1/hx/ltv',
+  path: '/api/v1/hx/ltv',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1ChatCompletionsRoute = ApiV1ChatCompletionsRouteImport.update({
-  id: '/api/v1/chat/completions',
-  path: '/api/v1/chat/completions',
+const ApiV1HxMarketRoute = ApiV1HxMarketRouteImport.update({
+  id: '/api/v1/hx/market',
+  path: '/api/v1/hx/market',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1HostAskRoute = ApiV1HostAskRouteImport.update({
-  id: '/api/v1/host/ask',
-  path: '/api/v1/host/ask',
+const ApiV1HxRetainRoute = ApiV1HxRetainRouteImport.update({
+  id: '/api/v1/hx/retain',
+  path: '/api/v1/hx/retain',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1HostPublishRoute = ApiV1HostPublishRouteImport.update({
-  id: '/api/v1/host/publish',
-  path: '/api/v1/host/publish',
+const ApiV1HxUeRoute = ApiV1HxUeRouteImport.update({
+  id: '/api/v1/hx/ue',
+  path: '/api/v1/hx/ue',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1HostWslRoute = ApiV1HostWslRouteImport.update({
-  id: '/api/v1/host/wsl',
-  path: '/api/v1/host/wsl',
+const ApiV1V01dFsRoute = ApiV1V01dFsRouteImport.update({
+  id: '/api/v1/v01d/fs',
+  path: '/api/v1/v01d/fs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1V01dRunRoute = ApiV1V01dRunRouteImport.update({
+  id: '/api/v1/v01d/run',
+  path: '/api/v1/v01d/run',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1V01dShareRoute = ApiV1V01dShareRouteImport.update({
+  id: '/api/v1/v01d/share',
+  path: '/api/v1/v01d/share',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1V01dSpeakRoute = ApiV1V01dSpeakRouteImport.update({
+  id: '/api/v1/v01d/speak',
+  path: '/api/v1/v01d/speak',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/bi': typeof BiRoute
-  '/chat': typeof ChatRoute
-  '/downloads': typeof DownloadsRoute
-  '/hx': typeof HxRouteWithChildren
-  '/login': typeof LoginRoute
-  '/sandbox': typeof SandboxRoute
-  '/verify': typeof VerifyRoute
-  '/api/rtc': typeof ApiRtcRoute
-  '/api/share': typeof ApiShareRoute
-  '/h/$slug': typeof HSlugRoute
-  '/hx/session': typeof HxSessionRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/v1/cloud': typeof ApiV1CloudRoute
-  '/api/v1/devices': typeof ApiV1DevicesRoute
-  '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
-  '/api/v1/extensions': typeof ApiV1ExtensionsRoute
-  '/api/v1/functions': typeof ApiV1FunctionsRoute
-  '/api/v1/kvm': typeof ApiV1KvmRoute
-  '/api/v1/mcp': typeof ApiV1McpRoute
-  '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/chimera': typeof ApiV1ChimeraRoute
+  '/api/v1/ghostwalk': typeof ApiV1GhostwalkRoute
   '/api/v1/net': typeof ApiV1NetRoute
-  '/api/v1/os': typeof ApiV1OsRoute
-  '/api/v1/share': typeof ApiV1ShareRoute
-  '/api/v1/spool': typeof ApiV1SpoolRoute
-  '/api/v1/vision': typeof ApiV1VisionRoute
-  '/api/v1/zt': typeof ApiV1ZtRoute
-  '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
-  '/api/v1/host/ask': typeof ApiV1HostAskRoute
-  '/api/v1/host/publish': typeof ApiV1HostPublishRoute
-  '/api/v1/host/wsl': typeof ApiV1HostWslRoute
+  '/api/v1/time': typeof ApiV1TimeRoute
+  '/api/v1/hx/author': typeof ApiV1HxAuthorRoute
+  '/api/v1/hx/godot': typeof ApiV1HxGodotRoute
+  '/api/v1/hx/horizon': typeof ApiV1HxHorizonRoute
+  '/api/v1/hx/ltv': typeof ApiV1HxLtvRoute
+  '/api/v1/hx/market': typeof ApiV1HxMarketRoute
+  '/api/v1/hx/retain': typeof ApiV1HxRetainRoute
+  '/api/v1/hx/ue': typeof ApiV1HxUeRoute
+  '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
+  '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
+  '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
+  '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/bi': typeof BiRoute
-  '/chat': typeof ChatRoute
-  '/downloads': typeof DownloadsRoute
-  '/hx': typeof HxRouteWithChildren
-  '/login': typeof LoginRoute
-  '/sandbox': typeof SandboxRoute
-  '/verify': typeof VerifyRoute
-  '/api/rtc': typeof ApiRtcRoute
-  '/api/share': typeof ApiShareRoute
-  '/h/$slug': typeof HSlugRoute
-  '/hx/session': typeof HxSessionRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/v1/cloud': typeof ApiV1CloudRoute
-  '/api/v1/devices': typeof ApiV1DevicesRoute
-  '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
-  '/api/v1/extensions': typeof ApiV1ExtensionsRoute
-  '/api/v1/functions': typeof ApiV1FunctionsRoute
-  '/api/v1/kvm': typeof ApiV1KvmRoute
-  '/api/v1/mcp': typeof ApiV1McpRoute
-  '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/chimera': typeof ApiV1ChimeraRoute
+  '/api/v1/ghostwalk': typeof ApiV1GhostwalkRoute
   '/api/v1/net': typeof ApiV1NetRoute
-  '/api/v1/os': typeof ApiV1OsRoute
-  '/api/v1/share': typeof ApiV1ShareRoute
-  '/api/v1/spool': typeof ApiV1SpoolRoute
-  '/api/v1/vision': typeof ApiV1VisionRoute
-  '/api/v1/zt': typeof ApiV1ZtRoute
-  '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
-  '/api/v1/host/ask': typeof ApiV1HostAskRoute
-  '/api/v1/host/publish': typeof ApiV1HostPublishRoute
-  '/api/v1/host/wsl': typeof ApiV1HostWslRoute
+  '/api/v1/time': typeof ApiV1TimeRoute
+  '/api/v1/hx/author': typeof ApiV1HxAuthorRoute
+  '/api/v1/hx/godot': typeof ApiV1HxGodotRoute
+  '/api/v1/hx/horizon': typeof ApiV1HxHorizonRoute
+  '/api/v1/hx/ltv': typeof ApiV1HxLtvRoute
+  '/api/v1/hx/market': typeof ApiV1HxMarketRoute
+  '/api/v1/hx/retain': typeof ApiV1HxRetainRoute
+  '/api/v1/hx/ue': typeof ApiV1HxUeRoute
+  '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
+  '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
+  '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
+  '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
-  '/bi': typeof BiRoute
-  '/chat': typeof ChatRoute
-  '/downloads': typeof DownloadsRoute
-  '/hx': typeof HxRouteWithChildren
-  '/login': typeof LoginRoute
-  '/sandbox': typeof SandboxRoute
-  '/verify': typeof VerifyRoute
-  '/api/rtc': typeof ApiRtcRoute
-  '/api/share': typeof ApiShareRoute
-  '/h/$slug': typeof HSlugRoute
-  '/hx/session': typeof HxSessionRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/v1/cloud': typeof ApiV1CloudRoute
-  '/api/v1/devices': typeof ApiV1DevicesRoute
-  '/api/v1/embeddings': typeof ApiV1EmbeddingsRoute
-  '/api/v1/extensions': typeof ApiV1ExtensionsRoute
-  '/api/v1/functions': typeof ApiV1FunctionsRoute
-  '/api/v1/kvm': typeof ApiV1KvmRoute
-  '/api/v1/mcp': typeof ApiV1McpRoute
-  '/api/v1/models': typeof ApiV1ModelsRoute
+  '/api/v1/chimera': typeof ApiV1ChimeraRoute
+  '/api/v1/ghostwalk': typeof ApiV1GhostwalkRoute
   '/api/v1/net': typeof ApiV1NetRoute
-  '/api/v1/os': typeof ApiV1OsRoute
-  '/api/v1/share': typeof ApiV1ShareRoute
-  '/api/v1/spool': typeof ApiV1SpoolRoute
-  '/api/v1/vision': typeof ApiV1VisionRoute
-  '/api/v1/zt': typeof ApiV1ZtRoute
-  '/api/v1/chat/completions': typeof ApiV1ChatCompletionsRoute
-  '/api/v1/host/ask': typeof ApiV1HostAskRoute
-  '/api/v1/host/publish': typeof ApiV1HostPublishRoute
-  '/api/v1/host/wsl': typeof ApiV1HostWslRoute
+  '/api/v1/time': typeof ApiV1TimeRoute
+  '/api/v1/hx/author': typeof ApiV1HxAuthorRoute
+  '/api/v1/hx/godot': typeof ApiV1HxGodotRoute
+  '/api/v1/hx/horizon': typeof ApiV1HxHorizonRoute
+  '/api/v1/hx/ltv': typeof ApiV1HxLtvRoute
+  '/api/v1/hx/market': typeof ApiV1HxMarketRoute
+  '/api/v1/hx/retain': typeof ApiV1HxRetainRoute
+  '/api/v1/hx/ue': typeof ApiV1HxUeRoute
+  '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
+  '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
+  '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
+  '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
-    | '/bi'
-    | '/chat'
-    | '/downloads'
-    | '/hx'
-    | '/login'
-    | '/sandbox'
-    | '/verify'
-    | '/api/rtc'
-    | '/api/share'
-    | '/h/$slug'
-    | '/hx/session'
-    | '/api/auth/$'
-    | '/api/v1/cloud'
-    | '/api/v1/devices'
-    | '/api/v1/embeddings'
-    | '/api/v1/extensions'
-    | '/api/v1/functions'
-    | '/api/v1/kvm'
-    | '/api/v1/mcp'
-    | '/api/v1/models'
+    | '/api/v1/chimera'
+    | '/api/v1/ghostwalk'
     | '/api/v1/net'
-    | '/api/v1/os'
-    | '/api/v1/share'
-    | '/api/v1/spool'
-    | '/api/v1/vision'
-    | '/api/v1/zt'
-    | '/api/v1/chat/completions'
-    | '/api/v1/host/ask'
-    | '/api/v1/host/publish'
-    | '/api/v1/host/wsl'
+    | '/api/v1/time'
+    | '/api/v1/hx/author'
+    | '/api/v1/hx/godot'
+    | '/api/v1/hx/horizon'
+    | '/api/v1/hx/ltv'
+    | '/api/v1/hx/market'
+    | '/api/v1/hx/retain'
+    | '/api/v1/hx/ue'
+    | '/api/v1/v01d/fs'
+    | '/api/v1/v01d/run'
+    | '/api/v1/v01d/share'
+    | '/api/v1/v01d/speak'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
-    | '/bi'
-    | '/chat'
-    | '/downloads'
-    | '/hx'
-    | '/login'
-    | '/sandbox'
-    | '/verify'
-    | '/api/rtc'
-    | '/api/share'
-    | '/h/$slug'
-    | '/hx/session'
-    | '/api/auth/$'
-    | '/api/v1/cloud'
-    | '/api/v1/devices'
-    | '/api/v1/embeddings'
-    | '/api/v1/extensions'
-    | '/api/v1/functions'
-    | '/api/v1/kvm'
-    | '/api/v1/mcp'
-    | '/api/v1/models'
+    | '/api/v1/chimera'
+    | '/api/v1/ghostwalk'
     | '/api/v1/net'
-    | '/api/v1/os'
-    | '/api/v1/share'
-    | '/api/v1/spool'
-    | '/api/v1/vision'
-    | '/api/v1/zt'
-    | '/api/v1/chat/completions'
-    | '/api/v1/host/ask'
-    | '/api/v1/host/publish'
-    | '/api/v1/host/wsl'
+    | '/api/v1/time'
+    | '/api/v1/hx/author'
+    | '/api/v1/hx/godot'
+    | '/api/v1/hx/horizon'
+    | '/api/v1/hx/ltv'
+    | '/api/v1/hx/market'
+    | '/api/v1/hx/retain'
+    | '/api/v1/hx/ue'
+    | '/api/v1/v01d/fs'
+    | '/api/v1/v01d/run'
+    | '/api/v1/v01d/share'
+    | '/api/v1/v01d/speak'
   id:
     | '__root__'
     | '/'
-    | '/admin'
-    | '/bi'
-    | '/chat'
-    | '/downloads'
-    | '/hx'
-    | '/login'
-    | '/sandbox'
-    | '/verify'
-    | '/api/rtc'
-    | '/api/share'
-    | '/h/$slug'
-    | '/hx/session'
-    | '/api/auth/$'
-    | '/api/v1/cloud'
-    | '/api/v1/devices'
-    | '/api/v1/embeddings'
-    | '/api/v1/extensions'
-    | '/api/v1/functions'
-    | '/api/v1/kvm'
-    | '/api/v1/mcp'
-    | '/api/v1/models'
+    | '/api/v1/chimera'
+    | '/api/v1/ghostwalk'
     | '/api/v1/net'
-    | '/api/v1/os'
-    | '/api/v1/share'
-    | '/api/v1/spool'
-    | '/api/v1/vision'
-    | '/api/v1/zt'
-    | '/api/v1/chat/completions'
-    | '/api/v1/host/ask'
-    | '/api/v1/host/publish'
-    | '/api/v1/host/wsl'
+    | '/api/v1/time'
+    | '/api/v1/hx/author'
+    | '/api/v1/hx/godot'
+    | '/api/v1/hx/horizon'
+    | '/api/v1/hx/ltv'
+    | '/api/v1/hx/market'
+    | '/api/v1/hx/retain'
+    | '/api/v1/hx/ue'
+    | '/api/v1/v01d/fs'
+    | '/api/v1/v01d/run'
+    | '/api/v1/v01d/share'
+    | '/api/v1/v01d/speak'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
-  BiRoute: typeof BiRoute
-  ChatRoute: typeof ChatRoute
-  DownloadsRoute: typeof DownloadsRoute
-  HxRoute: typeof HxRouteWithChildren
-  LoginRoute: typeof LoginRoute
-  SandboxRoute: typeof SandboxRoute
-  VerifyRoute: typeof VerifyRoute
-  ApiRtcRoute: typeof ApiRtcRoute
-  ApiShareRoute: typeof ApiShareRoute
-  HSlugRoute: typeof HSlugRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiV1CloudRoute: typeof ApiV1CloudRoute
-  ApiV1DevicesRoute: typeof ApiV1DevicesRoute
-  ApiV1EmbeddingsRoute: typeof ApiV1EmbeddingsRoute
-  ApiV1ExtensionsRoute: typeof ApiV1ExtensionsRoute
-  ApiV1FunctionsRoute: typeof ApiV1FunctionsRoute
-  ApiV1KvmRoute: typeof ApiV1KvmRoute
-  ApiV1McpRoute: typeof ApiV1McpRoute
-  ApiV1ModelsRoute: typeof ApiV1ModelsRoute
+  ApiV1ChimeraRoute: typeof ApiV1ChimeraRoute
+  ApiV1GhostwalkRoute: typeof ApiV1GhostwalkRoute
   ApiV1NetRoute: typeof ApiV1NetRoute
-  ApiV1OsRoute: typeof ApiV1OsRoute
-  ApiV1ShareRoute: typeof ApiV1ShareRoute
-  ApiV1SpoolRoute: typeof ApiV1SpoolRoute
-  ApiV1VisionRoute: typeof ApiV1VisionRoute
-  ApiV1ZtRoute: typeof ApiV1ZtRoute
-  ApiV1ChatCompletionsRoute: typeof ApiV1ChatCompletionsRoute
-  ApiV1HostAskRoute: typeof ApiV1HostAskRoute
-  ApiV1HostPublishRoute: typeof ApiV1HostPublishRoute
-  ApiV1HostWslRoute: typeof ApiV1HostWslRoute
+  ApiV1TimeRoute: typeof ApiV1TimeRoute
+  ApiV1HxAuthorRoute: typeof ApiV1HxAuthorRoute
+  ApiV1HxGodotRoute: typeof ApiV1HxGodotRoute
+  ApiV1HxHorizonRoute: typeof ApiV1HxHorizonRoute
+  ApiV1HxLtvRoute: typeof ApiV1HxLtvRoute
+  ApiV1HxMarketRoute: typeof ApiV1HxMarketRoute
+  ApiV1HxRetainRoute: typeof ApiV1HxRetainRoute
+  ApiV1HxUeRoute: typeof ApiV1HxUeRoute
+  ApiV1V01dFsRoute: typeof ApiV1V01dFsRoute
+  ApiV1V01dRunRoute: typeof ApiV1V01dRunRoute
+  ApiV1V01dShareRoute: typeof ApiV1V01dShareRoute
+  ApiV1V01dSpeakRoute: typeof ApiV1V01dSpeakRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -454,151 +247,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/api/v1/chimera': {
+      id: '/api/v1/chimera'
+      path: '/api/v1/chimera'
+      fullPath: '/api/v1/chimera'
+      preLoaderRoute: typeof ApiV1ChimeraRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/bi': {
-      id: '/bi'
-      path: '/bi'
-      fullPath: '/bi'
-      preLoaderRoute: typeof BiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chat': {
-      id: '/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/downloads': {
-      id: '/downloads'
-      path: '/downloads'
-      fullPath: '/downloads'
-      preLoaderRoute: typeof DownloadsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hx': {
-      id: '/hx'
-      path: '/hx'
-      fullPath: '/hx'
-      preLoaderRoute: typeof HxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sandbox': {
-      id: '/sandbox'
-      path: '/sandbox'
-      fullPath: '/sandbox'
-      preLoaderRoute: typeof SandboxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/verify': {
-      id: '/verify'
-      path: '/verify'
-      fullPath: '/verify'
-      preLoaderRoute: typeof VerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/rtc': {
-      id: '/api/rtc'
-      path: '/api/rtc'
-      fullPath: '/api/rtc'
-      preLoaderRoute: typeof ApiRtcRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/share': {
-      id: '/api/share'
-      path: '/api/share'
-      fullPath: '/api/share'
-      preLoaderRoute: typeof ApiShareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/h/$slug': {
-      id: '/h/$slug'
-      path: '/h/$slug'
-      fullPath: '/h/$slug'
-      preLoaderRoute: typeof HSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hx/session': {
-      id: '/hx/session'
-      path: '/session'
-      fullPath: '/hx/session'
-      preLoaderRoute: typeof HxSessionRouteImport
-      parentRoute: typeof HxRoute
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/cloud': {
-      id: '/api/v1/cloud'
-      path: '/api/v1/cloud'
-      fullPath: '/api/v1/cloud'
-      preLoaderRoute: typeof ApiV1CloudRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/devices': {
-      id: '/api/v1/devices'
-      path: '/api/v1/devices'
-      fullPath: '/api/v1/devices'
-      preLoaderRoute: typeof ApiV1DevicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/embeddings': {
-      id: '/api/v1/embeddings'
-      path: '/api/v1/embeddings'
-      fullPath: '/api/v1/embeddings'
-      preLoaderRoute: typeof ApiV1EmbeddingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/extensions': {
-      id: '/api/v1/extensions'
-      path: '/api/v1/extensions'
-      fullPath: '/api/v1/extensions'
-      preLoaderRoute: typeof ApiV1ExtensionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/functions': {
-      id: '/api/v1/functions'
-      path: '/api/v1/functions'
-      fullPath: '/api/v1/functions'
-      preLoaderRoute: typeof ApiV1FunctionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/kvm': {
-      id: '/api/v1/kvm'
-      path: '/api/v1/kvm'
-      fullPath: '/api/v1/kvm'
-      preLoaderRoute: typeof ApiV1KvmRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/mcp': {
-      id: '/api/v1/mcp'
-      path: '/api/v1/mcp'
-      fullPath: '/api/v1/mcp'
-      preLoaderRoute: typeof ApiV1McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/models': {
-      id: '/api/v1/models'
-      path: '/api/v1/models'
-      fullPath: '/api/v1/models'
-      preLoaderRoute: typeof ApiV1ModelsRouteImport
+    '/api/v1/ghostwalk': {
+      id: '/api/v1/ghostwalk'
+      path: '/api/v1/ghostwalk'
+      fullPath: '/api/v1/ghostwalk'
+      preLoaderRoute: typeof ApiV1GhostwalkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/net': {
@@ -608,114 +268,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1NetRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/os': {
-      id: '/api/v1/os'
-      path: '/api/v1/os'
-      fullPath: '/api/v1/os'
-      preLoaderRoute: typeof ApiV1OsRouteImport
+    '/api/v1/time': {
+      id: '/api/v1/time'
+      path: '/api/v1/time'
+      fullPath: '/api/v1/time'
+      preLoaderRoute: typeof ApiV1TimeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/share': {
-      id: '/api/v1/share'
-      path: '/api/v1/share'
-      fullPath: '/api/v1/share'
-      preLoaderRoute: typeof ApiV1ShareRouteImport
+    '/api/v1/hx/author': {
+      id: '/api/v1/hx/author'
+      path: '/api/v1/hx/author'
+      fullPath: '/api/v1/hx/author'
+      preLoaderRoute: typeof ApiV1HxAuthorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/spool': {
-      id: '/api/v1/spool'
-      path: '/api/v1/spool'
-      fullPath: '/api/v1/spool'
-      preLoaderRoute: typeof ApiV1SpoolRouteImport
+    '/api/v1/hx/godot': {
+      id: '/api/v1/hx/godot'
+      path: '/api/v1/hx/godot'
+      fullPath: '/api/v1/hx/godot'
+      preLoaderRoute: typeof ApiV1HxGodotRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/vision': {
-      id: '/api/v1/vision'
-      path: '/api/v1/vision'
-      fullPath: '/api/v1/vision'
-      preLoaderRoute: typeof ApiV1VisionRouteImport
+    '/api/v1/hx/horizon': {
+      id: '/api/v1/hx/horizon'
+      path: '/api/v1/hx/horizon'
+      fullPath: '/api/v1/hx/horizon'
+      preLoaderRoute: typeof ApiV1HxHorizonRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/zt': {
-      id: '/api/v1/zt'
-      path: '/api/v1/zt'
-      fullPath: '/api/v1/zt'
-      preLoaderRoute: typeof ApiV1ZtRouteImport
+    '/api/v1/hx/ltv': {
+      id: '/api/v1/hx/ltv'
+      path: '/api/v1/hx/ltv'
+      fullPath: '/api/v1/hx/ltv'
+      preLoaderRoute: typeof ApiV1HxLtvRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/chat/completions': {
-      id: '/api/v1/chat/completions'
-      path: '/api/v1/chat/completions'
-      fullPath: '/api/v1/chat/completions'
-      preLoaderRoute: typeof ApiV1ChatCompletionsRouteImport
+    '/api/v1/hx/market': {
+      id: '/api/v1/hx/market'
+      path: '/api/v1/hx/market'
+      fullPath: '/api/v1/hx/market'
+      preLoaderRoute: typeof ApiV1HxMarketRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/host/ask': {
-      id: '/api/v1/host/ask'
-      path: '/api/v1/host/ask'
-      fullPath: '/api/v1/host/ask'
-      preLoaderRoute: typeof ApiV1HostAskRouteImport
+    '/api/v1/hx/retain': {
+      id: '/api/v1/hx/retain'
+      path: '/api/v1/hx/retain'
+      fullPath: '/api/v1/hx/retain'
+      preLoaderRoute: typeof ApiV1HxRetainRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/host/publish': {
-      id: '/api/v1/host/publish'
-      path: '/api/v1/host/publish'
-      fullPath: '/api/v1/host/publish'
-      preLoaderRoute: typeof ApiV1HostPublishRouteImport
+    '/api/v1/hx/ue': {
+      id: '/api/v1/hx/ue'
+      path: '/api/v1/hx/ue'
+      fullPath: '/api/v1/hx/ue'
+      preLoaderRoute: typeof ApiV1HxUeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/host/wsl': {
-      id: '/api/v1/host/wsl'
-      path: '/api/v1/host/wsl'
-      fullPath: '/api/v1/host/wsl'
-      preLoaderRoute: typeof ApiV1HostWslRouteImport
+    '/api/v1/v01d/fs': {
+      id: '/api/v1/v01d/fs'
+      path: '/api/v1/v01d/fs'
+      fullPath: '/api/v1/v01d/fs'
+      preLoaderRoute: typeof ApiV1V01dFsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/v01d/run': {
+      id: '/api/v1/v01d/run'
+      path: '/api/v1/v01d/run'
+      fullPath: '/api/v1/v01d/run'
+      preLoaderRoute: typeof ApiV1V01dRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/v01d/share': {
+      id: '/api/v1/v01d/share'
+      path: '/api/v1/v01d/share'
+      fullPath: '/api/v1/v01d/share'
+      preLoaderRoute: typeof ApiV1V01dShareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/v01d/speak': {
+      id: '/api/v1/v01d/speak'
+      path: '/api/v1/v01d/speak'
+      fullPath: '/api/v1/v01d/speak'
+      preLoaderRoute: typeof ApiV1V01dSpeakRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface HxRouteChildren {
-  HxSessionRoute: typeof HxSessionRoute
-}
-
-const HxRouteChildren: HxRouteChildren = {
-  HxSessionRoute: HxSessionRoute,
-}
-
-const HxRouteWithChildren = HxRoute._addFileChildren(HxRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
-  BiRoute: BiRoute,
-  ChatRoute: ChatRoute,
-  DownloadsRoute: DownloadsRoute,
-  HxRoute: HxRouteWithChildren,
-  LoginRoute: LoginRoute,
-  SandboxRoute: SandboxRoute,
-  VerifyRoute: VerifyRoute,
-  ApiRtcRoute: ApiRtcRoute,
-  ApiShareRoute: ApiShareRoute,
-  HSlugRoute: HSlugRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiV1CloudRoute: ApiV1CloudRoute,
-  ApiV1DevicesRoute: ApiV1DevicesRoute,
-  ApiV1EmbeddingsRoute: ApiV1EmbeddingsRoute,
-  ApiV1ExtensionsRoute: ApiV1ExtensionsRoute,
-  ApiV1FunctionsRoute: ApiV1FunctionsRoute,
-  ApiV1KvmRoute: ApiV1KvmRoute,
-  ApiV1McpRoute: ApiV1McpRoute,
-  ApiV1ModelsRoute: ApiV1ModelsRoute,
+  ApiV1ChimeraRoute: ApiV1ChimeraRoute,
+  ApiV1GhostwalkRoute: ApiV1GhostwalkRoute,
   ApiV1NetRoute: ApiV1NetRoute,
-  ApiV1OsRoute: ApiV1OsRoute,
-  ApiV1ShareRoute: ApiV1ShareRoute,
-  ApiV1SpoolRoute: ApiV1SpoolRoute,
-  ApiV1VisionRoute: ApiV1VisionRoute,
-  ApiV1ZtRoute: ApiV1ZtRoute,
-  ApiV1ChatCompletionsRoute: ApiV1ChatCompletionsRoute,
-  ApiV1HostAskRoute: ApiV1HostAskRoute,
-  ApiV1HostPublishRoute: ApiV1HostPublishRoute,
-  ApiV1HostWslRoute: ApiV1HostWslRoute,
+  ApiV1TimeRoute: ApiV1TimeRoute,
+  ApiV1HxAuthorRoute: ApiV1HxAuthorRoute,
+  ApiV1HxGodotRoute: ApiV1HxGodotRoute,
+  ApiV1HxHorizonRoute: ApiV1HxHorizonRoute,
+  ApiV1HxLtvRoute: ApiV1HxLtvRoute,
+  ApiV1HxMarketRoute: ApiV1HxMarketRoute,
+  ApiV1HxRetainRoute: ApiV1HxRetainRoute,
+  ApiV1HxUeRoute: ApiV1HxUeRoute,
+  ApiV1V01dFsRoute: ApiV1V01dFsRoute,
+  ApiV1V01dRunRoute: ApiV1V01dRunRoute,
+  ApiV1V01dShareRoute: ApiV1V01dShareRoute,
+  ApiV1V01dSpeakRoute: ApiV1V01dSpeakRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

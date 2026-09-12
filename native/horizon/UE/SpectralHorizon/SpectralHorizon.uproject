@@ -1,0 +1,16 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Games",
+  "Description": "Spectral Horizon Portal. Hell. Obsidian. DeltaKingZero.",
+  "Modules": [
+    {
+      "Name": "HorizonRuntime",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    { "Name": "Horizon", "Enabled": true }
+  ]
+}

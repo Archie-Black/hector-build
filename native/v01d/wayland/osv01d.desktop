@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=OS V01D
+Comment=Hector Build Wayland session
+Exec=/usr/share/osv01d/native/v01d/wayland/session.sh
+Type=Application
+DesktopNames=OSV01D

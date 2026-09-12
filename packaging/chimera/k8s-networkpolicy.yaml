@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chimera-default-deny
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              chimera: sidecar
+      ports:
+        - protocol: TCP
+          port: 8443
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chimera-sidecar
+data:
+  wrap: "rest,ws,grpc,rf"
+  hop: "epoch*7919%400"
+  chaff: "on"

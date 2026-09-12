@@ -1,0 +1,30 @@
+// Spectral HX tensor surface. Drives roughness/albedo/SSS from a 3-core sample.
+// Loaded by a UE 5.8 material as a custom HLSL node. Not a copy of Epic stock.
+
+float3 HXTensorAlbedo(float3 WorldPos, float3 N)
+{
+    float t = frac(dot(WorldPos, float3(0.031, 0.017, 0.023)));
+    float braid = sin(6.2831853 * t + N.y) * 0.5 + 0.5;
+    float3 cobalt = float3(0.0, 0.18, 0.67);
+    float3 uranium = float3(0.90, 1.0, 0.16);
+    return lerp(cobalt, uranium, braid);
+}
+
+float HXRoughness(float3 WorldPos)
+{
+    float k = frac(WorldPos.x * 0.07 + WorldPos.z * 0.05);
+    return saturate(0.18 + 0.55 * k);
+}
+
+float HXSubsurface(float3 N, float3 L)
+{
+    float wrap = saturate(dot(N, L) * 0.5 + 0.5);
+    return wrap * wrap * 0.35;
+}
+
+void HXTensorSurface(float3 WorldPos, float3 N, float3 L, out float3 Albedo, out float Rough, out float SSS)
+{
+    Albedo = HXTensorAlbedo(WorldPos, N);
+    Rough = HXRoughness(WorldPos);
+    SSS = HXSubsurface(N, L);
+}

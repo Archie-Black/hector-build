@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=OS V01D
+Comment=Hector Build. Spectral HX. Portal.
+Exec=@PREFIX@/packaging/linux/osv01d.sh
+Icon=@PREFIX@/public/horsemen/icons/portal.png
+Terminal=false
+Categories=Development;Game;
+StartupNotify=true

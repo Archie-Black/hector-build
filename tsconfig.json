@@ -19,8 +19,7 @@
     "noEmit": true,
     "types": [
       "vite/client",
-      "node",
-      "webxr"
+      "node"
     ],
     "baseUrl": ".",
     "paths": {
@@ -33,5 +32,8 @@
   "include": [
     "src",
     "server"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
   ]
 }

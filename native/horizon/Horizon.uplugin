@@ -1,0 +1,18 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.1.0",
+  "FriendlyName": "Spectral Horizon",
+  "Description": "Spectral HX TQC runtime for Unreal Engine 5.8. Original. DeltaKingZero.",
+  "Category": "Runtime",
+  "CreatedBy": "DeltaKingZero",
+  "EnabledByDefault": true,
+  "CanContainContent": false,
+  "Modules": [
+    {
+      "Name": "HorizonRuntime",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
