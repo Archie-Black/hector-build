@@ -2,28 +2,26 @@ import { useEffect, useMemo, useState } from "react";
 import { Enclave, Riv, VECTORS, hopPort, status } from "@/lib/chimera";
 import { hectorEpoch, hectorHop } from "@/lib/hector";
 import { LAW, sealed } from "@/lib/hector/unique";
-import { BOND } from "@/lib/v01d/bond";
 import { CHARTER } from "@/lib/v01d/charter";
 import { readIntent } from "@/lib/v01d/intent";
 import { ask as hectorAsk } from "@/lib/v01d/ask";
 import { plan } from "@/lib/v01d/runtime";
-import { play, speak } from "@/lib/v01d/voice/speak";
-import { engines } from "@/lib/v01d/voice/stack";
+import { split } from "@/lib/hector/cores";
+import { say } from "@/lib/v01d/tts";
 import type { AppId } from "@/lib/horsemen/layout";
 import { GhostWalk } from "./ghostwalk";
 import { GhostIT } from "./ghostit";
 import { FileGlyph } from "./icons";
+import { HxIde } from "./hx-ide";
 import { Portal } from "./portal";
-
-const CODE_SEED = `// Write your program here. It stays on this computer.
-
-fn main() {
-    println!("hello from OS V01D");
-}
-`;
+import { Crapple } from "./crapple";
+import { LinuxRoom } from "./room";
+import { Asimov01 } from "./asimov";
+import { Suite } from "./suite";
+import { SysPanel } from "./sys";
 
 export function AppBody({ app }: { app: AppId }) {
-  if (app === "code") return <Editor />;
+  if (app === "code") return <HxIde />;
   if (app === "terminal") return <Term />;
   if (app === "security") return <Security />;
   if (app === "notes") return <GhostIT />;
@@ -31,28 +29,15 @@ export function AppBody({ app }: { app: AppId }) {
   if (app === "programs") return <Files start="/v01d/programs" />;
   if (app === "ghostwalk") return <GhostWalk />;
   if (app === "portal") return <Portal />;
+  if (app === "crapple") return <Crapple pane="darwin" />;
+  if (app === "unix") return <Crapple pane="unix" />;
+  if (app === "helix") return <LinuxRoom start="helix" />;
+  if (app === "room") return <LinuxRoom />;
+  if (app === "asimov") return <Asimov01 />;
+  if (app === "forge") return <Suite start="forge" />;
+  if (app === "suite") return <Suite />;
   if (app === "settings") return <Prefs />;
   return <Trash />;
-}
-
-function Editor() {
-  const [src, setSrc] = useState(CODE_SEED);
-  useEffect(() => {
-    const saved = localStorage.getItem("hx-code");
-    if (saved) setSrc(saved);
-  }, []);
-  useEffect(() => {
-    localStorage.setItem("hx-code", src);
-  }, [src]);
-  return (
-    <textarea
-      value={src}
-      onChange={(e) => setSrc(e.target.value)}
-      spellCheck={false}
-      className="h-full w-full resize-none bg-transparent p-3 font-mono text-sm leading-relaxed text-ash outline-none"
-      aria-label="Code"
-    />
-  );
 }
 
 function Security() {
@@ -159,7 +144,7 @@ function reply(t: string): string[] {
 
 function Files({ start = "/v01d/home" }: { start?: string }) {
   const [at, setAt] = useState(start);
-  const [items, setItems] = useState<{ name: string; dir: boolean; native: string; kind: string; path: string }[]>([]);
+  const [items, setItems] = useState<{ name: string; dir: boolean; native: string; kind: string; path: string; run?: string }[]>([]);
   const [shares, setShares] = useState<{ name: string; unc: string; smb: string }[]>([]);
   const [q, setQ] = useState("");
   const [heard, setHeard] = useState("");
@@ -199,7 +184,19 @@ function Files({ start = "/v01d/home" }: { start?: string }) {
             <button
               type="button"
               className="flex h-12 w-full items-center gap-3 border-b border-cobalt/20 px-2 text-left text-sm"
-              onClick={() => it.dir && setAt(it.path)}
+              onClick={() => {
+                if (it.dir) setAt(it.path);
+                else {
+                  void fetch("/api/v1/v01d/run", {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                    body: JSON.stringify({ file: it.run || it.name, prompt: `open ${it.name}` }),
+                  }).then(async (r) => {
+                    const j = (await r.json()) as { ok?: boolean; launch?: { note?: string } };
+                    setHeard(j.launch?.note || (j.ok ? `Opening ${it.name}.` : "Stopped."));
+                  });
+                }
+              }}
             >
               <FileGlyph />
               <span className="flex-1 text-ash">{it.name}</span>
@@ -224,7 +221,7 @@ function Files({ start = "/v01d/home" }: { start?: string }) {
           e.preventDefault();
           const job = hectorAsk(`${q} in ${here}`);
           setHeard(job.say);
-          if (job.voice && job.voice !== "silent") play(speak(job.say).pcm);
+          if (job.voice && job.voice !== "silent" && split(`${q} in ${here}`).core === "diplomat") say(job.say);
           if (job.app === "programs") setAt("/v01d/programs");
           if (/\b(share|picture|photo|media)\b/i.test(q)) setAt("/v01d/shared");
           if (/\b(home|document|download)\b/i.test(q)) setAt("/v01d/home");
@@ -247,31 +244,8 @@ function Files({ start = "/v01d/home" }: { start?: string }) {
 
 function Prefs() {
   return (
-    <div className="space-y-4 p-4 text-sm leading-relaxed text-ash">
-      <p>This is OS V01D. Black glass. The picture behind your windows is just a picture.</p>
-      <p className="text-steel">Wi-Fi, sound, and updates are handled for you. Ask Hector if something is wrong.</p>
-      <p className="text-steel">GhostWalk is the browser. It forgets trackers and does not keep other people's cookies. Tor hides your road when it is on. It does not break into anyone else.</p>
-      <section className="rounded-xl border border-cobalt/40 bg-void/40 p-3">
-        <p className="font-mono text-[10px] tracking-[0.2em] text-uranium uppercase">Sealed law</p>
-        <p className="mt-2">{LAW.text}</p>
-        <p className="mt-2 text-xs text-steel">Not a setting. {LAW.by}. {LAW.id}</p>
-      </section>
-      <section className="rounded-xl border border-cobalt/40 bg-void/40 p-3">
-        <p className="font-mono text-[10px] tracking-[0.2em] text-uranium uppercase">One desk</p>
-        <p className="mt-2">{CHARTER.text}</p>
-        <p className="mt-2 text-xs text-steel">{CHARTER.license}. {CHARTER.range}</p>
-      </section>
-      <p className="text-steel">Shared folders live on this house network. Windows sees \\V01D\Pictures. Linux sees smb://v01d/pictures. Guest is off.</p>
-      <p className="text-steel">{BOND.text}</p>
-      <p className="text-steel">Voice is the formant tract. It learns quietly. Chatterbox, VoxCPM, and Fish wait until you install them.</p>
-      <ul className="text-xs text-steel">
-        {engines().map((e) => (
-          <li key={e.id}>
-            {e.id}
-            {e.ready ? " · on" : ""} — {e.note}
-          </li>
-        ))}
-      </ul>
+    <div className="sys-page">
+      <SysPanel />
     </div>
   );
 }

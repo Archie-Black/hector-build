@@ -12,3 +12,11 @@ export function env(key: string): string | undefined {
 export function isWorkspacePreview(): boolean {
   return !env("GROK_PROJECT_ID");
 }
+
+export function fabricUrl(): string | undefined {
+  return env("DATABASE_URL");
+}
+
+export function onV01dFabric(): boolean {
+  return (env("DATABASE_URL") || "").includes("10.13.0.20");
+}

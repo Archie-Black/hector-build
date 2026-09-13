@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { ask as hectorAsk } from "@/lib/v01d/ask";
+import { search, type Hit } from "@/lib/v01d/search";
 import { prefer, setPrefer } from "@/lib/v01d/inquisitor";
 import { hatSrc, load, save, SHOW, type Hat, type Skin } from "@/lib/v01d/skin";
-import { play, speak } from "@/lib/v01d/voice/speak";
-
-type Note = { who: "you" | "hector"; text: string };
 
 export function AskGhost({
   onJob,
@@ -12,26 +10,21 @@ export function AskGhost({
   onJob: (job: ReturnType<typeof hectorAsk>) => void;
 }) {
   const [skin, setSkin] = useState<Skin>(load);
-  const [chat, setChat] = useState(false);
+  const [open, setOpen] = useState(false);
   const [dress, setDress] = useState(false);
-  const last = useRef(0);
 
   useEffect(() => {
     setSkin(load());
-  }, [chat, dress]);
+  }, [open, dress]);
 
   return (
     <>
       <button
         type="button"
-        aria-label="Ask Hector"
+        aria-label="Search this computer and the web"
         className="ask-ghost"
         style={{ filter: `hue-rotate(${skin.hue}deg)` }}
-        onClick={() => {
-          const n = Date.now();
-          if (n - last.current < 380) setChat(true);
-          last.current = n;
-        }}
+        onClick={() => setOpen(true)}
         onContextMenu={(e) => {
           e.preventDefault();
           setDress(true);
@@ -40,10 +33,10 @@ export function AskGhost({
         <img src="/horsemen/hector-ask.png" alt="" className="ask-ghost-body" />
         {skin.hat !== "none" ? <img src={hatSrc(skin.hat)} alt="" className="ask-ghost-hat" /> : null}
       </button>
-      {chat ? (
-        <HectorChat
+      {open ? (
+        <HectorSearch
           skin={skin}
-          onClose={() => setChat(false)}
+          onClose={() => setOpen(false)}
           onDress={() => setDress(true)}
           onJob={onJob}
         />
@@ -62,7 +55,30 @@ export function AskGhost({
   );
 }
 
-function HectorChat({
+function pick(h: Hit, onJob: (job: ReturnType<typeof hectorAsk>) => void) {
+  if (h.where === "web" && h.url) {
+    try {
+      sessionStorage.setItem("v01d.walk", h.url);
+    } catch {
+      /* */
+    }
+    window.dispatchEvent(new CustomEvent("v01d-walk", { detail: { q: h.url } }));
+    onJob({ app: "ghostwalk", say: h.blurb });
+    return;
+  }
+  if (h.run && !h.app) {
+    void fetch("/api/v1/v01d/run", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ file: h.run, prompt: `open ${h.title}` }),
+    });
+    onJob({ say: `Opening ${h.title}.` });
+    return;
+  }
+  if (h.app) onJob({ app: h.app, say: h.blurb });
+}
+
+function HectorSearch({
   skin,
   onClose,
   onDress,
@@ -74,13 +90,28 @@ function HectorChat({
   onJob: (job: ReturnType<typeof hectorAsk>) => void;
 }) {
   const [q, setQ] = useState("");
-  const [log, setLog] = useState<Note[]>([{ who: "hector", text: "Ask. I will not narrate the whole job." }]);
-  const box = useRef<HTMLDivElement>(null);
+  const hits = search(q);
+  const box = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    box.current?.scrollTo(0, box.current.scrollHeight);
-  }, [log]);
+    box.current?.focus();
+  }, []);
+
+  function go(h?: Hit) {
+    const t = q.trim();
+    if (h) {
+      pick(h, onJob);
+      onClose();
+      return;
+    }
+    if (!t) return;
+    const web = hits.web[0];
+    const sys = hits.system[0];
+    pick(sys && (!web || sys.title.toLowerCase().includes(t.toLowerCase())) ? sys : web || sys!, onJob);
+    onClose();
+  }
+
   return (
-    <div className="hector-chat pane-glass" onPointerDown={(e) => e.stopPropagation()}>
+    <div className="hector-chat pane-glass hector-search" onPointerDown={(e) => e.stopPropagation()}>
       <header className="flex items-center gap-2 border-b border-cobalt/40 px-3 py-2">
         <img src="/horsemen/hector-ask.png" alt="" className="size-8 object-contain" style={{ filter: `hue-rotate(${skin.hue}deg)` }} />
         <p className="flex-1 text-sm text-uranium">{skin.name || "Hector"}</p>
@@ -91,34 +122,43 @@ function HectorChat({
           Close
         </button>
       </header>
-      <div ref={box} className="min-h-0 flex-1 overflow-auto px-3 py-2 text-sm">
-        {log.map((n, i) => (
-          <p key={i} className={n.who === "you" ? "text-ash" : "text-uranium"}>
-            {n.text}
-          </p>
-        ))}
-      </div>
       <form
-        className="flex border-t border-cobalt/40"
+        className="flex border-b border-cobalt/40"
         onSubmit={(e) => {
           e.preventDefault();
-          const t = q.trim();
-          if (!t) return;
-          const job = hectorAsk(t);
-          setLog((l) => [...l, { who: "you", text: t }, { who: "hector", text: job.say }]);
-          if (job.voice && job.voice !== "silent") play(speak(job.say).pcm);
-          onJob(job);
-          setQ("");
+          go();
         }}
       >
         <input
+          ref={box}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           className="h-12 min-w-0 flex-1 bg-transparent px-3 text-sm text-ash outline-none"
-          placeholder="Tell Hector"
-          aria-label="Tell Hector"
+          placeholder="Search this computer or the web"
+          aria-label="Search this computer or the web"
         />
       </form>
+      <div className="min-h-0 flex-1 overflow-auto px-3 py-2 text-sm">
+        {!q.trim() ? <p className="text-steel">Programs, files, settings. The web through GhostWalk.</p> : null}
+        {hits.system.length ? (
+          <p className="mb-1 mt-1 text-[10px] tracking-[0.16em] text-ice uppercase">This computer</p>
+        ) : null}
+        {hits.system.map((h) => (
+          <button key={h.id} type="button" className="hector-hit" onClick={() => go(h)}>
+            <b>{h.title}</b>
+            <span>{h.blurb}</span>
+          </button>
+        ))}
+        {hits.web.length ? (
+          <p className="mb-1 mt-2 text-[10px] tracking-[0.16em] text-ice uppercase">Web</p>
+        ) : null}
+        {hits.web.map((h) => (
+          <button key={h.id} type="button" className="hector-hit web" onClick={() => go(h)}>
+            <b>{h.title}</b>
+            <span>{h.blurb}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -152,11 +192,7 @@ function Dress({ skin, onSave, onClose }: { skin: Skin; onSave: (s: Skin) => voi
       </div>
       <label className="mt-3 block text-xs text-steel">
         Language
-        <select
-          className="ml-2 bg-transparent text-uranium"
-          defaultValue={prefer()}
-          onChange={(e) => setPrefer(e.target.value)}
-        >
+        <select className="ml-2 bg-transparent text-uranium" defaultValue={prefer()} onChange={(e) => setPrefer(e.target.value)}>
           {["en", "es", "fr", "de", "zh", "ja", "ar", "ru"].map((c) => (
             <option key={c} value={c}>
               {c}

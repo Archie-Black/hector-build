@@ -12,7 +12,14 @@ runtime/
 native/chimera/target/
 native/horizon/horizon
 native/horizon/horizon.exe
-artifacts/imagine_images/
+vendor/
+artifacts/
+attachments/
+.grok/status
+packaging/suite/weights/*.bin
+packaging/suite/weights/*.safetensors
+
+
 .DS_Store
 *.pyc
 __pycache__/

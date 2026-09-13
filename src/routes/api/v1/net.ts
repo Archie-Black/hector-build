@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { createFileRoute } from "@tanstack/react-router";
+import { FABRIC, status } from "@/lib/v01d/cloud";
 
 const run = promisify(execFile);
 
@@ -25,7 +26,7 @@ async function ssid(): Promise<{ ssid: string; on: boolean; note: string }> {
 export const Route = createFileRoute("/api/v1/net")({
   server: {
     handlers: {
-      GET: async () => Response.json(await ssid()),
+      GET: async () => Response.json({ ...(await ssid()), fabric: status(), overlay: FABRIC.overlay }),
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => ({}))) as { ssid?: string; pass?: string };
         const name = (body.ssid || "").trim();

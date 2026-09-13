@@ -1,0 +1,17 @@
+[api]
+enabled = true
+address = "0.0.0.0:8686"
+
+[sources.traefik]
+type = "prometheus_scrape"
+endpoints = ["http://10.13.0.2:8082/metrics"]
+scrape_interval_secs = 15
+
+[sources.host]
+type = "host_metrics"
+scrape_interval_secs = 15
+
+[sinks.prom]
+type = "prometheus_exporter"
+inputs = ["traefik", "host"]
+address = "0.0.0.0:9598"

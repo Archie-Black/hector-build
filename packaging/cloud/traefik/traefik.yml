@@ -1,0 +1,48 @@
+api:
+  dashboard: false
+  insecure: false
+
+ping: {}
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: le
+      middlewares:
+        - stomp@file
+  metrics:
+    address: "10.13.0.2:8082"
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addServicesLabels: true
+
+certificatesResolvers:
+  le:
+    acme:
+      email: Deltakingzero@doomchat.ca
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+
+providers:
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+tracing:
+  otlp:
+    http:
+      endpoint: http://10.13.0.45:4318

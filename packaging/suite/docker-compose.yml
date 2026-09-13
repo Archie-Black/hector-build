@@ -1,0 +1,18 @@
+# Local only. Not on the public wire.
+services:
+  media_vault:
+    image: qdrant/qdrant:latest
+    container_name: hx_media_vector_vault
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - ${V01D_SUITE:-/v01d/suite}/vector:/qdrant/storage
+    restart: unless-stopped
+  broker:
+    image: eclipse-mosquitto:latest
+    container_name: hx_system_broker
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ${V01D_SUITE:-/v01d/suite}/broker:/mosquitto/config
+    restart: unless-stopped

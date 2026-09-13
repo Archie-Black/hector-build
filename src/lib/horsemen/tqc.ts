@@ -1,4 +1,4 @@
-/** Classical TQC: braid the motion. User sees glass, not algebra. */
+/** Classical TQC: braid the motion. Timing comes from the ops graph when known. */
 export function wobble(vx: number, vy: number) {
   const e = Math.hypot(vx, vy);
   const s = Math.tanh(e * 0.04);
@@ -8,9 +8,10 @@ export function wobble(vx: number, vy: number) {
   };
 }
 
-export function braidDelay(i: number, n: number) {
+export function braidDelay(i: number, n: number, curvature = 0) {
   const t = n <= 1 ? 0 : i / (n - 1);
-  return 40 + t * 180 + Math.sin(t * Math.PI) * 40;
+  const k = 32 + Math.max(0, curvature) * 160;
+  return k + t * 180 + Math.sin(t * Math.PI) * 40;
 }
 
 function clamp(n: number, a: number, b: number) {

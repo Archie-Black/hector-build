@@ -1,0 +1,21 @@
+// Spectral Horizon 00:13. Next-gen GPU particles.
+// One field. Bitonic-friendly. Chaos break writes Heat.
+
+float HXSparkHash(uint i)
+{
+    i ^= 2747636419u;
+    i *= 2654435769u;
+    return float(i) * (1.0 / 4294967295.0);
+}
+
+void HXSpark(uint ID, float Time, float Heat, float3 Origin, out float3 Pos, out float3 Emissive, out float Life)
+{
+    float u = HXSparkHash(ID);
+    float v = HXSparkHash(ID * 7u + 3u);
+    float w = HXSparkHash(ID * 13u + 11u);
+    float ang = u * 6.2831853;
+    float speed = 4.0 + Heat * 18.0 * v;
+    Life = saturate(1.0 - Time * (1.4 + w));
+    Pos = Origin + float3(cos(ang) * speed * Time, 2.0 * Heat * Time - 4.9 * Time * Time, sin(ang) * speed * Time);
+    Emissive = lerp(float3(0.0, 0.18, 0.67), float3(1.0, 0.22, 0.04), Heat) * Life;
+}

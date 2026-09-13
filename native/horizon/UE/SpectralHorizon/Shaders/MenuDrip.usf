@@ -1,0 +1,32 @@
+// Spectral Horizon 00:13. Niagara-style GPU drip.
+// One field. Viscous. Not a particle spawn per drop.
+
+float HXHash(float n)
+{
+    return frac(sin(n) * 43758.5453);
+}
+
+float HXDrip(float2 UV, float Time, float Heat)
+{
+    float x = UV.x * 9.0;
+    float cell = floor(x);
+    float k = HXHash(cell * 17.13);
+    float thick = 0.05 + 0.11 * k * Heat;
+    float column = 1.0 - smoothstep(0.0, thick, abs(frac(x) - 0.5));
+    float speed = 0.09 + 0.22 * Heat * (0.4 + k);
+    float y = frac(UV.y + Time * speed + k);
+    float head = smoothstep(0.18, 0.0, abs(y - 0.12));
+    float tail = saturate((1.0 - y) * 1.4) * 0.55;
+    float visc = pow(column, 1.6 + Heat);
+    return visc * (head + tail);
+}
+
+void HXMenuDrip(float2 UV, float Time, float Heat, out float3 Emissive, out float Opacity)
+{
+    float d = HXDrip(UV, Time, Heat);
+    float3 cobalt = float3(0.0, 0.18, 0.67);
+    float3 uranium = float3(0.90, 1.0, 0.16);
+    float3 lava = float3(1.0, 0.22, 0.04);
+    Emissive = lerp(cobalt, lerp(uranium, lava, Heat), d);
+    Opacity = d * (0.55 + 0.4 * Heat);
+}

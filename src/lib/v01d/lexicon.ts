@@ -2,7 +2,7 @@ import { BOND } from "./bond";
 
 export type Sense =
   | "amend" | "add" | "hold" | "start"
-  | "files" | "programs" | "share" | "browse" | "notes" | "settings" | "run" | "who" | "law" | "help" | "arrange"
+  | "files" | "programs" | "share" | "browse" | "notes" | "settings" | "run" | "who" | "law" | "help" | "arrange" | "heal" | "swarm"
   | "allow" | "deny"
   | "hurt" | "raid" | "scan" | "learn" | "shield" | "jail";
 
@@ -22,6 +22,8 @@ const CTRL: Record<Exclude<Sense, "hurt" | "raid" | "scan" | "learn" | "shield" 
   law: ["law", "loi", "ley", "gesetz", "legge", "закон", "法"],
   help: ["help", "aide", "ayuda", "hilfe", "aiuto", "ajuda", "помощь", "助け", "帮助", "مساعدة"],
   arrange: ["arrange", "tidy", "tile", "ranger", "ordenar", "ordnen"],
+  heal: ["restart the site", "restart the server", "site is down", "website is down", "fix the site"],
+  swarm: ["swarm", "agents", "army of", "raise a team", "fleet of ghosts", "massive swarm"],
   allow: ["allow", "yes", "grant", "oui", "sí", "ja", "sì", "sim", "да", "はい", "是", "نعم"],
   deny: ["don't", "stop that", "refuse", "non", "no hagas", "nicht", "не надо", "しないで", "不要"],
 };
@@ -113,7 +115,7 @@ export function say(key: "deny" | "jail" | "work", text: string) {
 export function syntax() {
   return {
     fly: ["amend", "add", "hold", "start"],
-    desk: ["files", "programs", "share", "browse", "notes", "settings", "run", "arrange"],
+    desk: ["files", "programs", "share", "browse", "notes", "settings", "run", "arrange", "heal"],
     voice: ["who", "help", "law", "allow", "deny"],
     sealed: [...SEALED],
     bond: BOND.id,

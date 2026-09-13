@@ -1,20 +1,69 @@
 # Maintainer: DeltaKingZero <Deltakingzero@doomchat.ca>
 pkgname=osv01d
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
-pkgdesc="OS V01D. Hector Build. Spectral HX. Wayland desktop."
+pkgdesc="OS V01D. Hector + Spectral HX. Dual-core diplomat hear on PipeWire."
 arch=('x86_64')
 url="https://www.doomchat.ca"
-license=('custom')
-depends=('hyprland' 'wayland' 'nodejs' 'npm' 'pipewire' 'samba' 'mesa')
-source=()
-md5sums=()
+license=('MIT')
+depends=(
+  hyprland wayland nodejs npm git
+  python ffmpeg perl-image-exiftool
+  pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber
+  samba mesa vulkan-icd-loader
+  systemd
+)
+makedepends=(rsync)
+optdepends=('fwupd: signed BIOS capsules' 'docker: cloud fabric')
+install=osv01d.install
+backup=(
+  'etc/pipewire/pipewire.conf.d/99-osv01d-diplomat.conf'
+  'etc/security/limits.d/99-osv01d-rt.conf'
+)
+# Sign: makepkg --sign   (needs a secret key; never commit one)
+# Fingerprint after first sign:
+validpgpkeys=()
 
 package() {
-  prefix="$pkgdir/usr/share/osv01d"
-  install -d "$prefix" "$pkgdir/usr/bin" "$pkgdir/usr/share/wayland-sessions" "$pkgdir/usr/share/applications"
-  cp -a "$startdir/../.."/. "$prefix"/ || true
-  install -Dm755 "$startdir/../linux/osv01d.sh" "$pkgdir/usr/bin/osv01d"
-  install -Dm644 "$startdir/../linux/osv01d.desktop" "$pkgdir/usr/share/applications/osv01d.desktop"
-  install -Dm644 "$startdir/../../native/v01d/wayland/osv01d.desktop" "$pkgdir/usr/share/wayland-sessions/osv01d.desktop"
+  local root="$startdir/../.."
+  local dest="$pkgdir/usr/share/osv01d"
+  install -d "$dest" \
+    "$pkgdir/usr/bin" \
+    "$pkgdir/usr/lib/osv01d" \
+    "$pkgdir/usr/lib/systemd/system" \
+    "$pkgdir/usr/lib/systemd/user" \
+    "$pkgdir/usr/share/wayland-sessions" \
+    "$pkgdir/usr/share/applications" \
+    "$pkgdir/etc/pipewire/pipewire.conf.d" \
+    "$pkgdir/etc/security/limits.d"
+
+  rsync -a \
+    --exclude '.git/' \
+    --exclude 'node_modules/' \
+    --exclude 'artifacts/' \
+    --exclude 'dist/' \
+    --exclude '.output/' \
+    "$root"/ "$dest"/
+
+  install -Dm755 "$root/packaging/linux/osv01d.sh" "$pkgdir/usr/bin/osv01d"
+  install -Dm755 "$root/packaging/arch/dual-core/verify.sh" "$pkgdir/usr/bin/osv01d-verify"
+  install -Dm755 "$root/packaging/arch/dual-core/hear.sh" "$pkgdir/usr/bin/osv01d-hear"
+  install -Dm755 "$root/packaging/arch/dual-core/gateway.py" "$pkgdir/usr/lib/osv01d/gateway.py"
+
+  install -Dm644 "$root/packaging/linux/osv01d.desktop" "$pkgdir/usr/share/applications/osv01d.desktop"
+  install -Dm644 "$root/native/v01d/wayland/osv01d.desktop" "$pkgdir/usr/share/wayland-sessions/osv01d.desktop"
+
+  install -Dm644 "$root/packaging/arch/dual-core/osv01d-cores.service" "$pkgdir/usr/lib/systemd/system/osv01d-cores.service"
+  install -Dm644 "$root/packaging/arch/osv01d-firmware-keep.service" "$pkgdir/usr/lib/systemd/system/osv01d-firmware-keep.service"
+  install -Dm644 "$root/packaging/arch/osv01d-firmware.timer" "$pkgdir/usr/lib/systemd/system/osv01d-firmware.timer"
+  install -Dm644 "$root/packaging/arch/dual-core/osv01d-hear.service" "$pkgdir/usr/lib/systemd/user/osv01d-hear.service"
+
+  install -Dm644 "$root/packaging/arch/dual-core/pipewire-diplomat.conf" \
+    "$pkgdir/etc/pipewire/pipewire.conf.d/99-osv01d-diplomat.conf"
+  install -Dm644 /dev/stdin "$pkgdir/etc/security/limits.d/99-osv01d-rt.conf" <<'EOF'
+@wheel           soft    rtprio          95
+@wheel           hard    rtprio          99
+@wheel           soft    memlock         unlimited
+@wheel           hard    memlock         unlimited
+EOF
 }

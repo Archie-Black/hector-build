@@ -1,7 +1,8 @@
 import { isGhstkrt } from "@/lib/ghstkrt/knot";
 import { dialectOf, say, spread } from "./talk";
+import { folder } from "./programs";
 
-export type Kind = "win" | "nix" | "v01d";
+export type Kind = "win" | "nix" | "v01d" | "mac";
 
 export type Node = {
   name: string;
@@ -9,6 +10,7 @@ export type Node = {
   kind: Kind;
   dir: boolean;
   native: string;
+  run?: string;
 };
 
 const HOME = [
@@ -21,13 +23,7 @@ const HOME = [
   { name: "GhostIT.md", dir: false },
 ];
 
-const PROGRAMS = [
-  { name: "GhostWalk", dir: false },
-  { name: "GhostIT", dir: false },
-  { name: "notepad.exe", dir: false },
-  { name: "code", dir: false },
-  { name: "vlc", dir: false },
-];
+const PROGRAMS = folder();
 
 const SHARED = [
   { name: "Files", dir: true },
@@ -41,9 +37,9 @@ function hidden(name: string) {
   return isGhstkrt(name) || name.startsWith(".") || /tongue/i.test(name);
 }
 
-function face(kind: Kind, name: string, path: string) {
+function face(kind: Kind, name: string, path: string, run?: string) {
   if (kind === "win") return windows(path);
-  if (/programs/i.test(path)) return name;
+  if (/programs/i.test(path)) return run || name;
   if (/shared/i.test(path)) return name;
   return path.replace(/^\/v01d\/home/, "~").replace(/^\/v01d\//, "~/");
 }
@@ -63,6 +59,17 @@ export function native(input: string): { path: string; kind: Kind } {
   if (raw.startsWith("v01d://") || raw.startsWith("/v01d/")) {
     return { path: raw.replace(/^v01d:\/\//, "/v01d/").replace(/\/+/g, "/"), kind: "v01d" };
   }
+  if (
+    /^\/Users\//.test(raw) ||
+    /^\/Applications\//.test(raw) ||
+    /^\/Volumes\//.test(raw) ||
+    /^\/System\//.test(raw) ||
+    /^\/mac\//.test(raw) ||
+    /\.app(\/|$)/i.test(raw)
+  ) {
+    const p = raw.startsWith("/mac/") ? raw : `/mac${raw.startsWith("/") ? raw : `/${raw}`}`;
+    return { path: p.replace(/\/+/g, "/"), kind: "mac" };
+  }
   const p = raw.replace(/\\/g, "/");
   return { path: p.startsWith("/") ? p : `/home/${p}`, kind: "nix" };
 }
@@ -80,12 +87,14 @@ export function list(at = "/v01d/home"): Node[] {
     .filter((h) => !hidden(h.name))
     .map((h) => {
       const path = `${n.path.replace(/\/$/, "")}/${h.name}`;
+      const run = "run" in h && typeof h.run === "string" ? h.run : undefined;
       return {
         name: h.name,
         path,
         kind: n.kind,
         dir: h.dir,
-        native: face(n.kind, h.name, path),
+        native: face(n.kind, h.name, path, run),
+        run,
       };
     });
 }

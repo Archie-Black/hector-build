@@ -1,0 +1,8 @@
+[Unit]
+Description=OS V01D autonomous firmware keep
+After=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/share/osv01d/packaging/arch/firmware-keep.sh
+[Install]
+WantedBy=multi-user.target

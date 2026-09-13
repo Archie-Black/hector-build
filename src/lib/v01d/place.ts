@@ -1,4 +1,5 @@
 import { has } from "./lexicon";
+import { resetPath, think } from "./pathways";
 
 export type Step = { id: string; do: string; done: boolean };
 
@@ -51,22 +52,24 @@ export function begin(title: string, work: string[]) {
 
 export function hear(text: string) {
   const t = text.trim();
-  const how = kind(t);
+  const thought = think(t);
+  let how = kind(t);
+  if (how === "add" && thought.glue) how = "add";
   if (how === "start") {
     begin(t, [t]);
-    return { how, say: "On it.", place: snapshot() };
+    return { how, say: "On it.", place: snapshot(), morph: thought.morph };
   }
   const cur = now()!;
   if (how === "amend") {
     cur.steps[cur.at] = { ...cur.steps[cur.at], do: t };
-    return { how, say: "Changed. Same place.", place: snapshot() };
+    return { how, say: "Changed. Same place.", place: snapshot(), morph: thought.morph };
   }
   if (how === "add") {
     cur.steps.splice(cur.at + 1, 0, { id: `${cur.steps.length}`, do: t, done: false });
-    return { how, say: "Added. Still working.", place: snapshot() };
+    return { how, say: "Added. Still working.", place: snapshot(), morph: thought.morph };
   }
   INBOX.push(t);
-  return { how, say: "Holding this. I did not lose my place.", place: snapshot() };
+  return { how, say: "Holding this. I did not lose my place.", place: snapshot(), morph: thought.morph };
 }
 
 export function tick() {
@@ -89,4 +92,5 @@ export function inbox() {
 export function reset() {
   WORK.length = 0;
   INBOX.length = 0;
+  resetPath();
 }

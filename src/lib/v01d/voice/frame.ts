@@ -1,4 +1,4 @@
-export const RATE = 16000;
+export const RATE = 22050;
 
 export type Frame = {
   f0: number;

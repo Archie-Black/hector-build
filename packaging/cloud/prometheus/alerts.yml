@@ -1,0 +1,99 @@
+groups:
+  - name: osv01d
+    interval: 15s
+    rules:
+      - alert: WebsiteDown
+        expr: max(osv01d_container_healthy{service="v01d"}) < 1
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: The website process is down.
+
+      - alert: WebsiteUnhealthy
+        expr: osv01d_container_healthy{service="v01d"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: A website copy failed its healthcheck.
+
+      - alert: TooFewWebsiteCopies
+        expr: sum(osv01d_container_healthy{service="v01d"}) < 1
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: No healthy website copy is running.
+
+      - alert: ProxyDown
+        expr: max(osv01d_container_healthy{service="traefik"}) < 1 or up{job="traefik"} == 0
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: HTTPS proxy is down. Ports 80 and 443 will fail.
+
+      - alert: DatabaseDown
+        expr: max(osv01d_container_healthy{service="timescale"}) < 1
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: The website database is not accepting connections.
+
+      - alert: WebsiteProbeFailed
+        expr: probe_success{job="blackbox"} == 0
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: HTTP probe to the website failed.
+
+      - alert: ContainerHighMemory
+        expr: (container_memory_working_set_bytes{name=~"osv01d-.*"} / container_spec_memory_limit_bytes{name=~"osv01d-.*"}) > 0.9 and container_spec_memory_limit_bytes{name=~"osv01d-.*"} > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: A container is over 90% of its memory limit.
+
+      - alert: HostDiskLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"}) < 0.1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Less than 10% disk free on the host.
+
+      - alert: HostCpuHot
+        expr: 1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Host CPU over 90% for ten minutes.
+
+      - alert: PrometheusDead
+        expr: up{job="prometheus"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Prometheus is not scraping itself.
+
+      - alert: TraceCollectorDown
+        expr: up{job="otel"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: The OpenTelemetry collector is down. Traces are not being stored.
+
+      - alert: AlertmanagerDead
+        expr: up{job="alertmanager"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Alertmanager is down. Alerts cannot be delivered.

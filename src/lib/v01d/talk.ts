@@ -46,6 +46,9 @@ function rewrite(path: string, from: Tongue, to: Tongue) {
     }
     return parts.join(to.sep);
   }
+  if (to.id === "apfs" || to.id === "hfs" || to.id === "xnu") {
+    if (parts[0] === "mac") return `/${parts.slice(1).join("/")}`;
+  }
   if (from.sep === "\\" && parts[0]?.length === 2 && parts[0][1] === ":") {
     return `/win/${parts[0][0].toLowerCase()}/${parts.slice(1).join("/")}`;
   }
@@ -116,6 +119,7 @@ export function say(path: string, from: Dialect, to: Dialect, op: Op = "open") {
 export function dialectOf(path: string): Dialect {
   if (/^[a-zA-Z]:[\\/]/.test(path) || path.includes("\\")) return "ntfs";
   if (path.startsWith("/win/")) return "ntfs";
+  if (path.startsWith("/mac/") || path.startsWith("/Users/") || path.startsWith("/Applications/") || /\.app(\/|$)/i.test(path)) return "apfs";
   if (path.startsWith("v01d://") || path.startsWith("/v01d/")) return "v01d";
   return "ext4";
 }

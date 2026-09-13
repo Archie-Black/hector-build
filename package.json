@@ -16,7 +16,8 @@
     "preview:stop": "node scripts/preview.mjs stop",
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
-    "test:hx": "npx vitest run --reporter=dot",
+    "test": "vitest run --reporter=dot",
+    "test:hx": "vitest run --reporter=dot",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -65,6 +66,7 @@
     "react-hook-form": "^7.54.0",
     "react-resizable-panels": "^4.6.5",
     "recharts": "^2.13.0",
+    "sam-js": "^0.3.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.3.0",

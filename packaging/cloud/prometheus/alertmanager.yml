@@ -1,0 +1,28 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: hector
+  group_by: ["alertname"]
+  group_wait: 20s
+  group_interval: 2m
+  repeat_interval: 4h
+  routes:
+    - matchers:
+        - severity = page
+      receiver: hector
+      repeat_interval: 15m
+
+inhibit_rules:
+  - source_matchers:
+      - alertname = WebsiteDown
+    target_matchers:
+      - alertname = WebsiteUnhealthy
+    equal: ["severity"]
+
+receivers:
+  - name: hector
+    webhook_configs:
+      - url: http://v01d:8080/api/v1/v01d/alerts
+        send_resolved: true
+        max_alerts: 20

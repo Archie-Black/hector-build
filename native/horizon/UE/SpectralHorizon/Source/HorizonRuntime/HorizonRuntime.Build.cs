@@ -8,6 +8,11 @@ public class HorizonRuntime : ModuleRules
 		bUseUnity = false;
 		OptimizeCode = CodeOptimization.Always;
 		PublicIncludePaths.AddRange(new string[] { "HorizonRuntime/Public", "../../../../../include" });
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "RenderCore", "RHI" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core", "CoreUObject", "Engine", "RenderCore", "RHI",
+			"Chaos", "ChaosVehicles", "ChaosVehiclesCore",
+			"Niagara", "NiagaraCore", "GeometryCollectionEngine"
+		});
 	}
 }

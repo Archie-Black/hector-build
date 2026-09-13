@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS v01d_log (
+  ts TIMESTAMPTZ NOT NULL DEFAULT now(),
+  host TEXT NOT NULL DEFAULT 'osv01d',
+  service TEXT NOT NULL,
+  level TEXT NOT NULL DEFAULT 'info',
+  msg TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS v01d_metric (
+  ts TIMESTAMPTZ NOT NULL DEFAULT now(),
+  name TEXT NOT NULL,
+  value DOUBLE PRECISION NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS v01d_log_service_ts ON v01d_log (service, ts DESC);
+CREATE INDEX IF NOT EXISTS v01d_metric_name_ts ON v01d_metric (name, ts DESC);

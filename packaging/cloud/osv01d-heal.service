@@ -1,0 +1,9 @@
+[Unit]
+Description=OS V01D fabric heal
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/osv01d/cloud/repair.sh
+WorkingDirectory=/opt/osv01d/cloud

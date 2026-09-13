@@ -1,5 +1,6 @@
 import { teach } from "./adapt";
 import { RATE, render } from "./klatt";
+import { PAUL_RATE, pcm as paulPcm } from "./paul";
 import { frames, phones, tags } from "./phones";
 import { pick } from "./stack";
 
@@ -7,14 +8,19 @@ export type Utter = { pcm: Float32Array; rate: number; engine: string };
 
 export function speak(text: string): Utter {
   const engine = pick();
-  const { clean, mood } = tags(text);
-  const fr = frames(phones(clean), mood);
-  const pcm = render(fr);
-  teach(fr);
-  return { pcm, rate: RATE, engine };
+  try {
+    const pcm = paulPcm(text);
+    return { pcm, rate: PAUL_RATE, engine: "formant" };
+  } catch {
+    const { clean, mood } = tags(text);
+    const fr = frames(phones(clean), mood);
+    const pcm = render(fr);
+    teach(fr);
+    return { pcm, rate: RATE, engine };
+  }
 }
 
-export function wav(pcm: Float32Array, rate = RATE): Uint8Array {
+export function wav(pcm: Float32Array, rate = PAUL_RATE): Uint8Array {
   const data = pcm.length * 2;
   const buf = new ArrayBuffer(44 + data);
   const v = new DataView(buf);
@@ -42,12 +48,26 @@ export function wav(pcm: Float32Array, rate = RATE): Uint8Array {
   return new Uint8Array(buf);
 }
 
-export function play(pcm: Float32Array, rate = RATE) {
+export function play(pcm: Float32Array, rate = PAUL_RATE) {
   const AC = globalThis.AudioContext || (globalThis as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AC) return;
   const ctx = new AC();
   const buf = ctx.createBuffer(1, pcm.length, rate);
   buf.getChannelData(0).set(pcm);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.connect(ctx.destination);
+  src.start();
+}
+
+export function playSpace(l: Float32Array, r: Float32Array, rate = PAUL_RATE) {
+  const AC = globalThis.AudioContext || (globalThis as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AC) return;
+  const n = Math.max(l.length, r.length);
+  const ctx = new AC();
+  const buf = ctx.createBuffer(2, n, rate);
+  buf.getChannelData(0).set(l);
+  buf.getChannelData(1).set(r);
   const src = ctx.createBufferSource();
   src.buffer = buf;
   src.connect(ctx.destination);

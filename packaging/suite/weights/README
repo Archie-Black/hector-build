@@ -1,0 +1,2 @@
+ggml-tiny.bin — official whisper.cpp tiny. SHA-256 be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21
+Flux.1 and SD3.5 Large are not in this folder. They are tens of gigabytes. fetch-weights.sh pulls them onto the box.

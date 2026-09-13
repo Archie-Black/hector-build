@@ -14,17 +14,26 @@ import { Route as ApiV1ChimeraRouteImport } from './routes/api/v1/chimera'
 import { Route as ApiV1GhostwalkRouteImport } from './routes/api/v1/ghostwalk'
 import { Route as ApiV1NetRouteImport } from './routes/api/v1/net'
 import { Route as ApiV1TimeRouteImport } from './routes/api/v1/time'
+import { Route as ApiV1WslRouteImport } from './routes/api/v1/wsl'
 import { Route as ApiV1HxAuthorRouteImport } from './routes/api/v1/hx/author'
 import { Route as ApiV1HxGodotRouteImport } from './routes/api/v1/hx/godot'
 import { Route as ApiV1HxHorizonRouteImport } from './routes/api/v1/hx/horizon'
 import { Route as ApiV1HxLtvRouteImport } from './routes/api/v1/hx/ltv'
 import { Route as ApiV1HxMarketRouteImport } from './routes/api/v1/hx/market'
+import { Route as ApiV1HxMetahumanRouteImport } from './routes/api/v1/hx/metahuman'
 import { Route as ApiV1HxRetainRouteImport } from './routes/api/v1/hx/retain'
 import { Route as ApiV1HxUeRouteImport } from './routes/api/v1/hx/ue'
+import { Route as ApiV1SentinelEventsRouteImport } from './routes/api/v1/sentinel/events'
+import { Route as ApiV1SentinelKpisRouteImport } from './routes/api/v1/sentinel/kpis'
+import { Route as ApiV1SpeechPredictiveRouteImport } from './routes/api/v1/speech/predictive'
+import { Route as ApiV1V01dAlertsRouteImport } from './routes/api/v1/v01d/alerts'
+import { Route as ApiV1V01dCloudRouteImport } from './routes/api/v1/v01d/cloud'
+import { Route as ApiV1V01dFirmwareRouteImport } from './routes/api/v1/v01d/firmware'
 import { Route as ApiV1V01dFsRouteImport } from './routes/api/v1/v01d/fs'
 import { Route as ApiV1V01dRunRouteImport } from './routes/api/v1/v01d/run'
 import { Route as ApiV1V01dShareRouteImport } from './routes/api/v1/v01d/share'
 import { Route as ApiV1V01dSpeakRouteImport } from './routes/api/v1/v01d/speak'
+import { Route as ApiV1V01dWeaveRouteImport } from './routes/api/v1/v01d/weave'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,6 +58,11 @@ const ApiV1NetRoute = ApiV1NetRouteImport.update({
 const ApiV1TimeRoute = ApiV1TimeRouteImport.update({
   id: '/api/v1/time',
   path: '/api/v1/time',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1WslRoute = ApiV1WslRouteImport.update({
+  id: '/api/v1/wsl',
+  path: '/api/v1/wsl',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1HxAuthorRoute = ApiV1HxAuthorRouteImport.update({
@@ -76,6 +90,11 @@ const ApiV1HxMarketRoute = ApiV1HxMarketRouteImport.update({
   path: '/api/v1/hx/market',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1HxMetahumanRoute = ApiV1HxMetahumanRouteImport.update({
+  id: '/api/v1/hx/metahuman',
+  path: '/api/v1/hx/metahuman',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1HxRetainRoute = ApiV1HxRetainRouteImport.update({
   id: '/api/v1/hx/retain',
   path: '/api/v1/hx/retain',
@@ -84,6 +103,36 @@ const ApiV1HxRetainRoute = ApiV1HxRetainRouteImport.update({
 const ApiV1HxUeRoute = ApiV1HxUeRouteImport.update({
   id: '/api/v1/hx/ue',
   path: '/api/v1/hx/ue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SentinelEventsRoute = ApiV1SentinelEventsRouteImport.update({
+  id: '/api/v1/sentinel/events',
+  path: '/api/v1/sentinel/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SentinelKpisRoute = ApiV1SentinelKpisRouteImport.update({
+  id: '/api/v1/sentinel/kpis',
+  path: '/api/v1/sentinel/kpis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SpeechPredictiveRoute = ApiV1SpeechPredictiveRouteImport.update({
+  id: '/api/v1/speech/predictive',
+  path: '/api/v1/speech/predictive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1V01dAlertsRoute = ApiV1V01dAlertsRouteImport.update({
+  id: '/api/v1/v01d/alerts',
+  path: '/api/v1/v01d/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1V01dCloudRoute = ApiV1V01dCloudRouteImport.update({
+  id: '/api/v1/v01d/cloud',
+  path: '/api/v1/v01d/cloud',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1V01dFirmwareRoute = ApiV1V01dFirmwareRouteImport.update({
+  id: '/api/v1/v01d/firmware',
+  path: '/api/v1/v01d/firmware',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1V01dFsRoute = ApiV1V01dFsRouteImport.update({
@@ -106,6 +155,11 @@ const ApiV1V01dSpeakRoute = ApiV1V01dSpeakRouteImport.update({
   path: '/api/v1/v01d/speak',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1V01dWeaveRoute = ApiV1V01dWeaveRouteImport.update({
+  id: '/api/v1/v01d/weave',
+  path: '/api/v1/v01d/weave',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -113,17 +167,26 @@ export interface FileRoutesByFullPath {
   '/api/v1/ghostwalk': typeof ApiV1GhostwalkRoute
   '/api/v1/net': typeof ApiV1NetRoute
   '/api/v1/time': typeof ApiV1TimeRoute
+  '/api/v1/wsl': typeof ApiV1WslRoute
   '/api/v1/hx/author': typeof ApiV1HxAuthorRoute
   '/api/v1/hx/godot': typeof ApiV1HxGodotRoute
   '/api/v1/hx/horizon': typeof ApiV1HxHorizonRoute
   '/api/v1/hx/ltv': typeof ApiV1HxLtvRoute
   '/api/v1/hx/market': typeof ApiV1HxMarketRoute
+  '/api/v1/hx/metahuman': typeof ApiV1HxMetahumanRoute
   '/api/v1/hx/retain': typeof ApiV1HxRetainRoute
   '/api/v1/hx/ue': typeof ApiV1HxUeRoute
+  '/api/v1/sentinel/events': typeof ApiV1SentinelEventsRoute
+  '/api/v1/sentinel/kpis': typeof ApiV1SentinelKpisRoute
+  '/api/v1/speech/predictive': typeof ApiV1SpeechPredictiveRoute
+  '/api/v1/v01d/alerts': typeof ApiV1V01dAlertsRoute
+  '/api/v1/v01d/cloud': typeof ApiV1V01dCloudRoute
+  '/api/v1/v01d/firmware': typeof ApiV1V01dFirmwareRoute
   '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
   '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
   '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
   '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
+  '/api/v1/v01d/weave': typeof ApiV1V01dWeaveRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,17 +194,26 @@ export interface FileRoutesByTo {
   '/api/v1/ghostwalk': typeof ApiV1GhostwalkRoute
   '/api/v1/net': typeof ApiV1NetRoute
   '/api/v1/time': typeof ApiV1TimeRoute
+  '/api/v1/wsl': typeof ApiV1WslRoute
   '/api/v1/hx/author': typeof ApiV1HxAuthorRoute
   '/api/v1/hx/godot': typeof ApiV1HxGodotRoute
   '/api/v1/hx/horizon': typeof ApiV1HxHorizonRoute
   '/api/v1/hx/ltv': typeof ApiV1HxLtvRoute
   '/api/v1/hx/market': typeof ApiV1HxMarketRoute
+  '/api/v1/hx/metahuman': typeof ApiV1HxMetahumanRoute
   '/api/v1/hx/retain': typeof ApiV1HxRetainRoute
   '/api/v1/hx/ue': typeof ApiV1HxUeRoute
+  '/api/v1/sentinel/events': typeof ApiV1SentinelEventsRoute
+  '/api/v1/sentinel/kpis': typeof ApiV1SentinelKpisRoute
+  '/api/v1/speech/predictive': typeof ApiV1SpeechPredictiveRoute
+  '/api/v1/v01d/alerts': typeof ApiV1V01dAlertsRoute
+  '/api/v1/v01d/cloud': typeof ApiV1V01dCloudRoute
+  '/api/v1/v01d/firmware': typeof ApiV1V01dFirmwareRoute
   '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
   '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
   '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
   '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
+  '/api/v1/v01d/weave': typeof ApiV1V01dWeaveRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,17 +222,26 @@ export interface FileRoutesById {
   '/api/v1/ghostwalk': typeof ApiV1GhostwalkRoute
   '/api/v1/net': typeof ApiV1NetRoute
   '/api/v1/time': typeof ApiV1TimeRoute
+  '/api/v1/wsl': typeof ApiV1WslRoute
   '/api/v1/hx/author': typeof ApiV1HxAuthorRoute
   '/api/v1/hx/godot': typeof ApiV1HxGodotRoute
   '/api/v1/hx/horizon': typeof ApiV1HxHorizonRoute
   '/api/v1/hx/ltv': typeof ApiV1HxLtvRoute
   '/api/v1/hx/market': typeof ApiV1HxMarketRoute
+  '/api/v1/hx/metahuman': typeof ApiV1HxMetahumanRoute
   '/api/v1/hx/retain': typeof ApiV1HxRetainRoute
   '/api/v1/hx/ue': typeof ApiV1HxUeRoute
+  '/api/v1/sentinel/events': typeof ApiV1SentinelEventsRoute
+  '/api/v1/sentinel/kpis': typeof ApiV1SentinelKpisRoute
+  '/api/v1/speech/predictive': typeof ApiV1SpeechPredictiveRoute
+  '/api/v1/v01d/alerts': typeof ApiV1V01dAlertsRoute
+  '/api/v1/v01d/cloud': typeof ApiV1V01dCloudRoute
+  '/api/v1/v01d/firmware': typeof ApiV1V01dFirmwareRoute
   '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
   '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
   '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
   '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
+  '/api/v1/v01d/weave': typeof ApiV1V01dWeaveRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -170,17 +251,26 @@ export interface FileRouteTypes {
     | '/api/v1/ghostwalk'
     | '/api/v1/net'
     | '/api/v1/time'
+    | '/api/v1/wsl'
     | '/api/v1/hx/author'
     | '/api/v1/hx/godot'
     | '/api/v1/hx/horizon'
     | '/api/v1/hx/ltv'
     | '/api/v1/hx/market'
+    | '/api/v1/hx/metahuman'
     | '/api/v1/hx/retain'
     | '/api/v1/hx/ue'
+    | '/api/v1/sentinel/events'
+    | '/api/v1/sentinel/kpis'
+    | '/api/v1/speech/predictive'
+    | '/api/v1/v01d/alerts'
+    | '/api/v1/v01d/cloud'
+    | '/api/v1/v01d/firmware'
     | '/api/v1/v01d/fs'
     | '/api/v1/v01d/run'
     | '/api/v1/v01d/share'
     | '/api/v1/v01d/speak'
+    | '/api/v1/v01d/weave'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,17 +278,26 @@ export interface FileRouteTypes {
     | '/api/v1/ghostwalk'
     | '/api/v1/net'
     | '/api/v1/time'
+    | '/api/v1/wsl'
     | '/api/v1/hx/author'
     | '/api/v1/hx/godot'
     | '/api/v1/hx/horizon'
     | '/api/v1/hx/ltv'
     | '/api/v1/hx/market'
+    | '/api/v1/hx/metahuman'
     | '/api/v1/hx/retain'
     | '/api/v1/hx/ue'
+    | '/api/v1/sentinel/events'
+    | '/api/v1/sentinel/kpis'
+    | '/api/v1/speech/predictive'
+    | '/api/v1/v01d/alerts'
+    | '/api/v1/v01d/cloud'
+    | '/api/v1/v01d/firmware'
     | '/api/v1/v01d/fs'
     | '/api/v1/v01d/run'
     | '/api/v1/v01d/share'
     | '/api/v1/v01d/speak'
+    | '/api/v1/v01d/weave'
   id:
     | '__root__'
     | '/'
@@ -206,17 +305,26 @@ export interface FileRouteTypes {
     | '/api/v1/ghostwalk'
     | '/api/v1/net'
     | '/api/v1/time'
+    | '/api/v1/wsl'
     | '/api/v1/hx/author'
     | '/api/v1/hx/godot'
     | '/api/v1/hx/horizon'
     | '/api/v1/hx/ltv'
     | '/api/v1/hx/market'
+    | '/api/v1/hx/metahuman'
     | '/api/v1/hx/retain'
     | '/api/v1/hx/ue'
+    | '/api/v1/sentinel/events'
+    | '/api/v1/sentinel/kpis'
+    | '/api/v1/speech/predictive'
+    | '/api/v1/v01d/alerts'
+    | '/api/v1/v01d/cloud'
+    | '/api/v1/v01d/firmware'
     | '/api/v1/v01d/fs'
     | '/api/v1/v01d/run'
     | '/api/v1/v01d/share'
     | '/api/v1/v01d/speak'
+    | '/api/v1/v01d/weave'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -225,17 +333,26 @@ export interface RootRouteChildren {
   ApiV1GhostwalkRoute: typeof ApiV1GhostwalkRoute
   ApiV1NetRoute: typeof ApiV1NetRoute
   ApiV1TimeRoute: typeof ApiV1TimeRoute
+  ApiV1WslRoute: typeof ApiV1WslRoute
   ApiV1HxAuthorRoute: typeof ApiV1HxAuthorRoute
   ApiV1HxGodotRoute: typeof ApiV1HxGodotRoute
   ApiV1HxHorizonRoute: typeof ApiV1HxHorizonRoute
   ApiV1HxLtvRoute: typeof ApiV1HxLtvRoute
   ApiV1HxMarketRoute: typeof ApiV1HxMarketRoute
+  ApiV1HxMetahumanRoute: typeof ApiV1HxMetahumanRoute
   ApiV1HxRetainRoute: typeof ApiV1HxRetainRoute
   ApiV1HxUeRoute: typeof ApiV1HxUeRoute
+  ApiV1SentinelEventsRoute: typeof ApiV1SentinelEventsRoute
+  ApiV1SentinelKpisRoute: typeof ApiV1SentinelKpisRoute
+  ApiV1SpeechPredictiveRoute: typeof ApiV1SpeechPredictiveRoute
+  ApiV1V01dAlertsRoute: typeof ApiV1V01dAlertsRoute
+  ApiV1V01dCloudRoute: typeof ApiV1V01dCloudRoute
+  ApiV1V01dFirmwareRoute: typeof ApiV1V01dFirmwareRoute
   ApiV1V01dFsRoute: typeof ApiV1V01dFsRoute
   ApiV1V01dRunRoute: typeof ApiV1V01dRunRoute
   ApiV1V01dShareRoute: typeof ApiV1V01dShareRoute
   ApiV1V01dSpeakRoute: typeof ApiV1V01dSpeakRoute
+  ApiV1V01dWeaveRoute: typeof ApiV1V01dWeaveRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -275,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1TimeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/wsl': {
+      id: '/api/v1/wsl'
+      path: '/api/v1/wsl'
+      fullPath: '/api/v1/wsl'
+      preLoaderRoute: typeof ApiV1WslRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/hx/author': {
       id: '/api/v1/hx/author'
       path: '/api/v1/hx/author'
@@ -310,6 +434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1HxMarketRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/hx/metahuman': {
+      id: '/api/v1/hx/metahuman'
+      path: '/api/v1/hx/metahuman'
+      fullPath: '/api/v1/hx/metahuman'
+      preLoaderRoute: typeof ApiV1HxMetahumanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/hx/retain': {
       id: '/api/v1/hx/retain'
       path: '/api/v1/hx/retain'
@@ -322,6 +453,48 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/hx/ue'
       fullPath: '/api/v1/hx/ue'
       preLoaderRoute: typeof ApiV1HxUeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/sentinel/events': {
+      id: '/api/v1/sentinel/events'
+      path: '/api/v1/sentinel/events'
+      fullPath: '/api/v1/sentinel/events'
+      preLoaderRoute: typeof ApiV1SentinelEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/sentinel/kpis': {
+      id: '/api/v1/sentinel/kpis'
+      path: '/api/v1/sentinel/kpis'
+      fullPath: '/api/v1/sentinel/kpis'
+      preLoaderRoute: typeof ApiV1SentinelKpisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/speech/predictive': {
+      id: '/api/v1/speech/predictive'
+      path: '/api/v1/speech/predictive'
+      fullPath: '/api/v1/speech/predictive'
+      preLoaderRoute: typeof ApiV1SpeechPredictiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/v01d/alerts': {
+      id: '/api/v1/v01d/alerts'
+      path: '/api/v1/v01d/alerts'
+      fullPath: '/api/v1/v01d/alerts'
+      preLoaderRoute: typeof ApiV1V01dAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/v01d/cloud': {
+      id: '/api/v1/v01d/cloud'
+      path: '/api/v1/v01d/cloud'
+      fullPath: '/api/v1/v01d/cloud'
+      preLoaderRoute: typeof ApiV1V01dCloudRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/v01d/firmware': {
+      id: '/api/v1/v01d/firmware'
+      path: '/api/v1/v01d/firmware'
+      fullPath: '/api/v1/v01d/firmware'
+      preLoaderRoute: typeof ApiV1V01dFirmwareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/v01d/fs': {
@@ -352,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1V01dSpeakRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/v01d/weave': {
+      id: '/api/v1/v01d/weave'
+      path: '/api/v1/v01d/weave'
+      fullPath: '/api/v1/v01d/weave'
+      preLoaderRoute: typeof ApiV1V01dWeaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -361,17 +541,26 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1GhostwalkRoute: ApiV1GhostwalkRoute,
   ApiV1NetRoute: ApiV1NetRoute,
   ApiV1TimeRoute: ApiV1TimeRoute,
+  ApiV1WslRoute: ApiV1WslRoute,
   ApiV1HxAuthorRoute: ApiV1HxAuthorRoute,
   ApiV1HxGodotRoute: ApiV1HxGodotRoute,
   ApiV1HxHorizonRoute: ApiV1HxHorizonRoute,
   ApiV1HxLtvRoute: ApiV1HxLtvRoute,
   ApiV1HxMarketRoute: ApiV1HxMarketRoute,
+  ApiV1HxMetahumanRoute: ApiV1HxMetahumanRoute,
   ApiV1HxRetainRoute: ApiV1HxRetainRoute,
   ApiV1HxUeRoute: ApiV1HxUeRoute,
+  ApiV1SentinelEventsRoute: ApiV1SentinelEventsRoute,
+  ApiV1SentinelKpisRoute: ApiV1SentinelKpisRoute,
+  ApiV1SpeechPredictiveRoute: ApiV1SpeechPredictiveRoute,
+  ApiV1V01dAlertsRoute: ApiV1V01dAlertsRoute,
+  ApiV1V01dCloudRoute: ApiV1V01dCloudRoute,
+  ApiV1V01dFirmwareRoute: ApiV1V01dFirmwareRoute,
   ApiV1V01dFsRoute: ApiV1V01dFsRoute,
   ApiV1V01dRunRoute: ApiV1V01dRunRoute,
   ApiV1V01dShareRoute: ApiV1V01dShareRoute,
   ApiV1V01dSpeakRoute: ApiV1V01dSpeakRoute,
+  ApiV1V01dWeaveRoute: ApiV1V01dWeaveRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

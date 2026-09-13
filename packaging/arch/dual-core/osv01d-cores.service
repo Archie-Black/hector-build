@@ -1,0 +1,18 @@
+[Unit]
+Description=OS V01D dual core gateway
+After=network-online.target osv01d-tts.service
+[Service]
+Type=simple
+WorkingDirectory=/opt/osv01d/cores
+RuntimeDirectory=osv01d
+ExecStart=/usr/bin/python3 /opt/osv01d/cores/gateway.py
+Nice=-20
+LimitNICE=40
+LimitRTPRIO=99
+LimitMEMLOCK=infinity
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+[Install]
+WantedBy=multi-user.target

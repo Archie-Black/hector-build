@@ -1,0 +1,9 @@
+[Unit]
+Description=OS V01D keep the host BIOS current
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1w
+Persistent=true
+Unit=osv01d-firmware-keep.service
+[Install]
+WantedBy=timers.target

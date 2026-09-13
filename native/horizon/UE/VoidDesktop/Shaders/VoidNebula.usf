@@ -1,0 +1,11 @@
+// OS V01D void field. Same uniforms as WebGL and Godot. DeltaKingZero.
+float Hash21(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
+void MainPS(float2 uv, float t, float2 look, float q, out float3 col) {
+  float2 p = uv * 2 - 1;
+  p -= look * 0.018;
+  float n = 0;
+  for (int i = 0; i < 5; i++) {
+    n += Hash21(floor(p * (2.2 + i * 1.15) + t * 0.02)) / (i + 1.2);
+  }
+  col = float3(0.02, 0.02, 0.024) + float3(0.0, 0.12, 0.45) * n * 0.28 * q;
+}

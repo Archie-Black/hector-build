@@ -1,0 +1,17 @@
+[Unit]
+Description=OS V01D predictive TTS (DiT / Paul)
+After=network-online.target pipewire.service
+[Service]
+Type=simple
+WorkingDirectory=/opt/osv01d/tts
+Environment=OSV01D_TTS_ROOT=/opt/osv01d/tts
+Environment=OSV01D_TTS_HOST=127.0.0.1
+Environment=OSV01D_TTS_PORT=8090
+Environment=PIPEWIRE_LATENCY=64/48000
+ExecStart=/usr/bin/python3 /opt/osv01d/tts/server.py
+Restart=on-failure
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+[Install]
+WantedBy=multi-user.target

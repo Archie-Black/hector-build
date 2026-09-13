@@ -1,0 +1,23 @@
+// Aliens 1986 titling. Horizontal razor that opens. The 1 splits like the I.
+// Same numbers as src/lib/v01d/overture.ts. UE 5.8. DeltaKingZero.
+
+float Smooth01(float t) {
+  t = saturate(t);
+  return t * t * (3 - 2 * t);
+}
+
+void MainPS(float2 uv, float t, float glyph, float isOne, out float4 col) {
+  float local = (t - (3.2 + glyph * 3.6)) / 3.8;
+  float k = Smooth01(local);
+  float halfH = (1 - k) * 0.5;
+  float slit = uv.y > halfH && uv.y < (1 - halfH) ? 1 : 0;
+  float split = Smooth01((local - 0.15) / 0.85) * 0.18;
+  float2 p = uv;
+  if (isOne > 0.5) {
+    p.x += (uv.x < 0.5 ? -split : split) * 0.15;
+  }
+  float3 ivory = float3(0.86, 0.84, 0.78);
+  float a = slit * k;
+  if (t > 18.4) a *= 1 - Smooth01((t - 18.4) / 1.8);
+  col = float4(ivory * a, a);
+}

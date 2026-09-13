@@ -1,0 +1,11 @@
+[Unit]
+Description=OS V01D firmware census. Before install.
+DefaultDependencies=no
+After=sysinit.target
+Before=osv01d-install.service
+[Service]
+Type=oneshot
+ExecStart=/usr/share/osv01d/packaging/arch/firmware-first.sh
+RemainAfterExit=yes
+[Install]
+WantedBy=sysinit.target

@@ -1,4 +1,4 @@
-export type AppId = "files" | "programs" | "ghostwalk" | "code" | "terminal" | "security" | "notes" | "settings" | "trash" | "portal";
+export type AppId = "files" | "programs" | "ghostwalk" | "code" | "terminal" | "security" | "notes" | "settings" | "trash" | "portal" | "crapple" | "unix" | "helix" | "room" | "asimov" | "forge" | "suite";
 
 export type Rect = { x: number; y: number; w: number; h: number };
 
@@ -25,15 +25,22 @@ export const APPS: AppMeta[] = [
   { id: "programs", title: "Programs", blurb: "Windows and Linux programs. Same folder.", desk: true },
   { id: "ghostwalk", title: "GhostWalk", blurb: "Browse without being followed.", desk: true },
   { id: "notes", title: "GhostIT", blurb: "Sticky notes for you and Hector. Markdown.", desk: true },
-  { id: "portal", title: "Portal", blurb: "Games. Lava. DooMChaT.", desk: true },
-  { id: "trash", title: "Trash", blurb: "Things you deleted.", desk: true },
-  { id: "code", title: "Code", blurb: "Write and edit programs.", desk: false },
+  { id: "portal", title: "Portal 00:13", blurb: "Spectral Horizon. Games. DooMChaT.", desk: true },
+  { id: "code", title: "Spectral HX", blurb: "IDE suite. Write, run, git, debug.", desk: true },
+  { id: "crapple", title: "Crapple", blurb: "Mac programs. Darwin window.", desk: true },
+  { id: "helix", title: "Helix", blurb: "Inside the Linux room. Rebuild or wrap.", desk: false },
+  { id: "room", title: "Linux room", blurb: "Arch WSL. Helix lives here.", desk: true },
+  { id: "asimov", title: "Asimov 01", blurb: "Robotics lab. HAL + Hector RL. The laws hold.", desk: true },
+  { id: "forge", title: "Forge", blurb: "Inside Genesis HX. Ardour. Seal the bounce.", desk: false },
+  { id: "suite", title: "Genesis HX Suite", blurb: "Photo, vector, paint, 3D, film, stream, podcast.", desk: true },
+  { id: "trash", title: "Trash", blurb: "Things you deleted.", desk: false },
   { id: "terminal", title: "Terminal", blurb: "Type commands if you want to.", desk: false },
+  { id: "unix", title: "Unix", blurb: "Read, write, execute Unix. Second window.", desk: false },
   { id: "security", title: "Security", blurb: "See that this machine is locked down.", desk: false },
   { id: "settings", title: "Settings", blurb: "Sound, network, and how this computer feels.", desk: false },
 ];
 
-export const MENU = APPS.filter((a) => a.id !== "trash" && a.id !== "settings");
+export const MENU = APPS.filter((a) => a.id !== "trash" && a.id !== "settings" && a.id !== "unix" && a.id !== "helix");
 
 export function meta(id: AppId): AppMeta {
   return APPS.find((a) => a.id === id)!;

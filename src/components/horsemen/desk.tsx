@@ -4,13 +4,26 @@ import { english, USER_FACES } from "@/lib/horsemen/bucky";
 import { MENU, meta, type AppId, type Pane, place, tiles } from "@/lib/horsemen/layout";
 import { wobble } from "@/lib/horsemen/tqc";
 import { boot } from "@/lib/v01d/kernel";
+import { bootSound, unlock } from "@/lib/v01d/sound";
+import { warm } from "@/lib/v01d/tts";
+import { opening, parked, seenOpen } from "@/lib/v01d/overture";
+import { load, type Profile } from "@/lib/v01d/comfort";
+import { bootFeel } from "@/lib/v01d/feel";
+import { face } from "@/lib/v01d/comfort";
+import { Welcome } from "./welcome";
 import { AppBody } from "./apps";
 import { BuckyBall } from "./ball";
 import { ClockNet } from "./clock";
-import { Field } from "./field";
+import { VoidField } from "./void-field";
+import { VoidOpen } from "./void-open";
+import { VoidMark } from "./void-logo";
+import { SysFab } from "./sys";
+import { VoidRing } from "./void-ring";
 import { AskGhost } from "./hector-ask";
-import { AppGlyph, DeskIcons } from "./icons";
+import { AppGlyph } from "./icons";
 import { Window } from "./pane";
+import { loadWeave, pinDesks, joinBuild, type Weave } from "@/lib/v01d/weave";
+import { WeaveDock } from "./weave";
 
 type Space = { panes: Pane[]; focus: string | null };
 
@@ -24,11 +37,16 @@ export function HorsemenDesk() {
   const [expo, setExpo] = useState(false);
   const [menu, setMenu] = useState(false);
   const [joined, setJoined] = useState(false);
+  const [loom, setLoom] = useState<Weave>(() => loadWeave());
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [drop, setDrop] = useState<string | null>(null);
   const [heard, setHeard] = useState("");
+  const [who, setWho] = useState<Profile | null>(null);
+  const [ready, setReady] = useState(false);
+  const [overture, setOverture] = useState(() => !seenOpen());
+  const [mark, setMark] = useState(() => (seenOpen() ? parked() : opening(0)));
   const drag = useRef<{ id: string; dx: number; dy: number; kind: "move" | "resize"; lx: number; ly: number } | null>(null);
-  const zTop = useRef(4);
+  const zTop = useRef(40);
 
   const space = spaces[desk] ?? spaces[0];
   const panes = space.panes;
@@ -39,16 +57,41 @@ export function HorsemenDesk() {
     [spaces],
   );
   const hector = Math.min(15, filled.length * 3 + panes.length);
-  const line = english(filled, hector, joined || filled.length >= USER_FACES);
+  const line = loom.join?.note || english(filled, hector, joined || filled.length >= USER_FACES);
+
+  useEffect(() => {
+    setLoom(pinDesks(spaces));
+  }, [spaces]);
 
   useEffect(() => {
     boot();
+    bootFeel();
+    bootSound();
+    warm();
+    setWho(load());
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    const onFeel = () => {
+      setWho(null);
+    };
+    window.addEventListener("v01d-comfort", onFeel);
+    return () => window.removeEventListener("v01d-comfort", onFeel);
   }, []);
 
   useEffect(() => {
     const onTile = () => snap();
     window.addEventListener("v01d-tile", onTile);
-    return () => window.removeEventListener("v01d-tile", onTile);
+    const onOpen = (e: Event) => {
+      const app = (e as CustomEvent<{ app?: AppId }>).detail?.app;
+      if (app) open(app);
+    };
+    window.addEventListener("v01d-open", onOpen);
+    return () => {
+      window.removeEventListener("v01d-tile", onTile);
+      window.removeEventListener("v01d-open", onOpen);
+    };
   }, [desk]);
 
   useEffect(() => {
@@ -152,31 +195,51 @@ export function HorsemenDesk() {
   }
 
   const living = panes.filter((p) => !p.leaving);
+  const names = who ? face(who) : null;
+
+  if (ready && !who) {
+    return <Welcome onDone={(p) => setWho(p)} />;
+  }
 
   return (
     <main
-      className="relative h-dvh w-full overflow-hidden bg-void text-ash"
+      className={`relative h-dvh w-full overflow-hidden bg-void text-ash ${who?.desk === "work" ? "desk-work" : "desk-play"} ${overture ? "desk-overture" : ""}`}
       onPointerMove={onMove}
       onPointerUp={onUp}
       onPointerCancel={onUp}
-      onPointerDown={() => setMenu(false)}
+      onPointerDown={() => {
+        setMenu(false);
+        unlock();
+      }}
     >
-      <Field />
-      <header className="workspace-bar pane-glass absolute inset-x-0 top-0 z-50 flex h-11 items-center gap-3 rounded-none px-3" onPointerDown={(e) => e.stopPropagation()}>
-        <img src="/horsemen/hector.png" alt="Hector the Spectre" className="size-8 object-contain" crossOrigin="anonymous" />
-        <p className="hidden font-mono text-[11px] tracking-[0.28em] text-ice uppercase sm:block">OS V01D</p>
-        <div className="flex items-center gap-1">
-          {spaces.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Desktop ${i + 1}`}
-              aria-pressed={desk === i && !expo}
-              onClick={() => goDesk(i)}
-              className={`ws-radio ${desk === i && !expo ? "on" : ""}`}
-            />
-          ))}
-          <button type="button" aria-label="All desktops" aria-pressed={expo} onClick={() => setExpo((v) => !v)} className={`ws-ball ${expo ? "on" : ""}`} />
+      <VoidField quiet={who?.desk === "work"} />
+      {overture ? (
+        <VoidOpen
+          onTick={setMark}
+          onDone={() => {
+            setMark(parked());
+            setOverture(false);
+          }}
+        />
+      ) : null}
+      {overture ? null : <VoidMark top={mark.top} scale={mark.scale} opacity={1} />}
+      <SysFab />
+      <header className="workspace-bar pane-glass absolute inset-x-0 top-0 z-50 flex items-center gap-3 rounded-none px-3" onPointerDown={(e) => e.stopPropagation()}>
+        <div className="ws-pack">
+          <div className="flex items-center gap-1">
+            {spaces.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Workspace ${i + 1}`}
+                aria-pressed={desk === i && !expo}
+                onClick={() => goDesk(i)}
+                className={`ws-radio ${desk === i && !expo ? "on" : ""}`}
+              />
+            ))}
+            <button type="button" aria-label="All workspaces" aria-pressed={expo} onClick={() => setExpo((v) => !v)} className={`ws-ball ${expo ? "on" : ""}`} />
+          </div>
+          <span className="ws-label">workspaces</span>
         </div>
       </header>
       <div className="absolute top-12 right-3 z-50 flex items-start gap-2">
@@ -184,6 +247,12 @@ export function HorsemenDesk() {
           onJob={(job) => {
             setHeard(job.say);
             if (job.tile) snap();
+            if (job.run === "join") {
+              const w = joinBuild();
+              setLoom(w);
+              setJoined(true);
+              setExpo(true);
+            }
             if (job.app) open(job.app);
           }}
         />
@@ -201,10 +270,17 @@ export function HorsemenDesk() {
             }}
           />
           <p className="mt-4 max-w-lg px-6 text-center text-sm leading-relaxed text-ash">{line}</p>
+          <WeaveDock
+            weave={loom}
+            onJoin={(w) => {
+              setLoom(w);
+              setJoined(true);
+            }}
+          />
         </div>
       ) : (
         <>
-          <DeskIcons onOpen={open} />
+          <VoidRing onOpen={open} desk={who?.desk ?? "play"} />
           {living
             .filter((p) => !p.hidden)
             .map((p) => (
@@ -231,7 +307,7 @@ export function HorsemenDesk() {
         <div className="start-menu absolute bottom-[4.75rem] left-3 z-50 w-[min(380px,calc(100%-24px))] p-3" onPointerDown={(e) => e.stopPropagation()}>
           <p className="flex items-center gap-2 px-2 pb-2 text-xs tracking-[0.28em] text-uranium uppercase">
             <img src="/horsemen/hector.png" alt="" className="size-5 object-contain" crossOrigin="anonymous" />
-            Start
+            {names?.start ?? "Start"}
           </p>
           <ul className="max-h-[min(52vh,420px)] overflow-auto">
             {MENU.map((a) => (
@@ -241,7 +317,7 @@ export function HorsemenDesk() {
                     <AppGlyph id={a.id} className="size-8" />
                   </span>
                   <span>
-                    <span className="block text-sm text-uranium">{a.title}</span>
+                    <span className="block text-sm text-uranium">{a.id === "files" ? names?.files ?? a.title : a.id === "room" ? names?.linux ?? a.title : a.title}</span>
                     <span className="block text-xs text-ice/80">{a.blurb}</span>
                   </span>
                 </button>
@@ -273,7 +349,7 @@ export function HorsemenDesk() {
         className="start-btn absolute bottom-3 left-3 z-50 flex h-14 items-center gap-2 px-4"
       >
         <img src="/horsemen/hector.png" alt="" className="size-8 object-contain" crossOrigin="anonymous" />
-        Start
+        {names?.start ?? "Start"}
       </button>
     </main>
   );

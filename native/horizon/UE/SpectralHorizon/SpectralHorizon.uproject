@@ -2,7 +2,7 @@
   "FileVersion": 3,
   "EngineAssociation": "5.8",
   "Category": "Games",
-  "Description": "Spectral Horizon Portal. Hell. Obsidian. DeltaKingZero.",
+  "Description": "Spectral Horizon 00:13. Ghost Kart: Warzone. Chaos. Niagara. DeltaKingZero.",
   "Modules": [
     {
       "Name": "HorizonRuntime",
@@ -11,6 +11,17 @@
     }
   ],
   "Plugins": [
-    { "Name": "Horizon", "Enabled": true }
+    { "Name": "Horizon", "Enabled": true },
+    { "Name": "ChaosVehiclesPlugin", "Enabled": true },
+    { "Name": "Niagara", "Enabled": true },
+    { "Name": "ChaosNiagara", "Enabled": true },
+    { "Name": "GeometryCollectionPlugin", "Enabled": true },
+    { "Name": "NiagaraFluids", "Enabled": true },
+    { "Name": "CesiumForUnreal", "Enabled": true },
+    { "Name": "MetaHumanCreator", "Enabled": true },
+    { "Name": "MetaHumanCharacter", "Enabled": true },
+    { "Name": "MetaHumanCoreTech", "Enabled": true },
+    { "Name": "MetaHumanSDK", "Enabled": true },
+    { "Name": "MetaHumanLiveLink", "Enabled": true }
   ]
 }

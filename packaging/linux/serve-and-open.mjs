@@ -35,5 +35,6 @@ const child = spawn(bin, [join(root, "node_modules/vite/bin/vite.js"), "dev", "-
 });
 await wait();
 const open = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
-spawn(open, [`http://127.0.0.1:${port}`], { stdio: "ignore", detached: true }).unref();
+const install = process.env.V01D_INSTALL === "1" ? "?install=1" : "";
+spawn(open, [`http://127.0.0.1:${port}/${install}`], { stdio: "ignore", detached: true }).unref();
 child.on("exit", (c) => process.exit(c ?? 0));

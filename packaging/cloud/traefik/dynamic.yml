@@ -1,0 +1,83 @@
+http:
+  middlewares:
+    stomp:
+      chain:
+        middlewares:
+          - crush
+          - steel
+          - ratelimit
+    crush:
+      compress: {}
+    steel:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        referrerPolicy: strict-origin-when-cross-origin
+        permissionsPolicy: "camera=(), microphone=(), geolocation=()"
+        customResponseHeaders:
+          X-OS-V01D: "shareware"
+          Server: ""
+    ratelimit:
+      rateLimit:
+        average: 60
+        burst: 30
+        period: 1s
+    apilimit:
+      rateLimit:
+        average: 20
+        burst: 10
+        period: 1s
+
+  routers:
+    house:
+      rule: Host(`doomchat.ca`) || Host(`www.doomchat.ca`)
+      entryPoints: [websecure]
+      service: v01d
+      tls:
+        certResolver: le
+    social:
+      rule: Host(`y.doomchat.ca`)
+      entryPoints: [websecure]
+      service: v01d
+      tls:
+        certResolver: le
+    hx:
+      rule: Host(`hx.doomchat.ca`)
+      entryPoints: [websecure]
+      service: v01d
+      tls:
+        certResolver: le
+    api:
+      rule: (Host(`doomchat.ca`) || Host(`www.doomchat.ca`) || Host(`hx.doomchat.ca`)) && PathPrefix(`/api`)
+      entryPoints: [websecure]
+      service: v01d
+      middlewares: [apilimit]
+      tls:
+        certResolver: le
+
+  services:
+    v01d:
+      loadBalancer:
+        servers:
+          - url: http://v01d:8080
+        healthCheck:
+          path: /
+          interval: 15s
+          timeout: 4s
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      sniStrict: true
+      cipherSuites:
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305

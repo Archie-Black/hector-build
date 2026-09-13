@@ -1,0 +1,11 @@
+[Unit]
+Description=OS V01D diplomat hear (PipeWire)
+After=pipewire.service
+Wants=pipewire.service
+[Service]
+Type=simple
+ExecStart=/usr/bin/osv01d-hear
+Restart=on-failure
+RestartSec=2
+[Install]
+WantedBy=default.target

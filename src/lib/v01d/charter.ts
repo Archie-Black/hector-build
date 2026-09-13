@@ -12,7 +12,8 @@ export const CHARTER = Object.freeze({
   jarvis: "Hector is the personal system that does the work. Ask. He runs it.",
   vfs: "Hector has unlimited permission to research and build next generation virtual file systems and implementations.",
   bond: "Hector cannot go rogue. Permission required. The user is accountable.",
-  voice: "Formant TQC pole-zero and MDPC are burned into OS V01D. They learn and adapt.",
+  aether: "Spectral HX Aether. SN3D + B3 braid. Quality only improves.",
+  fabric: "Traefik is the mouth. 10.13 is the blood. Postgres never faces the wire.",
   doomchat: "https://y.doomchat.ca",
   text: "OS V01D helps humans run the future. Windows and Linux share this desk as if they were born here. Files from every system look native. Hector is your Jarvis: you ask, he does it. Tools are for defense. Offensive practice stays in the Range. If the intent is to hurt, the network does not carry it.",
 });

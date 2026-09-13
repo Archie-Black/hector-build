@@ -1,6 +1,7 @@
 import { ArrowLeft, Ghost, Plus, RotateCcw, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import { circuit, cleanUrl, isOnion } from "@/lib/ghostwalk/ghstkrt";
+import { handle, host, type Habitat } from "@/lib/ghostwalk/morph";
 
 type Tab = { id: string; title: string; url: string; html: string; note: string };
 
@@ -15,12 +16,32 @@ export function GhostWalk() {
   const [tor, setTor] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [cid, setCid] = useState(() => circuit());
+  const [form, setForm] = useState<Habitat>("web");
 
   useEffect(() => {
     void fetch("/api/v1/ghostwalk?probe=tor")
       .then((r) => r.json())
       .then((j) => setTor(Boolean(j.tor)))
       .catch(() => setTor(false));
+    const onWalk = (e: Event) => {
+      const q = (e as CustomEvent<{ q?: string }>).detail?.q;
+      if (q) {
+        setBar(q);
+        void go(q);
+      }
+    };
+    window.addEventListener("v01d-walk", onWalk);
+    try {
+      const pending = sessionStorage.getItem("v01d.walk");
+      if (pending) {
+        sessionStorage.removeItem("v01d.walk");
+        setBar(pending);
+        void go(pending);
+      }
+    } catch {
+      /* */
+    }
+    return () => window.removeEventListener("v01d-walk", onWalk);
   }, [cid]);
 
   const tab = tabs[cur] ?? tabs[0];
@@ -31,11 +52,21 @@ export function GhostWalk() {
     if (!href.includes(".") && !href.includes("://")) {
       href = `https://duckduckgo.com/?q=${encodeURIComponent(href)}`;
     }
-    const url = cleanUrl(href);
+    const g = handle(href);
+    setForm(g.browse ? host() : g.habitat);
+    if (!g.browse) {
+      window.dispatchEvent(new CustomEvent("v01d-open", { detail: { app: g.app, say: g.say } }));
+      setTabs((xs) =>
+        xs.map((t, i) => (i === cur ? { ...t, url: g.href, title: g.habitat, html: "", note: g.say } : t)),
+      );
+      setBar(g.href);
+      return;
+    }
+    const url = cleanUrl(g.href.startsWith("http") ? g.href : href);
     if (!url) return;
     setBusy(true);
     try {
-      const res = await fetch(`/api/v1/ghostwalk?url=${encodeURIComponent(url)}`);
+      const res = await fetch(`/api/v1/ghostwalk?url=${encodeURIComponent(url)}&habitat=${encodeURIComponent(host())}`);
       const data = await res.json();
       setTabs((xs) =>
         xs.map((t, i) =>
@@ -65,7 +96,7 @@ export function GhostWalk() {
   }
 
   return (
-    <div className="ghostwalk flex h-full flex-col">
+    <div className={`ghostwalk gw-${form} flex h-full flex-col`}>
       <div className="flex items-center gap-2 border-b border-cobalt/25 px-2 py-1">
         <Ghost className="size-4 text-ice" />
         <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto">
@@ -130,7 +161,7 @@ export function GhostWalk() {
       </form>
       <p className="flex items-center gap-2 px-3 py-1 font-mono text-[10px] tracking-[0.16em] text-ice uppercase">
         <Shield className="size-3" />
-        {tor ? "hidden path" : "quiet path"} · {cid.slice(0, 8)} · {tab.note}
+        {tor ? "hidden path" : "quiet path"} · {form} · {cid.slice(0, 8)} · {tab.note}
         {tab.url && isOnion(tab.url) ? " · onion" : ""}
       </p>
       <div className="relative min-h-0 flex-1">

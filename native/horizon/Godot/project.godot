@@ -3,16 +3,28 @@ config_version=5
 
 [application]
 config/name="Spectral Horizon"
-config/description="Oasis sandbox. Hector authors. Godot 4.7 + Unreal 5.8."
+config/description="Ghost Kart: Warzone. Omni. Voxel. Jolt."
 run/main_scene="res://horizon.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+VoxelHook="*res://voxel_hook.gd"
+GameManager="*res://game_manager.gd"
+HectorBrain="*res://hector_brain.gd"
 
 [display]
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 
+[physics]
+3d/physics_engine="JoltPhysics3D"
+3d/default_gravity=1.569
+
 [rendering]
 renderer/rendering_method="forward_plus"
 lights_and_shadows/use_physical_light_units=true
+
+[xr]
+openxr/enabled=true

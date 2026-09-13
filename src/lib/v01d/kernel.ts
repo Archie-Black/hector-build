@@ -6,6 +6,24 @@ import { evolve } from "./lab";
 import { snapshot } from "./place";
 import { listing } from "./samba";
 import { taught } from "./talk";
+import { FABRIC } from "./cloud";
+import { EDGES } from "./geom";
+import { care } from "@/lib/sentinel/care";
+import { wake } from "@/lib/sentinel";
+import { awake } from "./pathways";
+import { room } from "./wsl";
+import { sealTeam } from "@/lib/asimov/team";
+import { openLab } from "@/lib/asimov/lab";
+import { inhabit } from "@/lib/asimov/home";
+import { sealMouth, MOUTH } from "@/lib/asimov/mouth";
+import { sealLaws } from "@/lib/asimov/laws";
+import { sealOrder, ORDER } from "@/lib/hector/order";
+import { sealBrain, BRAIN } from "@/lib/hector/brain";
+import { sealNerves, NERVE } from "./nerves";
+import { of } from "@/lib/hx/proto";
+import { devices } from "./hal";
+import { seat } from "./origin";
+import { FIRM } from "./firmware";
 import { sealVoice, VOICE } from "./voice/adapt";
 
 /** First thing OS V01D does. Laws first. Filesystems learn. Hector builds. */
@@ -15,6 +33,19 @@ export function boot() {
   sealGrant();
   sealBond();
   sealVoice();
+  sealLaws();
+  sealOrder();
+  sealBrain();
+  sealNerves();
+  sealMouth();
+  const path = awake();
+  const tongues = care();
+  const sentinel = wake();
   const lab = evolve();
-  return { law: LAW, charter: CHARTER, bond: BOND, voice: VOICE, talk: taught(), share: listing(), lab, place: snapshot() };
+  const robotics = openLab();
+  const house = inhabit();
+  const origin = seat(true);
+  const rdna = sealTeam({ amd: true, nvidia: true });
+  const hal = devices();
+  return { law: LAW, charter: CHARTER, bond: BOND, voice: VOICE, talk: taught(), share: listing(), lab, place: snapshot(), fabric: FABRIC, graph: EDGES.length, learn: of("horizon")?.hits || 0, path, sentinel, tongues, wsl: room(null), rdna, hal: hal.length, robotics: robotics.name, origin, firmware: FIRM.path, house: house.seat, mouth: MOUTH.id, order: ORDER.head, brain: BRAIN.id, nerves: NERVE.id };
 }

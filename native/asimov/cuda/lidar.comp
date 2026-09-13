@@ -1,0 +1,11 @@
+#version 450
+// Asimov CUDA-side Vulkan compute. Twin of rdna/lidar.comp. DeltaKingZero.
+layout(local_size_x = 64) in;
+layout(std430, binding = 0) buffer Scan { float ranges[]; };
+layout(std430, binding = 1) buffer Pose { float x; float y; float th; };
+void main() {
+  uint i = gl_GlobalInvocationID.x;
+  if (i >= ranges.length()) return;
+  float a = th + (float(i) / float(ranges.length())) * 6.2831853 - 3.14159265;
+  ranges[i] = min(10.0, 0.2 + abs(cos(a + x * 0.01 + y * 0.01)));
+}
