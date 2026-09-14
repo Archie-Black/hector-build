@@ -104,6 +104,7 @@ wait_for "$ROOT/packaging/suite/weights/ggml-tiny.bin" "whisper tiny (packaging/
 need "$ROOT/packaging/arch/bootstrap.sh"
 need "$ROOT/packaging/arch/install-live.sh"
 need "$ROOT/packaging/arch/mkiso.sh"
+need "$ROOT/packaging/arch/live-boot.sh"
 need "$ROOT/packaging/arch/archiso/profiledef.sh"
 need "$ROOT/packaging/arch/archiso/efiboot/loader/loader.conf"
 need "$ROOT/packaging/linux/fetch-images.sh"

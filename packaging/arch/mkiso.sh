@@ -11,6 +11,8 @@ chmod +x "$HERE"/*.sh "$HERE/archiso"/profiledef.sh 2>/dev/null || true
 install -d "$PROFILE/airootfs/usr/share/osv01d" \
   "$PROFILE/airootfs/usr/local/bin" \
   "$PROFILE/airootfs/etc/systemd/system" \
+  "$PROFILE/airootfs/etc/systemd/system/graphical.target.wants" \
+  "$PROFILE/airootfs/etc/systemd/system/sysinit.target.wants" \
   "$PROFILE/airootfs/root" \
   "$PROFILE/syslinux" \
   "$PROFILE/efiboot/loader/entries" \
@@ -26,6 +28,10 @@ cp "$HERE/osv01d-install.service" "$PROFILE/airootfs/etc/systemd/system/osv01d-i
 cp "$HERE/osv01d-firmware.service" "$PROFILE/airootfs/etc/systemd/system/osv01d-firmware.service"
 ln -sfn /usr/share/osv01d/packaging/linux/osv01d.sh "$PROFILE/airootfs/usr/local/bin/osv01d"
 ln -sfn /usr/share/osv01d/packaging/arch/install-live.sh "$PROFILE/airootfs/root/install-live.sh"
+ln -sfn /usr/share/osv01d/packaging/arch/live-boot.sh "$PROFILE/airootfs/usr/local/bin/osv01d-live"
+ln -sfn /usr/share/osv01d/packaging/arch/bootstrap.sh "$PROFILE/airootfs/usr/local/bin/osv01d-bootstrap"
+ln -sfn /etc/systemd/system/osv01d-install.service "$PROFILE/airootfs/etc/systemd/system/graphical.target.wants/osv01d-install.service"
+ln -sfn /etc/systemd/system/osv01d-firmware.service "$PROFILE/airootfs/etc/systemd/system/sysinit.target.wants/osv01d-firmware.service"
 printf 'OSV01D\n' > "$PROFILE/airootfs/etc/hostname"
 printf 'LANG=en_US.UTF-8\n' > "$PROFILE/airootfs/etc/locale.conf"
 

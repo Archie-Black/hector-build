@@ -58,7 +58,6 @@ arch-chroot "$ROOT" bash -lc "
   systemctl enable osv01d-cores.service || true
   systemctl enable osv01d-firmware.timer || true
   systemctl enable osv01d-firmware.service || true
-  systemctl enable osv01d-install.service || true
   systemctl enable osv01d-update.timer || true
   echo 'OS V01D chroot done'
 " || true

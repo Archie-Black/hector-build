@@ -4,7 +4,11 @@ After=osv01d-firmware.service graphical.target
 [Service]
 Type=simple
 Environment=V01D_INSTALL=1
-ExecStart=/usr/local/bin/osv01d
+StandardInput=tty
+StandardOutput=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+ExecStart=/usr/share/osv01d/packaging/arch/live-boot.sh
 Restart=on-failure
 [Install]
 WantedBy=graphical.target

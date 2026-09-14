@@ -37,4 +37,4 @@ hyprland
 foot
 archiso
 grub
-syslinux
+# syslinux listed once (bios.syslinux bootmodes)

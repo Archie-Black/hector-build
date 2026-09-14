@@ -9,7 +9,7 @@ const UNIT_REL = "packaging/arch/dual-core/osv01d-cores.service";
 
 function unitPath(): string {
   const here = dirname(fileURLToPath(import.meta.url));
-  const candidates = [join(process.cwd(), UNIT_REL), join(here, "../../..", UNIT_REL), join("/workspace", UNIT_REL)];
+  const candidates = [join(process.cwd(), UNIT_REL), join(here, "../../..", UNIT_REL)];
   const hit = candidates.find((p) => existsSync(p));
   if (!hit) {
     throw new Error(`${UNIT_REL} not found. tried: ${candidates.join(", ")}`);
