@@ -1,14 +1,17 @@
 [Unit]
 Description=OS V01D install. No loader. Hector asks.
-After=osv01d-firmware.service graphical.target
+After=osv01d-firmware.service
+Wants=osv01d-firmware.service
+Conflicts=getty@tty1.service
 [Service]
-Type=simple
+Type=idle
 Environment=V01D_INSTALL=1
 StandardInput=tty
 StandardOutput=tty
 TTYPath=/dev/tty1
 TTYReset=yes
+TTYVHangup=yes
 ExecStart=/usr/share/osv01d/packaging/arch/live-boot.sh
 Restart=on-failure
 [Install]
-WantedBy=graphical.target
+WantedBy=multi-user.target

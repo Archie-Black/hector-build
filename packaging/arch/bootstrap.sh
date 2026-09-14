@@ -21,7 +21,8 @@ fi
 
 # 2. Packages. pacstrap when we are the installer; chroot pacman when /mnt is already a root.
 if command -v pacstrap >/dev/null && [[ ! -d "$ROOT/etc" || "${V01D_PACSTRAP:-1}" == "1" ]]; then
-  pacstrap -K "$ROOT" - < "$HERE/packages.x86_64"
+  mapfile -t PKGS < <(bash "$HERE/pkg-list.sh" "$HERE/packages.x86_64")
+  pacstrap -K "$ROOT" "${PKGS[@]}"
 fi
 
 # 3. Copy this tree. packaging/linux stays the install foundation.
@@ -29,6 +30,7 @@ install -d "$SHARE" "$ROOT/v01d/programs" "$ROOT/v01d/home/Downloads" "$ROOT/usr
 if command -v rsync >/dev/null; then
   rsync -a --delete \
     --exclude node_modules --exclude .git --exclude artifacts --exclude dist --exclude vendor \
+    --exclude packaging/arch/archiso/airootfs \
     "$TREE"/ "$SHARE"/
 else
   cp -a "$TREE"/. "$SHARE"/

@@ -27,6 +27,12 @@ describe("doomchat downloads and packages", () => {
     expect(pkgs).toContain("wine-staging");
     expect(pkgs).toContain("godot");
     expect(pkgs).toContain("blender");
+    expect(pkgs).not.toMatch(/\r/);
+    const listed = pkgs
+      .split(/\n/)
+      .map((l) => l.trim())
+      .filter((l) => l && !l.startsWith("#"));
+    expect(new Set(listed).size).toBe(listed.length);
     expect(pkgs).not.toMatch(/^steam$/m);
     for (const name of Object.values(PACMAN)) {
       expect(pkgs).toContain(name);

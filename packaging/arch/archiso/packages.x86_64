@@ -1,4 +1,3 @@
-# Live ISO packages. Target list plus installer tools. No loader menu.
 arch-install-scripts
 mkinitcpio-archiso
 syslinux
@@ -38,4 +37,5 @@ foot
 godot
 archiso
 grub
+# Live ISO packages. Target list plus installer tools. No loader menu.
 # syslinux listed once (bios.syslinux bootmodes)
