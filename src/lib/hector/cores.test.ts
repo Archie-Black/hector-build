@@ -1,7 +1,21 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { DIAG } from "./diagnose";
 import { allow, diplomat, firewall, split, which } from "./cores";
+
+const UNIT_REL = "packaging/arch/dual-core/osv01d-cores.service";
+
+function unitPath(): string {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [join(process.cwd(), UNIT_REL), join(here, "../../..", UNIT_REL), join("/workspace", UNIT_REL)];
+  const hit = candidates.find((p) => existsSync(p));
+  if (!hit) {
+    throw new Error(`${UNIT_REL} not found. tried: ${candidates.join(", ")}`);
+  }
+  return hit;
+}
 
 describe("dual core", () => {
   it("sends ffmpeg to the machine and walls the diplomat off exec", () => {
@@ -17,7 +31,7 @@ describe("dual core", () => {
   });
 
   it("ships one Service block without RR that would fail the unit", () => {
-    const unit = readFileSync("/workspace/packaging/arch/dual-core/osv01d-cores.service", "utf8");
+    const unit = readFileSync(unitPath(), "utf8");
     expect(unit.split("[Service]")).toHaveLength(2);
     expect(unit).not.toMatch(/CPUSchedulingPolicy/);
     expect(unit).toMatch(/Nice=-20/);
