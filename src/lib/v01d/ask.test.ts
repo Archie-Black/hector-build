@@ -55,5 +55,26 @@ describe("ask", () => {
     expect(ask("restore the website").run).toBe("site-restore");
     expect(ask("add a website peer").run).toBe("site-mesh");
     expect(ask("replace website copies").run).toBe("site-roll");
+    expect(ask("alert the website").run).toBe("site-alerts");
+  });
+  it("sends coding work to Spectral HX", () => {
+    expect(ask("open spectral hx").app).toBe("code");
+    expect(ask("write a program").app).toBe("code");
+    expect(ask("write a program").run).toBe("hx");
+  });
+  it("opens VSCodium as the Spectral HX heavy editor", () => {
+    expect(ask("open vscodium").app).toBe("code");
+    expect(ask("open vscodium").run).toBe("codium");
+  });
+  it("routes Hyper PBX jobs through hx-exec", () => {
+    expect(ask("open hyper pbx").app).toBe("code");
+    expect(ask("open hyper pbx").run).toBe("hx-exec");
+    expect(ask("open pbx console").run).toBe("hx-exec");
+    expect(ask("open pbx").run).toBe("hx-exec");
+  });
+  it("opens Godot and Unreal for the OS look", () => {
+    expect(ask("open godot").app).toBe("portal");
+    expect(ask("open godot").run).toBe("godot");
+    expect(ask("open unreal editor").run).toBe("ue");
   });
 });

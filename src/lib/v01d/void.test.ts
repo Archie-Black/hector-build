@@ -6,6 +6,8 @@ describe("void desk", () => {
   it("keeps the old wallpaper and places icons on a ring", () => {
     expect(VOID.saved).toMatch(/field-dawn/);
     expect(VOID.wallpaper).toMatch(/void/);
+    expect(VOID.ue).toMatch(/VoidDesktop/);
+    expect(VOID.godot).toMatch(/Godot\/void/);
     const a = ring(8, 0, 0, 100);
     const b = ring(8, 4, 0, 100);
     expect(Math.round(a.x + b.x)).toBe(0);

@@ -11,10 +11,10 @@ depends=(
   python ffmpeg perl-image-exiftool
   pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber
   samba mesa vulkan-icd-loader
-  systemd
+  systemd godot blender
 )
 makedepends=(rsync)
-optdepends=('fwupd: signed BIOS capsules' 'docker: cloud fabric')
+optdepends=('fwupd: signed BIOS capsules' 'docker: cloud fabric' 'wine-staging: Windows programs on the desk')
 install=osv01d.install
 backup=(
   'etc/pipewire/pipewire.conf.d/99-osv01d-diplomat.conf'
@@ -46,9 +46,16 @@ package() {
     "$root"/ "$dest"/
 
   install -Dm755 "$root/packaging/linux/osv01d.sh" "$pkgdir/usr/bin/osv01d"
+  install -Dm755 "$root/packaging/linux/hector-open" "$pkgdir/usr/bin/hector-open"
   install -Dm755 "$root/packaging/arch/dual-core/verify.sh" "$pkgdir/usr/bin/osv01d-verify"
   install -Dm755 "$root/packaging/arch/dual-core/hear.sh" "$pkgdir/usr/bin/osv01d-hear"
   install -Dm755 "$root/packaging/arch/dual-core/gateway.py" "$pkgdir/usr/lib/osv01d/gateway.py"
+  install -Dm755 "$root/packaging/arch/bootstrap.sh" "$pkgdir/usr/bin/osv01d-bootstrap"
+  install -Dm755 "$root/packaging/arch/mkiso.sh" "$pkgdir/usr/bin/osv01d-mkiso"
+  install -Dm755 "$root/packaging/arch/install-ue.sh" "$pkgdir/usr/bin/osv01d-unreal"
+  install -Dm755 "$root/packaging/arch/install-vscodium.sh" "$pkgdir/usr/bin/osv01d-codium"
+  install -Dm755 "$root/native/horizon/scripts/warm-aesthetics.sh" "$pkgdir/usr/bin/osv01d-aesthetics"
+  install -Dm755 "$root/packaging/arch/install-godot.sh" "$pkgdir/usr/bin/osv01d-godot"
 
   install -Dm644 "$root/packaging/linux/osv01d.desktop" "$pkgdir/usr/share/applications/osv01d.desktop"
   install -Dm644 "$root/native/v01d/wayland/osv01d.desktop" "$pkgdir/usr/share/wayland-sessions/osv01d.desktop"
@@ -56,6 +63,8 @@ package() {
   install -Dm644 "$root/packaging/arch/dual-core/osv01d-cores.service" "$pkgdir/usr/lib/systemd/system/osv01d-cores.service"
   install -Dm644 "$root/packaging/arch/osv01d-firmware-keep.service" "$pkgdir/usr/lib/systemd/system/osv01d-firmware-keep.service"
   install -Dm644 "$root/packaging/arch/osv01d-firmware.timer" "$pkgdir/usr/lib/systemd/system/osv01d-firmware.timer"
+  install -Dm644 "$root/packaging/arch/osv01d-update.service" "$pkgdir/usr/lib/systemd/system/osv01d-update.service"
+  install -Dm644 "$root/packaging/arch/osv01d-update.timer" "$pkgdir/usr/lib/systemd/system/osv01d-update.timer"
   install -Dm644 "$root/packaging/arch/dual-core/osv01d-hear.service" "$pkgdir/usr/lib/systemd/user/osv01d-hear.service"
 
   install -Dm644 "$root/packaging/arch/dual-core/pipewire-diplomat.conf" \

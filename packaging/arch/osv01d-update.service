@@ -1,0 +1,9 @@
+[Unit]
+Description=OS V01D silent update. User hour. Restore on conflict.
+After=network-online.target
+[Service]
+Type=oneshot
+Environment=HECTOR_PREFIX=/usr/share/osv01d
+ExecStart=/usr/share/osv01d/packaging/arch/update.sh
+[Install]
+WantedBy=multi-user.target

@@ -58,6 +58,15 @@ export function WeaveDock({
             <p className="hint">Hector will wire matching parts when you join.</p>
           )}
           {weave.join ? <p className="note">{weave.join.note}</p> : null}
+          {weave.join?.steps?.length ? (
+            <ul>
+              {weave.join.steps.map((s) => (
+                <li key={s.path}>
+                  {s.n}. {s.part} · {s.do}
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
       ) : null}
     </div>

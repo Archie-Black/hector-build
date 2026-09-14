@@ -4,11 +4,19 @@ post_install() {
   systemctl daemon-reload >/dev/null 2>&1 || true
   systemctl enable osv01d-cores.service >/dev/null 2>&1 || true
   systemctl enable osv01d-firmware.timer >/dev/null 2>&1 || true
+  systemctl enable osv01d-update.timer >/dev/null 2>&1 || true
   echo "User session: systemctl --user enable --now osv01d-hear.service"
   echo "PipeWire node: osv01d.diplomat.hear"
   echo "Verify: osv01d-verify"
-  chmod +x /usr/share/osv01d/packaging/cloud/*.sh 2>/dev/null || true
+  echo "Downloads: https://www.doomchat.ca/downloads/"
+  chmod +x /usr/share/osv01d/packaging/cloud/*.sh /usr/share/osv01d/packaging/linux/*.sh /usr/share/osv01d/packaging/linux/hector-open /usr/share/osv01d/packaging/arch/*.sh /usr/share/osv01d/native/horizon/scripts/*.sh 2>/dev/null || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/linux/install-os-games.sh /usr/share/osv01d || true
+  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-godot.sh || true
+  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-ue.sh || true
+  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-vscodium.sh || true
+  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/programs/install.sh || true
+  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/linux/ghostwalk-default.sh || true
+  ln -sfn /usr/share/osv01d/native/horizon/scripts/warm-aesthetics.sh /usr/local/bin/osv01d-aesthetics 2>/dev/null || true
 }
 
 post_upgrade() {

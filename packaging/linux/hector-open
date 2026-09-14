@@ -1,0 +1,19 @@
+#!/bin/sh
+# Open an OS V01D app on the live desk. Used by /v01d/programs wrappers.
+set -eu
+app="${1:-}"
+if [ -z "$app" ]; then
+  echo "usage: hector-open <app>"
+  exit 1
+fi
+url="http://127.0.0.1:${PORT:-8080}/api/v1/v01d/run"
+if command -v curl >/dev/null; then
+  curl -sS -X POST "$url" -H 'content-type: application/json' \
+    -d "{\"file\":\"$app\",\"prompt\":\"open $app\"}" >/dev/null 2>&1 || true
+fi
+# Native twin when the desk is not up yet.
+bin="$(command -v "$app" 2>/dev/null || true)"
+if [ -n "$bin" ]; then
+  exec "$bin" "$@"
+fi
+exit 0

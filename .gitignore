@@ -15,9 +15,15 @@ native/horizon/horizon.exe
 vendor/
 artifacts/
 attachments/
+/.vscode/
 .grok/status
 packaging/suite/weights/*.bin
 packaging/suite/weights/*.safetensors
+packaging/arch/archiso/airootfs/usr/
+packaging/arch/archiso/airootfs/root/
+packaging/arch/archiso/airootfs/etc/hostname
+packaging/arch/archiso/airootfs/etc/locale.conf
+packaging/arch/archiso/airootfs/etc/systemd/
 
 
 .DS_Store

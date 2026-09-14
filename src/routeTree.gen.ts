@@ -30,6 +30,7 @@ import { Route as ApiV1V01dAlertsRouteImport } from './routes/api/v1/v01d/alerts
 import { Route as ApiV1V01dCloudRouteImport } from './routes/api/v1/v01d/cloud'
 import { Route as ApiV1V01dFirmwareRouteImport } from './routes/api/v1/v01d/firmware'
 import { Route as ApiV1V01dFsRouteImport } from './routes/api/v1/v01d/fs'
+import { Route as ApiV1V01dHxRouteImport } from './routes/api/v1/v01d/hx'
 import { Route as ApiV1V01dRunRouteImport } from './routes/api/v1/v01d/run'
 import { Route as ApiV1V01dShareRouteImport } from './routes/api/v1/v01d/share'
 import { Route as ApiV1V01dSpeakRouteImport } from './routes/api/v1/v01d/speak'
@@ -140,6 +141,11 @@ const ApiV1V01dFsRoute = ApiV1V01dFsRouteImport.update({
   path: '/api/v1/v01d/fs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1V01dHxRoute = ApiV1V01dHxRouteImport.update({
+  id: '/api/v1/v01d/hx',
+  path: '/api/v1/v01d/hx',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1V01dRunRoute = ApiV1V01dRunRouteImport.update({
   id: '/api/v1/v01d/run',
   path: '/api/v1/v01d/run',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/v01d/cloud': typeof ApiV1V01dCloudRoute
   '/api/v1/v01d/firmware': typeof ApiV1V01dFirmwareRoute
   '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
+  '/api/v1/v01d/hx': typeof ApiV1V01dHxRoute
   '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
   '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
   '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/api/v1/v01d/cloud': typeof ApiV1V01dCloudRoute
   '/api/v1/v01d/firmware': typeof ApiV1V01dFirmwareRoute
   '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
+  '/api/v1/v01d/hx': typeof ApiV1V01dHxRoute
   '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
   '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
   '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/api/v1/v01d/cloud': typeof ApiV1V01dCloudRoute
   '/api/v1/v01d/firmware': typeof ApiV1V01dFirmwareRoute
   '/api/v1/v01d/fs': typeof ApiV1V01dFsRoute
+  '/api/v1/v01d/hx': typeof ApiV1V01dHxRoute
   '/api/v1/v01d/run': typeof ApiV1V01dRunRoute
   '/api/v1/v01d/share': typeof ApiV1V01dShareRoute
   '/api/v1/v01d/speak': typeof ApiV1V01dSpeakRoute
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
     | '/api/v1/v01d/cloud'
     | '/api/v1/v01d/firmware'
     | '/api/v1/v01d/fs'
+    | '/api/v1/v01d/hx'
     | '/api/v1/v01d/run'
     | '/api/v1/v01d/share'
     | '/api/v1/v01d/speak'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/api/v1/v01d/cloud'
     | '/api/v1/v01d/firmware'
     | '/api/v1/v01d/fs'
+    | '/api/v1/v01d/hx'
     | '/api/v1/v01d/run'
     | '/api/v1/v01d/share'
     | '/api/v1/v01d/speak'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/api/v1/v01d/cloud'
     | '/api/v1/v01d/firmware'
     | '/api/v1/v01d/fs'
+    | '/api/v1/v01d/hx'
     | '/api/v1/v01d/run'
     | '/api/v1/v01d/share'
     | '/api/v1/v01d/speak'
@@ -349,6 +361,7 @@ export interface RootRouteChildren {
   ApiV1V01dCloudRoute: typeof ApiV1V01dCloudRoute
   ApiV1V01dFirmwareRoute: typeof ApiV1V01dFirmwareRoute
   ApiV1V01dFsRoute: typeof ApiV1V01dFsRoute
+  ApiV1V01dHxRoute: typeof ApiV1V01dHxRoute
   ApiV1V01dRunRoute: typeof ApiV1V01dRunRoute
   ApiV1V01dShareRoute: typeof ApiV1V01dShareRoute
   ApiV1V01dSpeakRoute: typeof ApiV1V01dSpeakRoute
@@ -504,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1V01dFsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/v01d/hx': {
+      id: '/api/v1/v01d/hx'
+      path: '/api/v1/v01d/hx'
+      fullPath: '/api/v1/v01d/hx'
+      preLoaderRoute: typeof ApiV1V01dHxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/v01d/run': {
       id: '/api/v1/v01d/run'
       path: '/api/v1/v01d/run'
@@ -557,6 +577,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1V01dCloudRoute: ApiV1V01dCloudRoute,
   ApiV1V01dFirmwareRoute: ApiV1V01dFirmwareRoute,
   ApiV1V01dFsRoute: ApiV1V01dFsRoute,
+  ApiV1V01dHxRoute: ApiV1V01dHxRoute,
   ApiV1V01dRunRoute: ApiV1V01dRunRoute,
   ApiV1V01dShareRoute: ApiV1V01dShareRoute,
   ApiV1V01dSpeakRoute: ApiV1V01dSpeakRoute,

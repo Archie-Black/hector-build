@@ -4,7 +4,7 @@ import { now as ntpNow, syncNtp } from "@/lib/sky/clock";
 import { readLink, saveLink, type Link } from "@/lib/net/link";
 
 export function ClockNet({ onSettings }: { onSettings: () => void }) {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [link, setLink] = useState<Link>({ ssid: "…", on: false, note: "" });
   const [form, setForm] = useState(false);
   const [ssid, setSsid] = useState("");
@@ -18,7 +18,7 @@ export function ClockNet({ onSettings }: { onSettings: () => void }) {
     return () => window.clearInterval(id);
   }, []);
 
-  const t = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  const t = now ? now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }) : "\u00a0";
 
   return (
     <div className="clock-net flex flex-col items-end gap-1" onPointerDown={(e) => e.stopPropagation()}>

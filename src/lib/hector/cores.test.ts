@@ -9,12 +9,7 @@ const UNIT_REL = "packaging/arch/dual-core/osv01d-cores.service";
 
 function unitPath(): string {
   const here = dirname(fileURLToPath(import.meta.url));
-  const candidates = [join(process.cwd(), UNIT_REL), join(here, "../../..", UNIT_REL), join("/workspace", UNIT_REL)];
-  const hit = candidates.find((p) => existsSync(p));
-  if (!hit) {
-    throw new Error(`${UNIT_REL} not found. tried: ${candidates.join(", ")}`);
-  }
-  return hit;
+  return join(here, "../../..", UNIT_REL);
 }
 
 describe("dual core", () => {
@@ -31,7 +26,11 @@ describe("dual core", () => {
   });
 
   it("ships one Service block without RR that would fail the unit", () => {
-    const unit = readFileSync(unitPath(), "utf8");
+    const src = readFileSync(fileURLToPath(import.meta.url), "utf8");
+    expect(src).toContain(UNIT_REL);
+    const unitFile = unitPath();
+    expect(existsSync(unitFile)).toBe(true);
+    const unit = readFileSync(unitFile, "utf8");
     expect(unit.split("[Service]")).toHaveLength(2);
     expect(unit).not.toMatch(/CPUSchedulingPolicy/);
     expect(unit).toMatch(/Nice=-20/);

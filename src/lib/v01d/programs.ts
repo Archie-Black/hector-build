@@ -25,12 +25,19 @@ const EXTRA: Prog[] = [
   { name: "Linux room", bin: "wsl", linux: `${ROOT}/LinuxRoom`, win: `${WIN}\\wsl.exe`, app: "room" },
   { name: "Crapple", bin: "crapple", linux: `${ROOT}/Crapple`, win: `${WIN}\\Crapple.exe`, app: "crapple" },
   { name: "Asimov 01", bin: "asimov", linux: `${ROOT}/Asimov01`, win: `${WIN}\\Asimov01.exe`, app: "asimov" },
+  { name: "Godot", bin: "godot", linux: "/opt/godot/Godot", win: `${WIN}\\Godot.exe` },
+  { name: "Unreal Editor", bin: "unreal", linux: "/opt/unreal/Engine/Binaries/Linux/UnrealEditor", win: `${WIN}\\UnrealEditor.exe` },
+  { name: "VSCodium", bin: "codium", linux: "/opt/vscodium/bin/codium", win: `${WIN}\\VSCodium.exe`, app: "code" },
+  { name: "PBX Console", bin: "pbx", linux: `${ROOT}/PBXConsole`, win: `${WIN}\\PBXConsole.exe`, app: "code" },
 ];
 
 function nix(bin: string) {
   if (bin === "obs") return "/usr/bin/obs";
   if (bin === "comfyui") return "/opt/osv01d/suite/engine/ComfyUI/main.py";
   if (bin === "unreal") return "/opt/unreal/Engine/Binaries/Linux/UnrealEditor";
+  if (bin === "godot") return "/opt/godot/Godot";
+  if (bin === "codium") return "/opt/vscodium/bin/codium";
+  if (bin === "pbx") return "/v01d/programs/PBXConsole";
   if (bin === "penpot") return "/opt/osv01d/suite/penpot.sh";
   if (bin === "surge-xt") return "/usr/bin/surge-xt";
   return `/usr/bin/${bin}`;
@@ -79,4 +86,12 @@ export function findProg(q: string) {
 
 export function folder() {
   return catalog().map((p) => ({ name: p.name, dir: false as const, run: p.linux, win: p.win }));
+}
+
+export function binFor(app: AppId) {
+  return catalog().find((p) => p.app === app);
+}
+
+export function bins() {
+  return catalog().map((p) => p.bin);
 }

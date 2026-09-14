@@ -1,0 +1,19 @@
+{
+  "terminal.integrated.defaultProfile.linux": "Machine Core",
+  "terminal.integrated.profiles.linux": {
+    "Machine Core": {
+      "path": "bash",
+      "args": ["-lc"],
+      "icon": "terminal-linux",
+      "overrideName": true
+    },
+    "Spectral HX": {
+      "path": "bash",
+      "icon": "terminal",
+      "overrideName": true
+    }
+  },
+  "osv01d.spectralHx": true,
+  "osv01d.tasks": ["Typecheck", "Test", "Build", "Doctor", "ISO profile"],
+  "osv01d.terminal": ["Machine Core", "Spectral HX"]
+}

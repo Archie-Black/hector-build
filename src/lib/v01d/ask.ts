@@ -38,6 +38,10 @@ import { sayHear, wantsHear } from "@/lib/hector/hear";
 import { sayDiagnose, wantsDiagnose } from "@/lib/hector/diagnose";
 import { sayBrain, wantsBrain } from "@/lib/hector/brain";
 import { sayJoin, wantsJoin } from "./weave";
+import { sayDownloads, wantsDownloads } from "./downloads";
+import { wantsEngines } from "./aesthetics";
+import { sayCodium, wantsCodium } from "./codium";
+import { sayPbx, wantsPbx } from "./pbx-bridge";
 
 export type Job = {
   app?: AppId;
@@ -72,7 +76,29 @@ function route(t: string, k: string): Job | null {
     return { run: "site-mesh", say: "I'll write a WireGuard slot for the second box, then copy dumps when it answers." };
   }
   if (wantsAlerts(t)) {
-    return { run: "site-alerts", say: "I'll check website alerts." };
+    return { run: "site-alerts", say: "I'll check website alerts for doomchat.ca." };
+  }
+  if (wantsDownloads(t)) {
+    return { app: "files", run: "downloads", say: sayDownloads() };
+  }
+  if (wantsPbx(t)) {
+    return { app: "code", run: "hx-exec", say: sayPbx() };
+  }
+  if (wantsCodium(t)) {
+    return { app: "code", run: "codium", say: sayCodium() };
+  }
+  if (/\b(spectral hx|write (a |me a )?(program|app)|open the ide|code this)\b/i.test(k) || /^open spectral/i.test(k)) {
+    return { app: "code", run: "hx", say: "Spectral HX. Tell me what to build. Ghosts take the work." };
+  }
+  if (wantsEngines(t)) {
+    const ue = /\bunreal\b/i.test(t);
+    return {
+      app: "portal",
+      run: ue ? "ue" : "godot",
+      say: ue
+        ? "Unreal Editor 5.8. VoidDesktop for the desk. Spectral Horizon for games."
+        : "Godot 4.7. Void project for the desk. Horizon project for games.",
+    };
   }
   if (wantsHive(t)) {
     const h = raise(t);

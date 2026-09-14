@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Every installed program gets a real name in /v01d/programs.
 set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 DEST="${V01D_PROGRAMS:-/v01d/programs}"
 install -d "$DEST"
 
@@ -38,6 +39,10 @@ wrap "ComfyUI" "/opt/osv01d/suite/engine/ComfyUI/main.py"
 wrap "vlc" "$(command -v vlc || echo /usr/bin/vlc)"
 wrap "notepad.exe" "$(command -v notepad || echo /usr/bin/wine)"
 wrap "MetaHuman" "/opt/unreal/Engine/Binaries/Linux/UnrealEditor"
+wrap "Godot" "$(command -v godot || echo /opt/godot/Godot)"
+wrap "Unreal Editor" "/opt/unreal/Engine/Binaries/Linux/UnrealEditor"
+wrap "VSCodium" "$(command -v codium || echo /opt/vscodium/bin/codium)"
+wrap "PBX Console" "$ROOT/packaging/hx/hx-exec.sh"
 
 desk "GhostWalk" ghostwalk
 desk "GhostIT" notes

@@ -1,6 +1,7 @@
 import { isGhstkrt } from "@/lib/ghstkrt/knot";
 import { dialectOf, say, spread } from "./talk";
 import { folder } from "./programs";
+import { IMAGES } from "./downloads";
 
 export type Kind = "win" | "nix" | "v01d" | "mac";
 
@@ -82,6 +83,16 @@ export function windows(v01d: string): string {
 
 export function list(at = "/v01d/home"): Node[] {
   const n = native(at);
+  if (/downloads/i.test(n.path) && !/programs/i.test(n.path)) {
+    return IMAGES.map((img) => ({
+      name: img.name,
+      path: `/v01d/home/Downloads/${img.file || img.id}`,
+      kind: n.kind,
+      dir: img.kind === "community",
+      native: img.url,
+      run: img.url,
+    }));
+  }
   const rows = /programs/i.test(n.path) ? PROGRAMS : /shared|share/i.test(n.path) ? SHARED : HOME;
   return rows
     .filter((h) => !hidden(h.name))

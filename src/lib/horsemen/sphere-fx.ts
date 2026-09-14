@@ -1,5 +1,6 @@
-/** Hexagon sphere. Glass ticks, spin air, pick chime. Through the master bus. */
+/** Hexagon sphere. Glass ticks, spin air, pick chime. Hertz from Godot + UE. */
 
+import { ENGINE_SFX } from "@/lib/v01d/engine-sfx";
 import { bus, unlock } from "@/lib/v01d/sound";
 
 function tone(freq: number, dur: number, type: OscillatorType, vol: number, slide = 0) {
@@ -21,7 +22,7 @@ function tone(freq: number, dur: number, type: OscillatorType, vol: number, slid
 }
 
 export function tick() {
-  tone(1240, 0.06, "triangle", 0.045, -180);
+  tone(ENGINE_SFX.tick, 0.06, "triangle", 0.045, -180);
 }
 
 export function whoosh(speed: number) {
@@ -36,7 +37,7 @@ export function whoosh(speed: number) {
   src.buffer = n;
   const f = b.ac.createBiquadFilter();
   f.type = "bandpass";
-  f.frequency.value = 420 + Math.min(1800, Math.abs(speed) * 8000);
+  f.frequency.value = ENGINE_SFX.whoosh + Math.min(1800, Math.abs(speed) * 8000);
   f.Q.value = 0.7;
   const g = b.ac.createGain();
   g.gain.setValueAtTime(Math.min(0.12, 0.03 + Math.abs(speed) * 0.4), t);
@@ -48,8 +49,8 @@ export function whoosh(speed: number) {
 }
 
 export function pick() {
-  tone(523.25, 0.18, "sine", 0.07, 0);
-  tone(784, 0.28, "triangle", 0.05, 40);
+  tone(ENGINE_SFX.pickA, 0.18, "sine", 0.07, 0);
+  tone(ENGINE_SFX.pickB, 0.28, "triangle", 0.05, 40);
 }
 
 export function hum() {
@@ -59,7 +60,7 @@ export function hum() {
   const o = b.ac.createOscillator();
   const g = b.ac.createGain();
   o.type = "sine";
-  o.frequency.value = 62;
+  o.frequency.value = ENGINE_SFX.hum;
   g.gain.value = 0.012;
   o.connect(g);
   g.connect(b.gain);

@@ -1,11 +1,44 @@
-// OS V01D void field. Same uniforms as WebGL and Godot. DeltaKingZero.
-float Hash21(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
-void MainPS(float2 uv, float t, float2 look, float q, out float3 col) {
-  float2 p = uv * 2 - 1;
-  p -= look * 0.018;
-  float n = 0;
+// OS V01D void field. Same uniforms as Godot nebula.gdshader and WebGL. DeltaKingZero.
+float Hash21(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453123); }
+
+float Noise(float2 p) {
+  float2 i = floor(p);
+  float2 f = frac(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = Hash21(i);
+  float b = Hash21(i + float2(1.0, 0.0));
+  float c = Hash21(i + float2(0.0, 1.0));
+  float d = Hash21(i + float2(1.0, 1.0));
+  return lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+}
+
+float Fbm(float2 p, int steps) {
+  float v = 0;
+  float a = 0.55;
   for (int i = 0; i < 5; i++) {
-    n += Hash21(floor(p * (2.2 + i * 1.15) + t * 0.02)) / (i + 1.2);
+    if (i >= steps) break;
+    v += a * Noise(p);
+    p = p * 2.07 + float2(1.7, 9.2);
+    a *= 0.5;
   }
-  col = float3(0.02, 0.02, 0.024) + float3(0.0, 0.12, 0.45) * n * 0.28 * q;
+  return v;
+}
+
+void MainPS(float2 uv, float t, float2 look, float q, float2 res, out float3 col) {
+  float2 p = uv * 2 - 1;
+  p.x *= res.x / max(res.y, 1);
+  p -= look * 0.016;
+  int steps = q > 0.78 ? 5 : (q > 0.5 ? 4 : 3);
+  float n = Fbm(p * 1.35 + t * 0.018, steps);
+  float n2 = Fbm(p * 2.8 - t * 0.011 + 17.0, steps - 1);
+  col = float3(0.02, 0.02, 0.024);
+  col = lerp(col, float3(0.0, 0.11, 0.42), n * 0.34 * q);
+  col += float3(0.18, 0.38, 0.78) * n2 * 0.12 * q;
+  float star = step(0.9964 - 0.008 * q, Hash21(floor(uv * res * 0.55)));
+  float tw = 0.55 + 0.45 * sin(t * 2.1 + Hash21(uv * res) * 40.0);
+  col += float3(0.92, 1.0, 0.42) * star * tw * 0.55 * q;
+  float vig = smoothstep(1.35, 0.18, length(p * 0.72));
+  col *= lerp(0.55, 1.0, vig);
+  col = col / (col + 1);
+  col = pow(col, 0.92);
 }

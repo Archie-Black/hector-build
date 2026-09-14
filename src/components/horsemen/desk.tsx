@@ -10,6 +10,7 @@ import { opening, parked, seenOpen } from "@/lib/v01d/overture";
 import { load, type Profile } from "@/lib/v01d/comfort";
 import { bootFeel } from "@/lib/v01d/feel";
 import { face } from "@/lib/v01d/comfort";
+import { ask as hectorAsk } from "@/lib/v01d/ask";
 import { Welcome } from "./welcome";
 import { AppBody } from "./apps";
 import { BuckyBall } from "./ball";
@@ -23,6 +24,7 @@ import { AskGhost } from "./hector-ask";
 import { AppGlyph } from "./icons";
 import { Window } from "./pane";
 import { loadWeave, pinDesks, joinBuild, type Weave } from "@/lib/v01d/weave";
+import { requestAlerts, requestSite } from "@/lib/v01d/cloud";
 import { WeaveDock } from "./weave";
 
 type Space = { panes: Pane[]; focus: string | null };
@@ -43,8 +45,8 @@ export function HorsemenDesk() {
   const [heard, setHeard] = useState("");
   const [who, setWho] = useState<Profile | null>(null);
   const [ready, setReady] = useState(false);
-  const [overture, setOverture] = useState(() => !seenOpen());
-  const [mark, setMark] = useState(() => (seenOpen() ? parked() : opening(0)));
+  const [overture, setOverture] = useState(true);
+  const [mark, setMark] = useState(() => opening(0));
   const drag = useRef<{ id: string; dx: number; dy: number; kind: "move" | "resize"; lx: number; ly: number } | null>(null);
   const zTop = useRef(40);
 
@@ -70,6 +72,10 @@ export function HorsemenDesk() {
     warm();
     setWho(load());
     setReady(true);
+    if (seenOpen()) {
+      setMark(parked());
+      setOverture(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -122,6 +128,11 @@ export function HorsemenDesk() {
   function open(app: AppId) {
     setMenu(false);
     setExpo(false);
+    void fetch("/api/v1/v01d/run", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ file: app, prompt: `open ${app}` }),
+    }).catch(() => undefined);
     const existing = panes.find((p) => p.app === app && !p.leaving);
     if (existing) {
       bump(existing.id);
@@ -140,6 +151,60 @@ export function HorsemenDesk() {
       hidden: false,
     };
     patch((s) => ({ focus: next.id, panes: [...s.panes.filter((p) => !p.leaving), next] }));
+  }
+
+  function onHector(job: ReturnType<typeof hectorAsk>) {
+    setHeard(job.say);
+    if (job.tile) snap();
+    if (job.run === "join") {
+      const w = joinBuild();
+      setLoom(w);
+      setJoined(true);
+      setExpo(true);
+      void fetch("/api/v1/v01d/weave", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ act: "join" }),
+      }).catch(() => undefined);
+    }
+    if (job.run === "fabric-heal") void requestSite("repair");
+    if (job.run === "site-scale") void requestSite("scale");
+    if (job.run === "site-roll") void requestSite("roll");
+    if (job.run === "site-backup") void requestSite("backup");
+    if (job.run === "site-restore") void requestSite("restore");
+    if (job.run === "site-mesh") void requestSite("mesh");
+    if (job.run === "site-alerts") void requestAlerts();
+    if (job.run === "downloads") {
+      try {
+        sessionStorage.setItem("v01d.fs.at", "/v01d/home/Downloads");
+      } catch {
+        /* */
+      }
+      void fetch("/api/v1/v01d/downloads", { method: "POST" }).catch(() => undefined);
+    }
+    if (job.run === "godot") {
+      void fetch("/api/v1/hx/godot", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind: "void" }),
+      }).catch(() => undefined);
+    }
+    if (job.run === "ue") {
+      void fetch("/api/v1/hx/ue", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind: "void" }),
+      }).catch(() => undefined);
+    }
+    if (job.app === "code") {
+      try {
+        sessionStorage.setItem("v01d.hx.task", JSON.stringify(job));
+      } catch {
+        /* */
+      }
+      window.dispatchEvent(new CustomEvent("v01d-hx-task", { detail: job }));
+    }
+    if (job.app) open(job.app);
   }
 
   function close(id: string) {
@@ -243,19 +308,7 @@ export function HorsemenDesk() {
         </div>
       </header>
       <div className="absolute top-12 right-3 z-50 flex items-start gap-2">
-        <AskGhost
-          onJob={(job) => {
-            setHeard(job.say);
-            if (job.tile) snap();
-            if (job.run === "join") {
-              const w = joinBuild();
-              setLoom(w);
-              setJoined(true);
-              setExpo(true);
-            }
-            if (job.app) open(job.app);
-          }}
-        />
+        <AskGhost onJob={onHector} />
         <ClockNet onSettings={() => open("settings")} />
       </div>
 

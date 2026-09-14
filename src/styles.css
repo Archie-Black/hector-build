@@ -796,6 +796,77 @@ html.feel-flat .pane-glass, html.feel-flat .void-crystal, html.feel-flat .sys-sh
 .weave-body .hint, .weave-body .note { color: var(--color-ice); font-size: 0.72rem; }
 .weave-body ul { margin: 0.4rem 0 0; padding: 0; list-style: none; color: var(--color-ice); }
 
+.hx-ide {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: rgb(5 5 6 / 0.35);
+}
+.hx-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid rgb(0 71 171 / 0.4);
+}
+.hx-bar img { width: 1.4rem; height: 1.4rem; object-fit: contain; }
+.hx-bar b { color: var(--color-uranium); font-size: 0.72rem; letter-spacing: 0.22em; font-weight: 500; }
+.hx-bar em { color: var(--color-ice); font-style: normal; font-size: 0.68rem; }
+.hx-git { margin-left: auto; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-steel); font-family: var(--font-mono); font-size: 0.62rem; }
+.hx-work { display: grid; grid-template-columns: 7.2rem minmax(0, 1.2fr) minmax(0, 0.9fr); min-height: 0; flex: 1; }
+.hx-crew { border-right: 1px solid rgb(0 71 171 / 0.3); padding: 0.45rem; overflow: auto; }
+.hx-idle { color: var(--color-steel); font-size: 0.7rem; }
+.hx-agent { display: flex; gap: 0.35rem; margin-bottom: 0.45rem; }
+.hx-ghost { position: relative; width: 1.8rem; flex: none; }
+.hx-ghost img { width: 1.8rem; height: 1.8rem; object-fit: contain; }
+.hx-ghost b { position: absolute; right: -4px; bottom: -2px; color: var(--color-uranium); font-size: 0.62rem; }
+.hx-agent p { margin: 0; color: var(--color-ash); font-size: 0.68rem; }
+.hx-edit { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid rgb(0 71 171 / 0.3); }
+.hx-file { height: 2rem; border: 0; border-bottom: 1px solid rgb(0 71 171 / 0.3); background: transparent; color: var(--color-uranium); padding: 0 0.6rem; font-family: var(--font-mono); font-size: 0.72rem; outline: none; }
+.hx-buf { flex: 1; min-height: 6rem; border: 0; background: rgb(5 5 6 / 0.45); color: var(--color-ash); padding: 0.55rem 0.7rem; font-family: var(--font-mono); font-size: 0.78rem; outline: none; resize: none; }
+.hx-tools { display: flex; gap: 0.4rem; padding: 0.3rem 0.5rem; border-top: 1px solid rgb(0 71 171 / 0.3); }
+.hx-tools button { border: 0; background: rgb(0 71 171 / 0.28); color: var(--color-uranium); padding: 0.28rem 0.6rem; border-radius: 0.4rem; font-size: 0.68rem; letter-spacing: 0.08em; }
+.hx-term { margin: 0; max-height: 5.5rem; overflow: auto; padding: 0.4rem 0.6rem; background: rgb(5 5 6 / 0.7); color: var(--color-ice); font-size: 0.68rem; }
+.hx-chat { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.hx-log { flex: 1; overflow: auto; padding: 0.55rem 0.7rem; }
+.hx-log p { margin: 0 0 0.45rem; font-size: 0.78rem; }
+.hx-log .you { color: var(--color-ash); }
+.hx-log .hx { color: var(--color-uranium); }
+.hx-tag { display: inline-block; margin-right: 0.35rem; color: var(--color-ice); font-size: 0.62rem; }
+.hx-send { display: flex; gap: 0.4rem; border-top: 1px solid rgb(0 71 171 / 0.4); padding: 0.4rem; }
+.hx-send textarea { flex: 1; min-height: 2.6rem; border: 0; background: transparent; color: var(--color-ash); outline: none; resize: none; font-size: 0.82rem; }
+.hx-send button { border: 0; background: rgb(0 71 171 / 0.4); color: var(--color-uranium); padding: 0 0.9rem; border-radius: 0.45rem; letter-spacing: 0.12em; }
+
+.genesis { display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 0.6rem 0.75rem 0.5rem; }
+.genesis-bar { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; }
+.genesis-bar b { color: var(--color-uranium); letter-spacing: 0.14em; font-weight: 500; }
+.genesis-bar em { color: var(--color-ice); font-size: 0.68rem; font-style: normal; }
+.genesis-floors { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.55rem 0 0.35rem; }
+.genesis-floors button { border: 0; background: rgb(0 71 171 / 0.18); color: var(--color-ash); padding: 0.32rem 0.6rem; border-radius: 0.45rem; font-size: 0.72rem; }
+.genesis-floors button.on { background: rgb(0 71 171 / 0.5); color: var(--color-uranium); }
+.genesis-blurb { margin: 0 0 0.5rem; color: var(--color-steel); font-size: 0.78rem; }
+.genesis-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.45rem; }
+.genesis-card { display: flex; flex-direction: column; gap: 0.25rem; text-align: left; border: 1px solid rgb(0 71 171 / 0.4); background: rgb(5 5 6 / 0.4); color: var(--color-ash); padding: 0.55rem 0.6rem; border-radius: 0.65rem; }
+.genesis-card strong { color: var(--color-uranium); font-weight: 500; font-size: 0.82rem; }
+.genesis-card span { color: var(--color-ice); font-size: 0.68rem; }
+.genesis-tools { margin-top: 0.7rem; }
+.genesis-tools p { margin: 0 0 0.35rem; color: var(--color-uranium); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.genesis-tools ul { margin: 0; padding: 0; list-style: none; }
+.genesis-tools li { display: flex; gap: 0.5rem; font-size: 0.75rem; color: var(--color-ash); }
+.genesis-tools b { min-width: 4.2rem; color: var(--color-ice); font-weight: 500; }
+.genesis-pills { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.genesis-pills button { border: 0; background: rgb(0 71 171 / 0.2); color: var(--color-ash); padding: 0.28rem 0.55rem; border-radius: 999px; font-size: 0.7rem; }
+.genesis-pills button.on { background: rgb(0 71 171 / 0.55); color: var(--color-uranium); }
+.genesis-go { margin-top: 0.5rem; border: 0; background: rgb(0 71 171 / 0.45); color: var(--color-uranium); padding: 0.45rem 0.8rem; border-radius: 0.5rem; }
+.genesis-note { color: var(--color-steel); font-size: 0.75rem; }
+.genesis-look { margin-top: auto; display: flex; align-items: center; gap: 0.4rem; padding-top: 0.45rem; color: var(--color-steel); font-size: 0.7rem; }
+
+@media (max-width: 720px) {
+  .hx-work { grid-template-columns: 1fr; }
+  .hx-crew { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:not(.feel-motion) *, html:not(.feel-motion) *::before, html:not(.feel-motion) *::after {
     animation-duration: 0.01ms !important;

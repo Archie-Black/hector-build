@@ -194,10 +194,24 @@ export function Portal() {
               </div>
             ) : null}
             {t === "Friends" ? (
-              <a className="portal-fly portal-item" href={CHARTER.doomchat} target="_blank" rel="noreferrer">
-                <img src="/horsemen/icons/doomchat.png" alt="" />
-                DooMChaT
-              </a>
+              <div className="portal-fly">
+                <a className="portal-item" href={CHARTER.doomchat} target="_blank" rel="noreferrer">
+                  <img src="/horsemen/icons/doomchat.png" alt="" />
+                  DooMChaT
+                </a>
+                <a className="portal-item" href={CHARTER.www} target="_blank" rel="noreferrer">
+                  <img src="/horsemen/icons/doomchat.png" alt="" />
+                  www.doomchat.ca
+                </a>
+                <a className="portal-item" href={CHARTER.downloads} target="_blank" rel="noreferrer">
+                  <img src="/horsemen/icons/doomchat.png" alt="" />
+                  Downloads
+                </a>
+                <a className="portal-item" href={CHARTER.community} target="_blank" rel="noreferrer">
+                  <img src="/horsemen/icons/doomchat.png" alt="" />
+                  Community
+                </a>
+              </div>
             ) : null}
             {t === "Forge" ? (
               <div className="portal-fly">
