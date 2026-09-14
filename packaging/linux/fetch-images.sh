@@ -28,4 +28,7 @@ pull hector-build.tar.gz
 pull spectral-hx.tar.gz
 pull osv01d.iso
 pull osv01d.img.xz
+pull Godot_v4.7-stable_linux.x86_64.zip
+pull UnrealEditor-Linux.tar.xz
+pull vscodium-linux-x64.tar.gz
 echo "downloads in $DEST ($ok files). community: $URL/community/"

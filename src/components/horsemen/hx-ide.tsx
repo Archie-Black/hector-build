@@ -64,6 +64,16 @@ export function HxIde() {
       const a = accel({ amd: true, nvidia: true });
       setLog((xs) => xs.concat({ who: "hx", text: `${a.note} ${a.cc.join(" + ")}.` }));
     }
+    if (job.run === "codium") {
+      void fetch("/api/v1/v01d/hx", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ act: "codium", file, body: buf }),
+      })
+        .then((r) => r.json())
+        .then((j: { note?: string }) => setTerm((xs) => [...xs.slice(-24), j.note || "codium"]))
+        .catch(() => undefined);
+    }
     const text = extra || job.say;
     const n = job.jersey ?? Math.min(9, 1 + Math.floor(text.length / 24));
     const id = Date.now();
@@ -143,6 +153,9 @@ export function HxIde() {
             </button>
             <button type="button" onClick={() => void hx("git", { cmd: "status" })}>
               Git
+            </button>
+            <button type="button" onClick={() => void hx("codium")}>
+              Codium
             </button>
           </div>
           <pre className="hx-term">{term.join("\n")}</pre>

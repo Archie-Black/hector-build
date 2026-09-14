@@ -1,11 +1,24 @@
-import { execFile } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { execFile, spawn } from "node:child_process";
+import { cpSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
 import { createFileRoute } from "@tanstack/react-router";
 
 const run = promisify(execFile);
+
+function codiumBin() {
+  const hits = [
+    process.env.CODIUM,
+    "/opt/vscodium/bin/codium",
+    join(process.env.HECTOR_PREFIX || "", "runtime/vscodium/bin/codium"),
+    join(homedir(), ".local/share/hector-build/runtime/vscodium/bin/codium"),
+    join(homedir(), ".local/bin/codium"),
+    "/usr/bin/codium",
+    "/usr/local/bin/codium",
+  ].filter(Boolean) as string[];
+  return hits.find((p) => existsSync(p)) || "";
+}
 
 function repo() {
   const cwd = process.cwd();
@@ -33,7 +46,7 @@ export const Route = createFileRoute("/api/v1/v01d/hx")({
         } catch {
           /* */
         }
-        return Response.json({ ok: true, git, home: desk() });
+        return Response.json({ ok: true, git, home: desk(), codium: codiumBin() || "" });
       },
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => ({}))) as {
@@ -63,6 +76,18 @@ export const Route = createFileRoute("/api/v1/v01d/hx")({
             const msg = err && typeof err === "object" && "stderr" in err ? String((err as { stderr?: string }).stderr || "") : "";
             return Response.json({ ok: false, note: msg.trim() || "git failed" }, { status: 422 });
           }
+        }
+        if (act === "codium") {
+          const bin = codiumBin();
+          if (!bin) return Response.json({ ok: false, note: "VSCodium is not on this machine yet. packaging/linux/install-vscodium.sh" }, { status: 424 });
+          const cwd = repo();
+          const vsSrc = join(cwd, "packaging/hx/codium/.vscode");
+          if (existsSync(vsSrc)) {
+            cpSync(vsSrc, join(cwd, ".vscode"), { recursive: true });
+            cpSync(vsSrc, join(home, ".vscode"), { recursive: true });
+          }
+          spawn(bin, [cwd, "--new-window"], { detached: true, stdio: "ignore" }).unref();
+          return Response.json({ ok: true, note: `Codium ${cwd}`, path: bin });
         }
         if (act === "run") {
           const name = (body.file || "program.ts").replace(/[^a-zA-Z0-9._/-]/g, "");

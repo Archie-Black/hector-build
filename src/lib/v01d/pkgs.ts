@@ -31,7 +31,7 @@ export const PACMAN: Record<string, string> = {
 };
 
 /** Not in extra. packaging/suite and packaging/forge fetch these. */
-export const FETCH = ["penpot", "comfyui", "unreal", "cardinal", "surge-xt", "vital"];
+export const FETCH = ["penpot", "comfyui", "unreal", "codium", "cardinal", "surge-xt", "vital"];
 
 export function pacmanOf(bin: string) {
   return PACMAN[bin];

@@ -43,11 +43,17 @@ arch-chroot "$ROOT" bash -lc "
   bash /usr/share/osv01d/packaging/arch/dual-core/install.sh || true
   bash /usr/share/osv01d/packaging/arch/programs/install.sh || true
   bash /usr/share/osv01d/packaging/linux/install-flavor.sh '$FLAVOR' || true
+  bash /usr/share/osv01d/native/horizon/scripts/install-godot.sh || true
+  bash /usr/share/osv01d/packaging/arch/install-ue.sh || true
+  bash /usr/share/osv01d/packaging/linux/install-vscodium.sh || true
+  bash /usr/share/osv01d/native/horizon/scripts/install-stack.sh || true
+  bash /usr/share/osv01d/native/horizon/scripts/warm-aesthetics.sh || true
   bash /usr/share/osv01d/packaging/linux/ghostwalk-default.sh || true
   bash /usr/share/osv01d/packaging/linux/fetch-images.sh || true
   bash /usr/share/osv01d/packaging/arch/tts/install_predictive_tts.sh || true
   ln -sfn /usr/share/osv01d/packaging/linux/osv01d.sh /usr/local/bin/osv01d
   ln -sfn /usr/share/osv01d/packaging/linux/hector-open /usr/local/bin/hector-open
+  ln -sfn /usr/share/osv01d/native/horizon/scripts/warm-aesthetics.sh /usr/local/bin/osv01d-aesthetics
   systemctl enable NetworkManager || true
   systemctl enable osv01d-cores.service || true
   systemctl enable osv01d-firmware.timer || true

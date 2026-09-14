@@ -25,6 +25,9 @@ ln -sf "$PREFIX/packaging/linux/osv01d.sh" "$HOME/.local/bin/osv01d"
 chmod +x "$PREFIX/packaging/linux/"*.sh "$PREFIX/packaging/linux/hector-open" "$PREFIX/native/horizon/scripts/"*.sh "$PREFIX/packaging/cloud/"*.sh "$PREFIX/packaging/forge/"*.sh "$PREFIX/packaging/suite/"*.sh "$PREFIX/packaging/linux/install-flavor.sh" "$PREFIX/packaging/arch/"*.sh "$PREFIX/packaging/arch/mkiso.sh" || true
 make -C "$PREFIX/native/horizon" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/linux/install-os-games.sh" "$PREFIX" || true
+HECTOR_PREFIX="$PREFIX" bash "$PREFIX/native/horizon/scripts/install-godot.sh" || true
+HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/arch/install-ue.sh" || true
+HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/linux/install-vscodium.sh" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/wsl/install.sh" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/asimov/install.sh" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/forge/install.sh" "$HOME/v01d/studio" || true
@@ -36,5 +39,8 @@ echo "Wayland session: native/v01d/wayland/session.sh"
 echo "Doctor: bash $PREFIX/packaging/linux/doctor.sh"
 echo "User card: $PREFIX/packaging/linux/USER.md"
 echo "ISO: bash $PREFIX/packaging/arch/mkiso.sh"
+echo "Godot: bash $PREFIX/native/horizon/scripts/install-godot.sh"
+echo "Unreal: bash $PREFIX/packaging/arch/install-ue.sh"
+echo "VSCodium: bash $PREFIX/packaging/linux/install-vscodium.sh"
 echo "Cloud fabric (VPS): sudo bash $PREFIX/packaging/cloud/bootstrap_cloud.sh"
 echo "Downloads: https://www.doomchat.ca/downloads/"

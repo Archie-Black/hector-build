@@ -75,6 +75,33 @@ export const IMAGES: Image[] = [
     url: MIRROR.community,
     local: `${MIRROR.punisher}\\community`,
   },
+  {
+    id: "godot",
+    name: "Godot 4.7",
+    blurb: "Desk void + Horizon. Official Linux editor.",
+    kind: "ide",
+    file: "Godot_v4.7-stable_linux.x86_64.zip",
+    url: at("Godot_v4.7-stable_linux.x86_64.zip"),
+    local: `${MIRROR.punisher}\\Godot_v4.7-stable_linux.x86_64.zip`,
+  },
+  {
+    id: "unreal",
+    name: "Unreal Editor",
+    blurb: "VoidDesktop + Spectral Horizon. Linux editor.",
+    kind: "ide",
+    file: "UnrealEditor-Linux.tar.xz",
+    url: at("UnrealEditor-Linux.tar.xz"),
+    local: `${MIRROR.punisher}\\UnrealEditor-Linux.tar.xz`,
+  },
+  {
+    id: "vscodium",
+    name: "VSCodium",
+    blurb: "Heavy editor for Spectral HX. Agent tasks included.",
+    kind: "ide",
+    file: "vscodium-linux-x64.tar.gz",
+    url: at("vscodium-linux-x64.tar.gz"),
+    local: `${MIRROR.punisher}\\vscodium-linux-x64.tar.gz`,
+  },
 ];
 
 export function image(id: string) {

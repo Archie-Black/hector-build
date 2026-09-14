@@ -136,14 +136,14 @@ const ApiV1V01dFirmwareRoute = ApiV1V01dFirmwareRouteImport.update({
   path: '/api/v1/v01d/firmware',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiV1V01dHxRoute = ApiV1V01dHxRouteImport.update({
-  id: '/api/v1/v01d/hx',
-  path: '/api/v1/v01d/hx',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiV1V01dFsRoute = ApiV1V01dFsRouteImport.update({
   id: '/api/v1/v01d/fs',
   path: '/api/v1/v01d/fs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1V01dHxRoute = ApiV1V01dHxRouteImport.update({
+  id: '/api/v1/v01d/hx',
+  path: '/api/v1/v01d/hx',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1V01dRunRoute = ApiV1V01dRunRouteImport.update({
@@ -510,18 +510,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1V01dFirmwareRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/v01d/hx': {
-      id: '/api/v1/v01d/hx'
-      path: '/api/v1/v01d/hx'
-      fullPath: '/api/v1/v01d/hx'
-      preLoaderRoute: typeof ApiV1V01dHxRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/v1/v01d/fs': {
       id: '/api/v1/v01d/fs'
       path: '/api/v1/v01d/fs'
       fullPath: '/api/v1/v01d/fs'
       preLoaderRoute: typeof ApiV1V01dFsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/v01d/hx': {
+      id: '/api/v1/v01d/hx'
+      path: '/api/v1/v01d/hx'
+      fullPath: '/api/v1/v01d/hx'
+      preLoaderRoute: typeof ApiV1V01dHxRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/v01d/run': {

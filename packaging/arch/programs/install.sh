@@ -38,6 +38,9 @@ wrap "ComfyUI" "/opt/osv01d/suite/engine/ComfyUI/main.py"
 wrap "vlc" "$(command -v vlc || echo /usr/bin/vlc)"
 wrap "notepad.exe" "$(command -v notepad || echo /usr/bin/wine)"
 wrap "MetaHuman" "/opt/unreal/Engine/Binaries/Linux/UnrealEditor"
+wrap "Godot" "$(command -v godot || echo /opt/godot/Godot)"
+wrap "Unreal Editor" "/opt/unreal/Engine/Binaries/Linux/UnrealEditor"
+wrap "VSCodium" "$(command -v codium || echo /opt/vscodium/bin/codium)"
 
 desk "GhostWalk" ghostwalk
 desk "GhostIT" notes

@@ -1,13 +1,14 @@
 /** OS V01D void desk. Ridley Scott open. 3D icon carousel. HAL + UE + Godot. */
 
 import { learn, reward } from "@/lib/hector/rl";
+import { LOOK } from "./aesthetics";
 import { bind } from "./hal";
 
 export const VOID = Object.freeze({
   wallpaper: "/horsemen/void.jpg",
   saved: "/horsemen/field-dawn.jpg",
-  ue: "native/horizon/UE/VoidDesktop/VoidDesktop.uproject",
-  godot: "native/horizon/Godot/void/project.godot",
+  ue: LOOK.ue.desk,
+  godot: LOOK.godot.desk,
   spin: 140,
   radius: 240,
 });

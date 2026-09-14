@@ -12,4 +12,8 @@ System is the stack at the bottom right: volume, spatial audio, brightness, type
 
 Downloads for Hector Build, Spectral HX, and the OS images live at https://www.doomchat.ca/downloads/ The house is https://www.doomchat.ca and the chat is https://y.doomchat.ca
 
+Spectral HX writes code. Codium is the heavy editor behind it. Ask Hector “open codium” or press Codium in Spectral HX. Ghosts run Typecheck, Test, Build, and Doctor as workspace tasks.
+
+Godot and Unreal Editor paint the desk and the games. They install with the OS. The look stays vanta, cobalt, uranium.
+
 This computer is free to use. It needs an API key if you want the cloud brain. Local still works without one.

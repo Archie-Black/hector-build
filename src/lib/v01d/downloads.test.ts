@@ -24,7 +24,9 @@ describe("doomchat downloads and packages", () => {
     expect(pkgs).toContain("krita");
     expect(pkgs).toContain("obs-studio");
     expect(pkgs).toContain("wine-staging");
-    expect(pkgs).toContain("fwupd");
+    expect(pkgs).toContain("godot");
+    expect(pkgs).toContain("blender");
+    expect(pkgs).not.toMatch(/^steam$/m);
     for (const name of Object.values(PACMAN)) {
       expect(pkgs).toContain(name);
     }

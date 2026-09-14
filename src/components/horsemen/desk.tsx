@@ -181,6 +181,20 @@ export function HorsemenDesk() {
         /* */
       }
     }
+    if (job.run === "godot") {
+      void fetch("/api/v1/hx/godot", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind: "void" }),
+      }).catch(() => undefined);
+    }
+    if (job.run === "ue") {
+      void fetch("/api/v1/hx/ue", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind: "void" }),
+      }).catch(() => undefined);
+    }
     if (job.app === "code") {
       try {
         sessionStorage.setItem("v01d.hx.task", JSON.stringify(job));

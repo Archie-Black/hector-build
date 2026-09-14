@@ -80,10 +80,9 @@ nyx
 helix
 libreoffice-fresh
 chrony
-steam
-lutris
 noto-fonts-emoji
 xdg-utils
-# aur later: cardinal surge-xt vital
-# steam/lutris: play flavor + multilib
+# Unreal Editor: packaging/arch/install-ue.sh (Epic / doomchat prebuild)
+# VSCodium: packaging/linux/install-vscodium.sh
+# steam/lutris: play flavor + [multilib], not the base ISO
 
