@@ -35,6 +35,7 @@ describe("archiso phase B", () => {
     expect(new Set(iso).size).toBe(iso.length);
     expect(iso.filter((n) => n === "syslinux")).toHaveLength(1);
 
+    const lists = [repo("packaging/arch/packages.x86_64"), repo("packaging/arch/archiso/packages.x86_64")];
     const files = [...walkSh(repo("packaging")), ...lists];
     const cr = files.filter((f) => readFileSync(f).includes("\r"));
     expect(cr).toEqual([]);
