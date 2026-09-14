@@ -45,8 +45,8 @@ export function HorsemenDesk() {
   const [heard, setHeard] = useState("");
   const [who, setWho] = useState<Profile | null>(null);
   const [ready, setReady] = useState(false);
-  const [overture, setOverture] = useState(() => !seenOpen());
-  const [mark, setMark] = useState(() => (seenOpen() ? parked() : opening(0)));
+  const [overture, setOverture] = useState(true);
+  const [mark, setMark] = useState(() => opening(0));
   const drag = useRef<{ id: string; dx: number; dy: number; kind: "move" | "resize"; lx: number; ly: number } | null>(null);
   const zTop = useRef(40);
 
@@ -72,6 +72,10 @@ export function HorsemenDesk() {
     warm();
     setWho(load());
     setReady(true);
+    if (seenOpen()) {
+      setMark(parked());
+      setOverture(false);
+    }
   }, []);
 
   useEffect(() => {
