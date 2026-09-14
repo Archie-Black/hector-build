@@ -1,10 +1,12 @@
 # Spectral HX · VSCodium
 
-VSCodium is the heavy editor Spectral HX launches. The desk chrome stays Spectral HX. Ghosts do not get a second IDE skin.
+VSCodium is the heavy editor Spectral HX launches. Hyper PBX is the switchboard. The desk chrome stays Spectral HX. Ghosts do not get a second IDE skin.
 
 Install: `bash packaging/linux/install-vscodium.sh` or `bash packaging/arch/install-vscodium.sh` (Arch calls the linux installer).
 
-Open from Spectral HX (Codium) or tell Hector “open codium”.
+Open from Spectral HX (Codium) or tell Hector “open codium”. Hyper PBX jobs: “open hyper pbx” or “open pbx console”. Those jobs launch `codium` on the **vscodium-swarm** via `hx-exec` (`packaging/hx/hx-exec.sh`).
+
+## Agent tools
 
 ## Agent tools
 
@@ -24,5 +26,7 @@ Workspace folder: `$HECTOR_PREFIX/v01d/hx` (or `~/v01d/hx`). Tasks and terminal 
 - Spectral HX — plain bash for the editor’s own jobs.
 
 Diplomat Core never emits a shell. Agents pick Machine Core.
+
+PBX Console in Programs is the same path. It is not a carousel icon.
 
 Downloads: https://www.doomchat.ca/downloads/

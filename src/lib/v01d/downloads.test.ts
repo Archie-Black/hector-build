@@ -13,6 +13,7 @@ describe("doomchat downloads and packages", () => {
     expect(MIRROR.y).toBe("https://y.doomchat.ca");
     expect(image("hector-build")?.url).toContain("www.doomchat.ca/downloads");
     expect(IMAGES.some((i) => i.id === "spectral-hx")).toBe(true);
+    expect(image("vscodium")?.url).toBe("https://www.doomchat.ca/downloads/vscodium-linux-x64.tar.gz");
     expect(fetchCmd("os-iso").join(" ")).toMatch(/osv01d\.iso/);
     expect(wantsDownloads("download the os image from doomchat")).toBe(true);
     expect(list("/v01d/home/Downloads").some((n) => n.name === "Hector Build")).toBe(true);

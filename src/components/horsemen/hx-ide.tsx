@@ -64,14 +64,15 @@ export function HxIde() {
       const a = accel({ amd: true, nvidia: true });
       setLog((xs) => xs.concat({ who: "hx", text: `${a.note} ${a.cc.join(" + ")}.` }));
     }
-    if (job.run === "codium") {
+    if (job.run === "codium" || job.run === "hx-exec" || job.run === "pbx" || job.run === "hive") {
+      const act = job.run === "codium" ? "codium" : "hx-exec";
       void fetch("/api/v1/v01d/hx", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ act: "codium", file, body: buf }),
+        body: JSON.stringify({ act, file, body: buf }),
       })
         .then((r) => r.json())
-        .then((j: { note?: string }) => setTerm((xs) => [...xs.slice(-24), j.note || "codium"]))
+        .then((j: { note?: string }) => setTerm((xs) => [...xs.slice(-24), j.note || "hx-exec"]))
         .catch(() => undefined);
     }
     const text = extra || job.say;
@@ -154,7 +155,7 @@ export function HxIde() {
             <button type="button" onClick={() => void hx("git", { cmd: "status" })}>
               Git
             </button>
-            <button type="button" onClick={() => void hx("codium")}>
+            <button type="button" onClick={() => void hx("hx-exec")}>
               Codium
             </button>
           </div>

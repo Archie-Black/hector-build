@@ -25,5 +25,5 @@ export function wantsCodium(text: string) {
 }
 
 export function sayCodium() {
-  return "Spectral HX. VSCodium is the heavy editor. Ghosts use workspace tasks and Machine Core terminals.";
+  return "Spectral HX. VSCodium is the heavy editor. Hyper PBX launches it on the vscodium-swarm. Ghosts use workspace tasks and Machine Core terminals.";
 }

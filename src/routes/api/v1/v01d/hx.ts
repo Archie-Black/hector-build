@@ -4,6 +4,8 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
 import { createFileRoute } from "@tanstack/react-router";
+import { hxExecLaunch } from "@/lib/v01d/hx-exec";
+import { PBX } from "@/lib/v01d/pbx-bridge";
 
 const run = promisify(execFile);
 
@@ -54,6 +56,7 @@ export const Route = createFileRoute("/api/v1/v01d/hx")({
           file?: string;
           body?: string;
           cmd?: string;
+          task?: string;
         };
         const act = body.act || "save";
         const home = desk();
@@ -77,7 +80,7 @@ export const Route = createFileRoute("/api/v1/v01d/hx")({
             return Response.json({ ok: false, note: msg.trim() || "git failed" }, { status: 422 });
           }
         }
-        if (act === "codium") {
+        if (act === "codium" || act === "hx-exec" || act === "pbx") {
           const bin = codiumBin();
           if (!bin) return Response.json({ ok: false, note: "VSCodium is not on this machine yet. packaging/linux/install-vscodium.sh" }, { status: 424 });
           const cwd = repo();
@@ -86,8 +89,17 @@ export const Route = createFileRoute("/api/v1/v01d/hx")({
             cpSync(vsSrc, join(cwd, ".vscode"), { recursive: true });
             cpSync(vsSrc, join(home, ".vscode"), { recursive: true });
           }
-          spawn(bin, [cwd, "--new-window"], { detached: true, stdio: "ignore" }).unref();
-          return Response.json({ ok: true, note: `Codium ${cwd}`, path: bin });
+          const launch = hxExecLaunch({ folder: cwd, task: body.task, lane: "codium" });
+          const args = launch.args.map((a) => (a === launch.folder ? cwd : a));
+          spawn(bin, args, { detached: true, stdio: "ignore", cwd }).unref();
+          return Response.json({
+            ok: true,
+            note: `${PBX.exec} ${PBX.swarm} ${cwd}`,
+            path: bin,
+            swarm: PBX.swarm,
+            exec: PBX.exec,
+            task: launch.task || "",
+          });
         }
         if (act === "run") {
           const name = (body.file || "program.ts").replace(/[^a-zA-Z0-9._/-]/g, "");

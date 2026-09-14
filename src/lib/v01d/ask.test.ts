@@ -66,6 +66,11 @@ describe("ask", () => {
     expect(ask("open vscodium").app).toBe("code");
     expect(ask("open vscodium").run).toBe("codium");
   });
+  it("routes Hyper PBX jobs through hx-exec", () => {
+    expect(ask("open hyper pbx").app).toBe("code");
+    expect(ask("open hyper pbx").run).toBe("hx-exec");
+    expect(ask("open pbx console").run).toBe("hx-exec");
+  });
   it("opens Godot and Unreal for the OS look", () => {
     expect(ask("open godot").app).toBe("portal");
     expect(ask("open godot").run).toBe("godot");

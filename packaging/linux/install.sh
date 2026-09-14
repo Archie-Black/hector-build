@@ -22,7 +22,7 @@ mkdir -p "$HOME/.local/share/applications" "$HOME/.local/bin"
 cp "$PREFIX/packaging/linux/osv01d.desktop" "$HOME/.local/share/applications/osv01d.desktop"
 sed -i "s|@PREFIX@|$PREFIX|g" "$HOME/.local/share/applications/osv01d.desktop" || true
 ln -sf "$PREFIX/packaging/linux/osv01d.sh" "$HOME/.local/bin/osv01d"
-chmod +x "$PREFIX/packaging/linux/"*.sh "$PREFIX/packaging/linux/hector-open" "$PREFIX/native/horizon/scripts/"*.sh "$PREFIX/packaging/cloud/"*.sh "$PREFIX/packaging/forge/"*.sh "$PREFIX/packaging/suite/"*.sh "$PREFIX/packaging/linux/install-flavor.sh" "$PREFIX/packaging/arch/"*.sh "$PREFIX/packaging/arch/mkiso.sh" || true
+chmod +x "$PREFIX/packaging/linux/"*.sh "$PREFIX/packaging/linux/hector-open" "$PREFIX/packaging/hx/"*.sh "$PREFIX/native/horizon/scripts/"*.sh "$PREFIX/packaging/cloud/"*.sh "$PREFIX/packaging/forge/"*.sh "$PREFIX/packaging/suite/"*.sh "$PREFIX/packaging/linux/install-flavor.sh" "$PREFIX/packaging/arch/"*.sh "$PREFIX/packaging/arch/mkiso.sh" || true
 make -C "$PREFIX/native/horizon" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/linux/install-os-games.sh" "$PREFIX" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/arch/install-godot.sh" || true
@@ -42,5 +42,6 @@ echo "ISO: bash $PREFIX/packaging/arch/mkiso.sh"
 echo "Godot: bash $PREFIX/packaging/arch/install-godot.sh"
 echo "Unreal: bash $PREFIX/packaging/arch/install-ue.sh"
 echo "VSCodium: bash $PREFIX/packaging/arch/install-vscodium.sh"
+echo "Hyper PBX: bash $PREFIX/packaging/hx/hx-exec.sh"
 echo "Cloud fabric (VPS): sudo bash $PREFIX/packaging/cloud/bootstrap_cloud.sh"
 echo "Downloads: https://www.doomchat.ca/downloads/"

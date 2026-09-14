@@ -41,6 +41,7 @@ import { sayJoin, wantsJoin } from "./weave";
 import { sayDownloads, wantsDownloads } from "./downloads";
 import { wantsEngines } from "./aesthetics";
 import { sayCodium, wantsCodium } from "./codium";
+import { sayPbx, wantsPbx } from "./pbx-bridge";
 
 export type Job = {
   app?: AppId;
@@ -79,6 +80,9 @@ function route(t: string, k: string): Job | null {
   }
   if (wantsDownloads(t)) {
     return { app: "files", run: "downloads", say: sayDownloads() };
+  }
+  if (wantsPbx(t)) {
+    return { app: "code", run: "hx-exec", say: sayPbx() };
   }
   if (wantsCodium(t)) {
     return { app: "code", run: "codium", say: sayCodium() };

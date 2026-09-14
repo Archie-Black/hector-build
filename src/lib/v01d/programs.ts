@@ -28,6 +28,7 @@ const EXTRA: Prog[] = [
   { name: "Godot", bin: "godot", linux: "/opt/godot/Godot", win: `${WIN}\\Godot.exe` },
   { name: "Unreal Editor", bin: "unreal", linux: "/opt/unreal/Engine/Binaries/Linux/UnrealEditor", win: `${WIN}\\UnrealEditor.exe` },
   { name: "VSCodium", bin: "codium", linux: "/opt/vscodium/bin/codium", win: `${WIN}\\VSCodium.exe`, app: "code" },
+  { name: "PBX Console", bin: "pbx", linux: `${ROOT}/PBXConsole`, win: `${WIN}\\PBXConsole.exe`, app: "code" },
 ];
 
 function nix(bin: string) {
@@ -36,6 +37,7 @@ function nix(bin: string) {
   if (bin === "unreal") return "/opt/unreal/Engine/Binaries/Linux/UnrealEditor";
   if (bin === "godot") return "/opt/godot/Godot";
   if (bin === "codium") return "/opt/vscodium/bin/codium";
+  if (bin === "pbx") return "/v01d/programs/PBXConsole";
   if (bin === "penpot") return "/opt/osv01d/suite/penpot.sh";
   if (bin === "surge-xt") return "/usr/bin/surge-xt";
   return `/usr/bin/${bin}`;
