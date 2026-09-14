@@ -20,6 +20,7 @@ install -d "$PROFILE/airootfs/usr/share/osv01d" \
 
 rsync -a --delete \
   --exclude node_modules --exclude .git --exclude artifacts --exclude dist --exclude vendor \
+  --exclude packaging/arch/archiso/airootfs \
   "$TREE"/ "$PROFILE/airootfs/usr/share/osv01d"/
 
 cp "$HERE/boot/syslinux.cfg" "$PROFILE/syslinux/syslinux.cfg"
