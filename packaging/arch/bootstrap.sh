@@ -43,7 +43,7 @@ arch-chroot "$ROOT" bash -lc "
   bash /usr/share/osv01d/packaging/arch/dual-core/install.sh || true
   bash /usr/share/osv01d/packaging/arch/programs/install.sh || true
   bash /usr/share/osv01d/packaging/linux/install-flavor.sh '$FLAVOR' || true
-  bash /usr/share/osv01d/native/horizon/scripts/install-godot.sh || true
+  bash /usr/share/osv01d/packaging/arch/install-godot.sh || true
   bash /usr/share/osv01d/packaging/arch/install-ue.sh || true
   bash /usr/share/osv01d/packaging/linux/install-vscodium.sh || true
   bash /usr/share/osv01d/native/horizon/scripts/install-stack.sh || true

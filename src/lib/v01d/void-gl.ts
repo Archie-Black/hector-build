@@ -1,4 +1,4 @@
-/** OS V01D field. WebGL2 nebula. One triangle. Uniforms cached. Texture once. */
+/** OS V01D field. WebGL2 compile of Godot nebula.gdshader / UE VoidNebula.usf. */
 
 export const VERT = `#version 300 es
 in vec2 a;

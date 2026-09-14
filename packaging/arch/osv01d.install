@@ -11,7 +11,7 @@ post_install() {
   echo "Downloads: https://www.doomchat.ca/downloads/"
   chmod +x /usr/share/osv01d/packaging/cloud/*.sh /usr/share/osv01d/packaging/linux/*.sh /usr/share/osv01d/packaging/linux/hector-open /usr/share/osv01d/packaging/arch/*.sh /usr/share/osv01d/native/horizon/scripts/*.sh 2>/dev/null || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/linux/install-os-games.sh /usr/share/osv01d || true
-  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/native/horizon/scripts/install-godot.sh || true
+  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-godot.sh || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-ue.sh || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/linux/install-vscodium.sh || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/programs/install.sh || true

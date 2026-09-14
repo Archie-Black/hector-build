@@ -55,7 +55,7 @@ package() {
   install -Dm755 "$root/packaging/arch/install-ue.sh" "$pkgdir/usr/bin/osv01d-unreal"
   install -Dm755 "$root/packaging/linux/install-vscodium.sh" "$pkgdir/usr/bin/osv01d-codium"
   install -Dm755 "$root/native/horizon/scripts/warm-aesthetics.sh" "$pkgdir/usr/bin/osv01d-aesthetics"
-  install -Dm755 "$root/native/horizon/scripts/install-godot.sh" "$pkgdir/usr/bin/osv01d-godot"
+  install -Dm755 "$root/packaging/arch/install-godot.sh" "$pkgdir/usr/bin/osv01d-godot"
 
   install -Dm644 "$root/packaging/linux/osv01d.desktop" "$pkgdir/usr/share/applications/osv01d.desktop"
   install -Dm644 "$root/native/v01d/wayland/osv01d.desktop" "$pkgdir/usr/share/wayland-sessions/osv01d.desktop"

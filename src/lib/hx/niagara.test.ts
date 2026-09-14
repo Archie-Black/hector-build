@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boot, publish, step } from "./niagara";
+import { boot, hxDrip, publish, step } from "./niagara";
 
 describe("niagara", () => {
   it("one channel, play is a burst not a spawn storm", () => {
@@ -11,5 +11,6 @@ describe("niagara", () => {
     c = step(c, 11);
     expect(c.q.length).toBeLessThan(64);
     expect(c.burst).toBeLessThan(1);
+    expect(hxDrip(0.5, 0.2, 1, 0.8)).toBeGreaterThanOrEqual(0);
   });
 });

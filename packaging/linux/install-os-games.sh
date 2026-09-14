@@ -22,7 +22,7 @@ elif command -v pacman >/dev/null; then
 fi
 
 bash "$ROOT/native/horizon/scripts/install-stack.sh" || echo "addon clone skipped"
-bash "$ROOT/native/horizon/scripts/install-godot.sh" || true
+bash "$ROOT/packaging/arch/install-godot.sh" || true
 bash "$ROOT/packaging/arch/install-ue.sh" || true
 bash "$ROOT/native/horizon/scripts/install-pds.sh" || true
 make -C "$ROOT/native/horizon" || true

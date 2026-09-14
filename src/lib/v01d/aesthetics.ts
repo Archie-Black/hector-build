@@ -26,12 +26,11 @@ export const LOOK = Object.freeze({
     install: "packaging/arch/install-ue.sh",
   },
   sfx: {
-    score: "src/lib/v01d/void-score.ts",
-    overture: "native/horizon/UE/VoidDesktop/Source/VoidOverture.cpp",
-    godot: "native/horizon/Godot",
+    godot: "native/horizon/Godot/void/score.gd",
+    ue: "native/horizon/UE/VoidDesktop/Source/VoidScore.h",
     duck: 0.06,
   },
-  field: "src/lib/v01d/void-gl.ts",
+  field: "native/horizon/Godot/void/nebula.gdshader",
 });
 
 export function deskProjects() {

@@ -1,5 +1,6 @@
-/** Eerie void score. Sparse. Slow. Not a theme song. */
+/** Eerie void score. Sparse. Slow. Hertz from Godot void/score.gd and UE VoidScore.h. */
 
+import { ENGINE_SFX } from "./engine-sfx";
 import { bus, unlock } from "./sound";
 import { SPEECH_AT } from "./overture";
 
@@ -10,7 +11,7 @@ function env(g: GainNode, ac: AudioContext, t: number, a: number, peak: number, 
   g.gain.linearRampToValueAtTime(0, t + a + hold + rel);
 }
 
-export const SCORE_DUCK = 0.06;
+export const SCORE_DUCK = ENGINE_SFX.duck;
 
 export function score() {
   unlock();
@@ -52,10 +53,10 @@ export function score() {
   };
 
   const t0 = ac.currentTime;
-  const bed = tone(36.7, "sine", 0.09, out);
-  const beat = tone(37.15, "sine", 0.07, out);
-  const fifth = tone(55.1, "triangle", 0.035, out);
-  const air = tone(622, "sine", 0.012, out);
+  const bed = tone(ENGINE_SFX.bed, "sine", 0.09, out);
+  const beat = tone(ENGINE_SFX.beat, "sine", 0.07, out);
+  const fifth = tone(ENGINE_SFX.fifth, "triangle", 0.035, out);
+  const air = tone(ENGINE_SFX.air, "sine", 0.012, out);
   bed.o.frequency.linearRampToValueAtTime(34.2, t0 + 40);
   beat.o.frequency.linearRampToValueAtTime(35.6, t0 + 40);
   const lfo = ac.createOscillator();
@@ -97,10 +98,10 @@ export function score() {
     o.stop(t0 + when + 5);
     nodes.push(o);
   };
-  bellAt(7.5, 196);
-  bellAt(18.2, 147);
-  bellAt(29.4, 220);
-  bellAt(41.0, 164.8);
+  bellAt(7.5, ENGINE_SFX.bell[0]);
+  bellAt(18.2, ENGINE_SFX.bell[1]);
+  bellAt(29.4, ENGINE_SFX.bell[2]);
+  bellAt(41.0, ENGINE_SFX.bell[3]);
 
   out.gain.setValueAtTime(0, t0);
   out.gain.linearRampToValueAtTime(0.9, t0 + 8);
