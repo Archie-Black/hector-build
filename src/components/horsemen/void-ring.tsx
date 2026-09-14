@@ -17,7 +17,7 @@ function slots(): Slot[] {
   desk.push({
     key: "doomchat",
     title: "DooMChaT",
-    blurb: "Your house. y.doomchat.ca",
+    blurb: "Your house. doomchat.ca · y.doomchat.ca",
     src: "/horsemen/icons/doomchat.png",
     href: "https://y.doomchat.ca",
   });

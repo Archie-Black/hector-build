@@ -15,6 +15,11 @@ export const CHARTER = Object.freeze({
   aether: "Spectral HX Aether. SN3D + B3 braid. Quality only improves.",
   fabric: "Traefik is the mouth. 10.13 is the blood. Postgres never faces the wire.",
   doomchat: "https://y.doomchat.ca",
+  house: "https://doomchat.ca",
+  www: "https://www.doomchat.ca",
+  downloads: "https://www.doomchat.ca/downloads/",
+  community: "https://www.doomchat.ca/downloads/community/",
+  mail: "Deltakingzero@doomchat.ca",
   text: "OS V01D helps humans run the future. Windows and Linux share this desk as if they were born here. Files from every system look native. Hector is your Jarvis: you ask, he does it. Tools are for defense. Offensive practice stays in the Range. If the intent is to hurt, the network does not carry it.",
 });
 

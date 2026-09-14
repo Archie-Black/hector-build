@@ -2,8 +2,19 @@
 
 Zero Trust. Stateless app. Timescale for state. Traefik is the only mouth.
 
-Domain: doomchat.ca · y.doomchat.ca · hx.doomchat.ca
+Domain: doomchat.ca · www.doomchat.ca · y.doomchat.ca · hx.doomchat.ca
+Downloads: https://www.doomchat.ca/downloads/
 Builder: DeltaKingZero · shareware, no rent
+
+Hector English ops (implemented by packaging/cloud, spoken on the desk):
+
+- "restart the website" → repair.sh
+- "scale the website" → orchestrate.sh scale
+- "backup the website" → backup.sh
+- "restore the website" → restore.sh
+- "replace website copies" → orchestrate.sh roll
+- "alert the website" → alerts API / prometheus
+
 
 ```
                     [ Internet ]

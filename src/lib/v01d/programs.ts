@@ -80,3 +80,11 @@ export function findProg(q: string) {
 export function folder() {
   return catalog().map((p) => ({ name: p.name, dir: false as const, run: p.linux, win: p.win }));
 }
+
+export function binFor(app: AppId) {
+  return catalog().find((p) => p.app === app);
+}
+
+export function bins() {
+  return catalog().map((p) => p.bin);
+}

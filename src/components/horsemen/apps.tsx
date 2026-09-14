@@ -143,7 +143,13 @@ function reply(t: string): string[] {
 }
 
 function Files({ start = "/v01d/home" }: { start?: string }) {
-  const [at, setAt] = useState(start);
+  const [at, setAt] = useState(() => {
+    try {
+      return sessionStorage.getItem("v01d.fs.at") || start;
+    } catch {
+      return start;
+    }
+  });
   const [items, setItems] = useState<{ name: string; dir: boolean; native: string; kind: string; path: string; run?: string }[]>([]);
   const [shares, setShares] = useState<{ name: string; unc: string; smb: string }[]>([]);
   const [q, setQ] = useState("");
@@ -192,7 +198,16 @@ function Files({ start = "/v01d/home" }: { start?: string }) {
                     headers: { "content-type": "application/json" },
                     body: JSON.stringify({ file: it.run || it.name, prompt: `open ${it.name}` }),
                   }).then(async (r) => {
-                    const j = (await r.json()) as { ok?: boolean; launch?: { note?: string } };
+                    const j = (await r.json()) as { ok?: boolean; launch?: { note?: string }; walk?: string };
+                    if (j.walk) {
+                      try {
+                        sessionStorage.setItem("v01d.walk", j.walk);
+                      } catch {
+                        /* */
+                      }
+                      window.dispatchEvent(new CustomEvent("v01d-walk", { detail: { q: j.walk } }));
+                      window.dispatchEvent(new CustomEvent("v01d-open", { detail: { app: "ghostwalk" } }));
+                    }
                     setHeard(j.launch?.note || (j.ok ? `Opening ${it.name}.` : "Stopped."));
                   });
                 }

@@ -2,6 +2,8 @@
 
 import { APPS, type AppId } from "@/lib/horsemen/layout";
 import { catalog } from "./programs";
+import { CHARTER } from "./charter";
+import { IMAGES } from "./downloads";
 
 export type Hit = {
   id: string;
@@ -38,8 +40,13 @@ export function systemHits(q: string): Hit[] {
     { id: "place:home", where: "system", title: "Home", blurb: "/v01d/home", app: "files" },
     { id: "place:programs", where: "system", title: "Programs", blurb: "/v01d/programs", app: "programs" },
     { id: "place:shared", where: "system", title: "Shared", blurb: "/v01d/shared", app: "files" },
+    { id: "place:downloads", where: "system", title: "Downloads", blurb: CHARTER.downloads, app: "files", url: CHARTER.downloads },
     { id: "place:settings", where: "system", title: "System", blurb: "Volume, spatial audio, brightness, type.", app: "settings" },
   ];
+  for (const img of IMAGES) {
+    const n = score(q, img.name, img.blurb, img.file, "doomchat", "download");
+    if (n) out.push({ n, hit: { id: `dl:${img.id}`, where: "system", title: img.name, blurb: img.url, app: "files", url: img.url, run: img.url } });
+  }
   for (const r of rooms) {
     const n = score(q, r.title, r.blurb);
     if (n) out.push({ n, hit: r });

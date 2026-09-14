@@ -38,6 +38,7 @@ import { sayHear, wantsHear } from "@/lib/hector/hear";
 import { sayDiagnose, wantsDiagnose } from "@/lib/hector/diagnose";
 import { sayBrain, wantsBrain } from "@/lib/hector/brain";
 import { sayJoin, wantsJoin } from "./weave";
+import { sayDownloads, wantsDownloads } from "./downloads";
 
 export type Job = {
   app?: AppId;
@@ -72,7 +73,13 @@ function route(t: string, k: string): Job | null {
     return { run: "site-mesh", say: "I'll write a WireGuard slot for the second box, then copy dumps when it answers." };
   }
   if (wantsAlerts(t)) {
-    return { run: "site-alerts", say: "I'll check website alerts." };
+    return { run: "site-alerts", say: "I'll check website alerts for doomchat.ca." };
+  }
+  if (wantsDownloads(t)) {
+    return { app: "files", run: "downloads", say: sayDownloads() };
+  }
+  if (/\b(spectral hx|write (a |me a )?(program|app)|open the ide|code this)\b/i.test(k) || /^open spectral/i.test(k)) {
+    return { app: "code", run: "hx", say: "Spectral HX. Tell me what to build. Ghosts take the work." };
   }
   if (wantsHive(t)) {
     const h = raise(t);

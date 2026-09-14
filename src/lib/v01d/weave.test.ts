@@ -13,6 +13,8 @@ describe("workspace weave", () => {
     expect(j.join?.order.length).toBe(3);
     expect(order()[0]).toMatch(/suite|code|portal/);
     expect(j.join?.note).toMatch(/join|wire|build/i);
+    expect(j.join?.files.some((f) => f.path.endsWith("/ORDER"))).toBe(true);
+    expect(j.join?.steps.length).toBe(3);
     expect(kindOf("code")).toBe("code");
   });
 });

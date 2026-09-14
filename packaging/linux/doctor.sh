@@ -5,6 +5,9 @@ ok=0
 need() {
   if [ -e "$1" ]; then echo "ok  $1"; else echo "MISSING  $1"; ok=1; fi
 }
+wait_for() {
+  if [ -e "$1" ]; then echo "ok  $1"; else echo "wait $2"; fi
+}
 need "$ROOT/packaging/linux/install.sh"
 need "$ROOT/packaging/linux/install-node22.sh"
 need "$ROOT/packaging/linux/serve-and-open.mjs"
@@ -85,7 +88,7 @@ need "$ROOT/packaging/asimov/install-rdna.sh"
 need "$ROOT/native/asimov/rdna/step.hip"
 need "$ROOT/packaging/asimov/install.sh"
 need "$ROOT/packaging/asimov/install-isaac.sh"
-need "$ROOT/vendor/isaac/IsaacSim/VERSION"
+wait_for "$ROOT/vendor/isaac/IsaacSim/VERSION" "isaac (fetch on GPU box — packaging/asimov/install-isaac.sh)"
 need "$ROOT/src/components/horsemen/asimov.tsx"
 need "$ROOT/packaging/wsl/hector-hook.sh"
 need "$ROOT/packaging/helix/helix.sh"
@@ -97,7 +100,18 @@ need "$ROOT/packaging/sentinel/install.sh"
 need "$ROOT/src/lib/hx/suite.ts"
 need "$ROOT/src/lib/hx/weights-repair.ts"
 need "$ROOT/packaging/suite/install.sh"
-need "$ROOT/packaging/suite/weights/ggml-tiny.bin"
+wait_for "$ROOT/packaging/suite/weights/ggml-tiny.bin" "whisper tiny (packaging/suite/fetch-weights.sh)"
+need "$ROOT/packaging/arch/bootstrap.sh"
+need "$ROOT/packaging/arch/install-live.sh"
+need "$ROOT/packaging/arch/mkiso.sh"
+need "$ROOT/packaging/arch/archiso/profiledef.sh"
+need "$ROOT/packaging/arch/archiso/efiboot/loader/loader.conf"
+need "$ROOT/packaging/linux/fetch-images.sh"
+need "$ROOT/packaging/linux/hector-open"
+need "$ROOT/packaging/linux/USER.md"
+need "$ROOT/src/lib/v01d/downloads.ts"
+need "$ROOT/src/lib/v01d/programs.ts"
+need "$ROOT/src/components/horsemen/hx-ide.tsx"
 command -v blender >/dev/null && echo "ok  blender" || echo "wait blender (OS install)"
 command -v godot >/dev/null && echo "ok  godot" || echo "wait godot (OS install)"
 command -v node >/dev/null && echo "ok  node $(node -v)" || echo "MISSING  node"

@@ -109,5 +109,5 @@ export function wantsMesh(text: string) {
 }
 
 export function wantsAlerts(text: string) {
-  return /\b(website alerts|what('| i)?s (down|firing)|any alerts)\b/i.test(text);
+  return /\b(website alerts|alert the (site|website|server)|what('| i)?s (down|firing)|any alerts)\b/i.test(text);
 }

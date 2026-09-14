@@ -55,5 +55,11 @@ describe("ask", () => {
     expect(ask("restore the website").run).toBe("site-restore");
     expect(ask("add a website peer").run).toBe("site-mesh");
     expect(ask("replace website copies").run).toBe("site-roll");
+    expect(ask("alert the website").run).toBe("site-alerts");
+  });
+  it("sends coding work to Spectral HX", () => {
+    expect(ask("open spectral hx").app).toBe("code");
+    expect(ask("write a program").app).toBe("code");
+    expect(ask("write a program").run).toBe("hx");
   });
 });

@@ -1,0 +1,7 @@
+[Unit]
+Description=OS V01D silent update at the chosen hour
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+[Install]
+WantedBy=timers.target

@@ -1,14 +1,30 @@
+import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { createFileRoute } from "@tanstack/react-router";
 import { readIntent } from "@/lib/v01d/intent";
 import { carry } from "@/lib/v01d/netguard";
 import { admit } from "@/lib/v01d/range";
 import { plan } from "@/lib/v01d/runtime";
+import { findProg } from "@/lib/v01d/programs";
+
+function fire(path: string, args: string[] = []) {
+  if (!path || path.startsWith("v01d://") || path.startsWith("http") || path.includes("wine-staging")) {
+    return false;
+  }
+  if (!existsSync(path)) return false;
+  try {
+    spawn(path, args, { detached: true, stdio: "ignore" }).unref();
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export const Route = createFileRoute("/api/v1/v01d/run")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json().catch(() => ({}))) as { file?: string; prompt?: string };
+        const body = (await request.json().catch(() => ({}))) as { file?: string; prompt?: string; args?: string[] };
         const file = body.file || "";
         const prompt = body.prompt || "";
         const intent = readIntent({ tool: file, prompt });
@@ -16,7 +32,19 @@ export const Route = createFileRoute("/api/v1/v01d/run")({
         if (intent.stance === "range") return Response.json({ ok: true, intent, range: admit(prompt) });
         const wire = carry({ to: "local", tool: file, prompt });
         if (!wire.ok) return Response.json({ ok: false, intent, wire }, { status: 403 });
-        return Response.json({ ok: true, intent, launch: plan(file), wire });
+        if (/^https?:\/\//i.test(file)) {
+          return Response.json({
+            ok: true,
+            intent,
+            walk: file,
+            launch: { ok: true, how: "ghostwalk", note: "Opening in GhostWalk.", path: file },
+            wire,
+          });
+        }
+        const launch = plan(file);
+        const prog = findProg(file);
+        const spawned = fire(launch.path, body.args || []) || (prog ? fire(prog.linux, body.args || []) : false);
+        return Response.json({ ok: true, intent, launch, spawned, wire });
       },
     },
   },

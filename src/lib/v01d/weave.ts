@@ -7,7 +7,9 @@ export type Dir = "in" | "out";
 export type Port = { id: string; dir: Dir; name: string; takes: string };
 export type Part = { id: string; desk: number; app: AppId; title: string; kind: Kind; ports: Port[] };
 export type Wire = { id: string; from: string; out: string; to: string; inn: string };
-export type Join = { at: number; order: string[]; note: string; missing: string[] };
+export type Step = { n: number; part: string; do: string; path: string };
+export type BuildFile = { path: string; body: string };
+export type Join = { at: number; order: string[]; note: string; missing: string[]; files: BuildFile[]; steps: Step[] };
 export type Weave = { parts: Part[]; wires: Wire[]; join: Join | null };
 
 const KEY = "v01d.weave";
@@ -172,15 +174,55 @@ export function missing(parts = live.parts, wires = live.wires) {
   return need;
 }
 
+function recipe(seq: string[], gap: string[], desks: number) {
+  const stamp = Date.now();
+  const root = `/v01d/builds/${stamp}`;
+  const titles = seq.map((id) => live.parts.find((p) => p.id === id)?.title).filter(Boolean) as string[];
+  const steps: Step[] = seq.map((id, i) => {
+    const p = live.parts.find((x) => x.id === id);
+    const title = p?.title || id;
+    const kind = p?.kind || "note";
+    const path = `${root}/${String(i + 1).padStart(2, "0")}-${kind}.md`;
+    const work =
+      kind === "code"
+        ? "Spectral HX compiles this part."
+        : kind === "art"
+          ? "Genesis HX drops art into assets."
+          : kind === "sound"
+            ? "Forge seals the bounce."
+            : kind === "play"
+              ? "Portal 00:13 plays the focused title."
+              : kind === "bot"
+                ? "Asimov 01 runs the body."
+                : kind === "web"
+                  ? "GhostWalk opens the page."
+                  : "Files land in the build folder.";
+    return { n: i + 1, part: title, do: work, path };
+  });
+  const orderBody = titles.map((t, i) => `${i + 1}. ${t}`).join("\n") || "empty";
+  const note = gap.length
+    ? `Hector wired ${live.wires.length} connector${live.wires.length === 1 ? "" : "s"} across ${desks} workspace${desks === 1 ? "" : "s"}. Still open: ${gap.join(". ")}.`
+    : `Hector joined ${live.parts.length} part${live.parts.length === 1 ? "" : "s"} on ${desks} workspace${desks === 1 ? "" : "s"} into one build. ${titles.join(" → ")}.`;
+  const files: BuildFile[] = [
+    { path: `${root}/ORDER`, body: `${orderBody}\n` },
+    {
+      path: `${root}/BUILD.md`,
+      body: `# One build\n\n${note}\n\n${steps.map((s) => `${s.n}. ${s.part} — ${s.do} (${s.path})`).join("\n")}\n`,
+    },
+    ...steps.map((s) => ({
+      path: s.path,
+      body: `# ${s.part}\n\n${s.do}\n`,
+    })),
+  ];
+  return { at: stamp, order: seq, note, missing: gap, files, steps };
+}
+
 export function joinBuild() {
   autoWire();
   const seq = order();
   const gap = missing();
   const desks = new Set(live.parts.map((p) => p.desk + 1)).size;
-  const note = gap.length
-    ? `Hector wired ${live.wires.length} connector${live.wires.length === 1 ? "" : "s"} across ${desks} workspace${desks === 1 ? "" : "s"}. Still open: ${gap.join(". ")}.`
-    : `Hector joined ${live.parts.length} part${live.parts.length === 1 ? "" : "s"} on ${desks} workspace${desks === 1 ? "" : "s"} into one build. ${seq.map((id) => live.parts.find((p) => p.id === id)?.title).filter(Boolean).join(" → ")}.`;
-  return saveWeave({ ...live, join: { at: Date.now(), order: seq, note, missing: gap } });
+  return saveWeave({ ...live, join: recipe(seq, gap, desks) });
 }
 
 export function seams() {
