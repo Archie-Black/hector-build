@@ -16,7 +16,9 @@ function names(file: string) {
 
 function walkSh(dir: string, acc: string[] = []) {
   for (const ent of readdirSync(dir, { withFileTypes: true })) {
+    if (ent.name === "airootfs" || ent.name === "node_modules") continue;
     const p = join(dir, ent.name);
+    if (ent.isSymbolicLink()) continue;
     if (ent.isDirectory()) walkSh(p, acc);
     else if (ent.name.endsWith(".sh")) acc.push(p);
   }
@@ -47,6 +49,7 @@ describe("archiso phase B", () => {
     expect(readFileSync(repo("packaging/arch/bootstrap.sh"), "utf8")).toContain("usage: bootstrap.sh /mnt");
     expect(readFileSync(repo("packaging/arch/bootstrap.sh"), "utf8")).toContain("pkg-list.sh");
     expect(readFileSync(repo("packaging/arch/mkiso.sh"), "utf8")).toContain("packaging/arch/archiso/airootfs");
+    expect(readFileSync(repo("packaging/arch/mkiso.sh"), "utf8")).toMatch(/rm -rf "\$DEST\/packaging\/arch\/archiso\/airootfs"/);
     expect(readFileSync(repo("packaging/arch/live-boot.sh"), "utf8")).toContain("firmware-first.sh");
     expect(existsSync(repo("packaging/arch/archiso/airootfs/etc/mkinitcpio.conf.d/archiso.conf"))).toBe(true);
     expect(readFileSync(repo("packaging/arch/osv01d-install.service"), "utf8")).toContain("live-boot.sh");

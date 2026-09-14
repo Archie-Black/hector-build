@@ -19,10 +19,22 @@ install -d "$PROFILE/airootfs/usr/share/osv01d" \
   "$PROFILE/efiboot/loader/entries" \
   "$PROFILE/grub"
 
-rsync -a --delete \
-  --exclude node_modules --exclude .git --exclude artifacts --exclude dist --exclude vendor \
-  --exclude packaging/arch/archiso/airootfs \
-  "$TREE"/ "$PROFILE/airootfs/usr/share/osv01d"/
+DEST="$PROFILE/airootfs/usr/share/osv01d"
+mkdir -p "$DEST"
+if command -v rsync >/dev/null; then
+  rsync -a --delete \
+    --exclude node_modules --exclude .git --exclude artifacts --exclude dist --exclude vendor \
+    --exclude runtime --exclude screenshots --exclude .vercel \
+    --exclude packaging/arch/archiso/airootfs \
+    "$TREE"/ "$DEST"/
+else
+  tar -C "$TREE" \
+    --exclude=node_modules --exclude=.git --exclude=artifacts --exclude=dist --exclude=vendor \
+    --exclude=runtime --exclude=screenshots --exclude=.vercel \
+    --exclude=packaging/arch/archiso/airootfs --exclude=./packaging/arch/archiso/airootfs \
+    -cf - . | tar -C "$DEST" -xf -
+fi
+rm -rf "$DEST/packaging/arch/archiso/airootfs"
 
 cp "$HERE/boot/syslinux.cfg" "$PROFILE/syslinux/syslinux.cfg"
 cp "$HERE/boot/grub.cfg" "$PROFILE/grub/grub.cfg"
