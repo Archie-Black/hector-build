@@ -53,7 +53,7 @@ package() {
   install -Dm755 "$root/packaging/arch/bootstrap.sh" "$pkgdir/usr/bin/osv01d-bootstrap"
   install -Dm755 "$root/packaging/arch/mkiso.sh" "$pkgdir/usr/bin/osv01d-mkiso"
   install -Dm755 "$root/packaging/arch/install-ue.sh" "$pkgdir/usr/bin/osv01d-unreal"
-  install -Dm755 "$root/packaging/linux/install-vscodium.sh" "$pkgdir/usr/bin/osv01d-codium"
+  install -Dm755 "$root/packaging/arch/install-vscodium.sh" "$pkgdir/usr/bin/osv01d-codium"
   install -Dm755 "$root/native/horizon/scripts/warm-aesthetics.sh" "$pkgdir/usr/bin/osv01d-aesthetics"
   install -Dm755 "$root/packaging/arch/install-godot.sh" "$pkgdir/usr/bin/osv01d-godot"
 

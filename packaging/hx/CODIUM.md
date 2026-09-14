@@ -2,7 +2,7 @@
 
 VSCodium is the heavy editor Spectral HX launches. The desk chrome stays Spectral HX. Ghosts do not get a second IDE skin.
 
-Install: `bash packaging/linux/install-vscodium.sh`
+Install: `bash packaging/linux/install-vscodium.sh` or `bash packaging/arch/install-vscodium.sh` (Arch calls the linux installer).
 
 Open from Spectral HX (Codium) or tell Hector “open codium”.
 

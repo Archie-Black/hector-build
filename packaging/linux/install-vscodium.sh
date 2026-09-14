@@ -68,6 +68,10 @@ fi
 mkdir -p "$HX/.vscode"
 if [ -d "$ROOT/packaging/hx/codium/.vscode" ]; then
   cp -a "$ROOT/packaging/hx/codium/.vscode/." "$HX/.vscode/"
+  if [ -d "$ROOT/.git" ]; then
+    mkdir -p "$ROOT/.vscode"
+    cp -a "$ROOT/packaging/hx/codium/.vscode/." "$ROOT/.vscode/"
+  fi
 fi
 echo "codium: ${BIN:-wait}"
 exit 0

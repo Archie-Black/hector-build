@@ -14,5 +14,6 @@
     }
   },
   "osv01d.spectralHx": true,
-  "osv01d.tasks": ["Typecheck", "Test", "Build", "Doctor", "ISO profile"]
+  "osv01d.tasks": ["Typecheck", "Test", "Build", "Doctor", "ISO profile"],
+  "osv01d.terminal": ["Machine Core", "Spectral HX"]
 }

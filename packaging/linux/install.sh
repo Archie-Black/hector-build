@@ -27,7 +27,7 @@ make -C "$PREFIX/native/horizon" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/linux/install-os-games.sh" "$PREFIX" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/arch/install-godot.sh" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/arch/install-ue.sh" || true
-HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/linux/install-vscodium.sh" || true
+HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/arch/install-vscodium.sh" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/wsl/install.sh" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/asimov/install.sh" || true
 HECTOR_PREFIX="$PREFIX" bash "$PREFIX/packaging/forge/install.sh" "$HOME/v01d/studio" || true
@@ -41,6 +41,6 @@ echo "User card: $PREFIX/packaging/linux/USER.md"
 echo "ISO: bash $PREFIX/packaging/arch/mkiso.sh"
 echo "Godot: bash $PREFIX/packaging/arch/install-godot.sh"
 echo "Unreal: bash $PREFIX/packaging/arch/install-ue.sh"
-echo "VSCodium: bash $PREFIX/packaging/linux/install-vscodium.sh"
+echo "VSCodium: bash $PREFIX/packaging/arch/install-vscodium.sh"
 echo "Cloud fabric (VPS): sudo bash $PREFIX/packaging/cloud/bootstrap_cloud.sh"
 echo "Downloads: https://www.doomchat.ca/downloads/"

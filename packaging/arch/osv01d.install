@@ -13,7 +13,7 @@ post_install() {
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/linux/install-os-games.sh /usr/share/osv01d || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-godot.sh || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-ue.sh || true
-  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/linux/install-vscodium.sh || true
+  HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/install-vscodium.sh || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/arch/programs/install.sh || true
   HECTOR_PREFIX=/usr/share/osv01d bash /usr/share/osv01d/packaging/linux/ghostwalk-default.sh || true
   ln -sfn /usr/share/osv01d/native/horizon/scripts/warm-aesthetics.sh /usr/local/bin/osv01d-aesthetics 2>/dev/null || true
