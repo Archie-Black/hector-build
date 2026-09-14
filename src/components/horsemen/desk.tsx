@@ -180,6 +180,7 @@ export function HorsemenDesk() {
       } catch {
         /* */
       }
+      void fetch("/api/v1/v01d/downloads", { method: "POST" }).catch(() => undefined);
     }
     if (job.run === "godot") {
       void fetch("/api/v1/hx/godot", {

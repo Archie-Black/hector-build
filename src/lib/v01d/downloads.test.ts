@@ -16,7 +16,10 @@ describe("doomchat downloads and packages", () => {
     expect(image("vscodium")?.url).toBe("https://www.doomchat.ca/downloads/vscodium-linux-x64.tar.gz");
     expect(fetchCmd("os-iso").join(" ")).toMatch(/osv01d\.iso/);
     expect(wantsDownloads("download the os image from doomchat")).toBe(true);
+    expect(wantsDownloads("download vscodium from doomchat")).toBe(true);
     expect(list("/v01d/home/Downloads").some((n) => n.name === "Hector Build")).toBe(true);
+    expect(list("/v01d/home/Downloads").some((n) => n.name === "VSCodium")).toBe(true);
+    expect(list("/v01d/home/Downloads").every((n) => String(n.native).includes("doomchat.ca"))).toBe(true);
   });
 
   it("lists every official bin in packages.x86_64", () => {

@@ -30,7 +30,7 @@ export type PbxJob = {
 };
 
 export function wantsPbx(text: string) {
-  return /\b(hyper pbx|pbx console|pbx job|vscodium[- ]swarm|hx-exec)\b/i.test(text);
+  return /\b(hyper pbx|pbx console|pbx job|vscodium[- ]swarm|hx-exec|pbx)\b/i.test(text);
 }
 
 export function pbxJob(text: string, extra: Partial<PbxJob> = {}): PbxJob {

@@ -1,11 +1,14 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { createFileRoute } from "@tanstack/react-router";
+import { hxExecCmd } from "@/lib/v01d/hx-exec";
 import { readIntent } from "@/lib/v01d/intent";
 import { carry } from "@/lib/v01d/netguard";
+import { PBX } from "@/lib/v01d/pbx-bridge";
+import { findProg } from "@/lib/v01d/programs";
 import { admit } from "@/lib/v01d/range";
 import { plan } from "@/lib/v01d/runtime";
-import { findProg } from "@/lib/v01d/programs";
 
 function fire(path: string, args: string[] = []) {
   if (!path || path.startsWith("v01d://") || path.startsWith("http") || path.includes("wine-staging")) {
@@ -14,6 +17,18 @@ function fire(path: string, args: string[] = []) {
   if (!existsSync(path)) return false;
   try {
     spawn(path, args, { detached: true, stdio: "ignore" }).unref();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function fireHx(folder: string) {
+  const cmd = hxExecCmd({ folder });
+  const script = join(process.cwd(), PBX.script);
+  if (!existsSync(script)) return false;
+  try {
+    spawn(cmd[0]!, [script, folder], { detached: true, stdio: "ignore" }).unref();
     return true;
   } catch {
     return false;
@@ -43,8 +58,19 @@ export const Route = createFileRoute("/api/v1/v01d/run")({
         }
         const launch = plan(file);
         const prog = findProg(file);
-        const spawned = fire(launch.path, body.args || []) || (prog ? fire(prog.linux, body.args || []) : false);
-        return Response.json({ ok: true, intent, launch, spawned, wire });
+        const pbx = Boolean(prog && (prog.bin === "codium" || prog.bin === "pbx"));
+        const spawned = pbx
+          ? fireHx(process.cwd()) || fire(prog!.linux, body.args || [])
+          : fire(launch.path, body.args || []) || (prog ? fire(prog.linux, body.args || []) : false);
+        return Response.json({
+          ok: true,
+          intent,
+          launch,
+          spawned,
+          wire,
+          swarm: pbx ? PBX.swarm : "",
+          exec: pbx ? PBX.exec : "",
+        });
       },
     },
   },

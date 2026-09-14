@@ -48,7 +48,7 @@ export const Route = createFileRoute("/api/v1/v01d/hx")({
         } catch {
           /* */
         }
-        return Response.json({ ok: true, git, home: desk(), codium: codiumBin() || "" });
+        return Response.json({ ok: true, git, home: desk(), codium: codiumBin() || "", swarm: PBX.swarm, exec: PBX.exec, pbx: PBX.console });
       },
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => ({}))) as {

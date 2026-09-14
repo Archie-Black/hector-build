@@ -14,6 +14,7 @@ describe("hyper pbx", () => {
     expect(PBX.downloads).toBe(CHARTER.downloads);
     expect(wantsPbx("open hyper pbx")).toBe(true);
     expect(wantsPbx("open pbx console")).toBe(true);
+    expect(wantsPbx("open pbx")).toBe(true);
     expect(sayPbx()).toMatch(/hx-exec/);
     expect(pbxJob("refactor the repository").lane).toBe("codium");
     expect(pbxJob("raise 40 agents").lane).toBe("swarm");

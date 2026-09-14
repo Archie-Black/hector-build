@@ -42,7 +42,7 @@ export const IMAGES: Image[] = [
   {
     id: "spectral-hx",
     name: "Spectral HX",
-    blurb: "Coding IDE. Ghosts. Git. Terminal. Opens when Hector delegates.",
+    blurb: "Coding IDE. Ghosts. Git. Terminal. VSCodium through Hyper PBX.",
     kind: "ide",
     file: "spectral-hx.tar.gz",
     url: at("spectral-hx.tar.gz"),
@@ -96,7 +96,7 @@ export const IMAGES: Image[] = [
   {
     id: "vscodium",
     name: "VSCodium",
-    blurb: "Heavy editor for Spectral HX. Agent tasks included.",
+    blurb: "Heavy editor for Spectral HX. Hyper PBX launches it on the vscodium-swarm.",
     kind: "ide",
     file: "vscodium-linux-x64.tar.gz",
     url: at("vscodium-linux-x64.tar.gz"),
@@ -114,9 +114,13 @@ export function fetchCmd(id: string) {
 }
 
 export function wantsDownloads(text: string) {
-  return /\b(download|iso|usb image|hector build|spectral hx image|os image|community downloads)\b/i.test(text) && /\b(doomchat|hector|os v01d|osv01d|www\.doomchat|image|iso|usb)\b/i.test(text);
+  if (/www\.doomchat\.ca\/downloads/i.test(text)) return true;
+  return (
+    /\b(download|iso|usb image|hector build|spectral hx image|os image|community downloads|vscodium)\b/i.test(text) &&
+    /\b(doomchat|hector|os v01d|osv01d|www\.doomchat|image|iso|usb|codium)\b/i.test(text)
+  );
 }
 
 export function sayDownloads() {
-  return `Downloads live at ${MIRROR.downloads} Same files on the Punisher mirror. Hector Build, Spectral HX, OS images.`;
+  return `Downloads live at ${MIRROR.downloads} Hector Build, Spectral HX, VSCodium, OS images. Same files on the Punisher mirror.`;
 }
