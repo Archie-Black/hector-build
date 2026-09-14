@@ -15,7 +15,7 @@ native/horizon/horizon.exe
 vendor/
 artifacts/
 attachments/
-.vscode/
+/.vscode/
 .grok/status
 packaging/suite/weights/*.bin
 packaging/suite/weights/*.safetensors

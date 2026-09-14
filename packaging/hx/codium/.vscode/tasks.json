@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Typecheck",
+      "type": "shell",
+      "command": "npx tsc --noEmit",
+      "group": "build",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "npx vitest run",
+      "group": "test"
+    },
+    {
+      "label": "Build",
+      "type": "shell",
+      "command": "npm run build",
+      "group": "build"
+    },
+    {
+      "label": "Doctor",
+      "type": "shell",
+      "command": "bash packaging/linux/doctor.sh"
+    },
+    {
+      "label": "ISO profile",
+      "type": "shell",
+      "command": "bash packaging/arch/mkiso.sh"
+    }
+  ]
+}
